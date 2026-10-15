@@ -124,18 +124,21 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .vak[style*="--mod"] .punten li::before{border-color:var(--mod)}
 .vak[style*="--mod"] h2{color:color-mix(in srgb,var(--mod) 35%,var(--tekst))}
 
-/* Kleedkamer licht: Rubik + lichte kaarten */
+/* Lichte pagina + petrolgroene kaarten (badgekleuren zoals in het petrol-palet) */
+[data-thema="kleedkamer"]{--bg:#E6EEEE;--tekst:#14302F;--zacht:#4E6566;--rand:#C9D8D8;--hl:#1F5A63;--accent:#1F5A63}
 [data-thema="kleedkamer"] body{font-family:Rubik,system-ui,sans-serif}
 [data-thema="kleedkamer"] .merk,[data-thema="kleedkamer"] .vak-kop h2,[data-thema="kleedkamer"] .deel b{font-stretch:100%}
 [data-thema="kleedkamer"] .vak-kop h2{font-size:17px;letter-spacing:.04em}
+[data-thema="kleedkamer"] .vak{
+  --kaart:#15393F;--rand:#24525A;--tekst:#F2EFE6;--zacht:#A3BCBF;--licht:#DCE8E9;
+  --accent:#F4C95D;--accent-d:#DDB042;--op-accent:#0E2A2F;--live:#79D6A5;--knoprand:#3E6A71;--hl:#F4C95D;
+  background:var(--kaart);border-color:var(--rand);color:var(--tekst);box-shadow:0 8px 22px rgba(14,42,47,.18)}
+[data-thema="kleedkamer"] a.vak:hover{box-shadow:0 14px 30px rgba(14,42,47,.26)}
 [data-thema="kleedkamer"] .vak.een h1{font-family:Rubik,system-ui,sans-serif;font-variation-settings:normal;font-weight:700}
 [data-thema="kleedkamer"] .vak.een h1 em{font-weight:700}
-[data-thema="kleedkamer"] .vak{box-shadow:0 1px 4px rgba(23,36,53,.06)}
-[data-thema="kleedkamer"] a.vak:hover{box-shadow:0 10px 26px rgba(23,36,53,.12)}
-[data-thema="kleedkamer"] a.vak[href="coach/"]{--mod:#D2563A}
-[data-thema="kleedkamer"] a.vak[href="training/"]{--mod:#1F8F6A}
-[data-thema="kleedkamer"] a.vak[href="playernation/"]{--mod:#7452D1}
-[data-thema="kleedkamer"] .vak[style*="--mod"] h2{color:var(--tekst)}
+[data-thema="kleedkamer"] .waarom{border-top-color:var(--rand)}
+[data-thema="kleedkamer"] .waarom a{color:#1F5A63}
+[data-thema="kleedkamer"] .voet{border-top-color:var(--rand)}
 </style>
 </head>
 <body>
