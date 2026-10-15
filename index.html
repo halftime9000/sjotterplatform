@@ -223,7 +223,6 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   .kopstatus,.vak.een .lint{font-size:15px!important}
   .vak.een .lint{font-size:12px!important}
   .vak.een h1{font-size:16.5px!important;line-height:1.2!important;margin:0!important}
-  .vak .intro,.vak .punten{display:none!important}
   .duo,.vak .duo{grid-template-columns:1fr 1fr!important;gap:7px!important;margin-top:2px!important}
   .deel{min-height:0!important;padding:6px 7px!important;gap:7px!important;border-radius:10px}
   .deel img{height:52px!important;padding:2px!important;border-radius:8px}
@@ -236,6 +235,36 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   .vak .duo:has(.deel.speler){grid-template-columns:1.35fr 1fr!important}
   .naast .status{font-size:18px!important}
   .waarom{grid-template-columns:1fr!important;gap:10px!important}
+}
+
+.tegel{display:none}
+/* Mobiel: 4 compacte tegels (titel + icoon); tik om te openen */
+@media (max-width:640px){
+  .vakken{grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-auto-rows:auto!important}
+  .vakken > .vak{grid-column:span 3}
+  .vakken:has(.vak.open) > .vak:not(.open){grid-column:span 2;min-height:118px}
+  .vakken:has(.vak.open) > .vak:not(.open) .tegel img{height:50px}
+  .vakken:has(.vak.open) > .vak:not(.open) .vak-kop h2{font-size:12px!important}
+  .vakken:has(.vak.open) > .vak:not(.open)::after,.vakken:has(.vak.open) > .vak:not(.open) .kopstatus,.vakken:has(.vak.open) > .vak:not(.open) .lint{display:none}
+  .vak:not(.open){cursor:pointer;justify-content:center;align-items:center;text-align:center;min-height:148px;gap:8px!important;padding:12px 8px!important}
+  .vak:not(.open) > :not(.vak-kop):not(.tegel){display:none!important}
+  .vak:not(.open) .vak-kop{flex-direction:column;align-items:center;gap:5px}
+  .vak:not(.open) .vak-kop h2{font-size:14px!important;line-height:1.15!important}
+  .vak:not(.open) .kopstatus,.vak:not(.open) .lint{margin:0!important;font-size:14px!important}
+  .vak:not(.open) .vak.een .lint{font-size:11px!important}
+  .vak:not(.open) .tegel{display:flex;gap:6px;justify-content:center;order:-1}
+  .vak:not(.open) .tegel img{height:72px;border-radius:10px;background:var(--tegel)}
+  .vak:not(.open)::after{content:'Tik voor meer';font-size:11px;color:var(--zacht);letter-spacing:.02em}
+  .vak.open{grid-column:1/-1!important;order:-1}
+  .vak.open .vak-kop{cursor:pointer}
+  .vak.open .vak-kop h2{flex:1}
+  .vak.open .kopstatus{margin-left:0!important}
+  .vakken:has(.vak.open) > .vak:not(.open){padding:10px 4px!important}
+  .vakken:has(.vak.open) > .vak:not(.open) .vak-kop h2{font-size:10.5px!important;overflow-wrap:anywhere;flex-wrap:wrap;justify-content:center;gap:2px 4px;letter-spacing:.01em!important}
+  .vakken:has(.vak.open) > .vak:not(.open) .vak-kop h2 .hand{width:1.2em;height:1.2em}
+  .vak.open .vak-kop::after{content:'✕';margin-left:10px;font-size:16px;color:var(--zacht);font-style:normal}
+  .vak.open .intro{display:block}
+  .vak.open .punten{display:flex}
 }
 </style>
 </head>
@@ -257,6 +286,7 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   <!-- 01 Oefenmatch & Tornooi -->
   <section class="vak een">
     <div class="vak-kop"><h2>Oefenmatch &amp; Tornooi</h2><span class="lint">Nu open</span></div>
+    <div class="tegel"><img src="assets/oefenmatch.png" alt=""><img src="assets/tornooi.png" alt=""></div>
     <h1>Nog geen <em>tegenstander</em>&nbsp;voor zaterdag of <em>tornooi</em>&nbsp;voor de paasvakantie?</h1>
     <div class="duo">
       <div class="deel">
@@ -273,6 +303,7 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   <!-- 02 Coach & Speler -->
   <section class="vak" style="--mod:#FF8A6B">
     <div class="vak-kop"><h2 class="duo-titel">Coach <svg class="hand" viewBox="0 0 24 24" aria-label="en" role="img" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg> Speler</h2><span class="status kopstatus">binnenkort</span></div>
+    <div class="tegel"><img src="assets/platform-k.png" alt=""></div>
     <p class="intro"><b class="slagzin">Je ploeg online!</b> Na elke match denken je spelers zelf na over wat er gebeurde.</p>
     <ul class="punten"><li>Ze begrijpen het verhaal van de match en leren meedenken</li><li>Verantwoordelijkheid: zichzelf en hun ploegmaats eerlijk beoordelen</li><li>De tegenstander leren kennen en lezen</li></ul>
     <div class="duo">
@@ -289,6 +320,7 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   <!-- 03 Training Hub -->
   <a class="vak" href="training/" style="--mod:#6FD6B0">
     <div class="vak-kop"><h2>Training Hub</h2><span class="status kopstatus">binnenkort</span></div>
+    <div class="tegel"><img src="assets/training-k.png" alt=""></div>
     <p class="intro">Je favoriete oefenvideo's per thema bewaard, plus een gedeelde bibliotheek van andere coaches.</p>
     <ul class="punten"><li>Links van YouTube, Instagram of TikTok</li><li>Opwarming, techniek, eindspel, keeper…</li><li>Zelf kiezen wat je deelt</li></ul>
     <div class="duo">
@@ -305,6 +337,7 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   <!-- 04 ThePlayerNation -->
   <a class="vak" href="playernation/" style="--mod:#B79CFF">
     <div class="vak-kop"><h2>ThePlayerNation</h2></div>
+    <div class="tegel"><img src="assets/playernation-k.png" alt=""></div>
     <p class="intro">Iets nieuws, speciaal voor spelers. Hoe het werkt vertellen we je binnenkort.</p>
     <div class="duo">
       <div class="deel">
@@ -339,6 +372,24 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   document.getElementById("jaar").textContent = new Date().getFullYear();
   var u = C.huidigeGebruiker && C.huidigeGebruiker();
   if (u && u.email) document.getElementById("organiseer").href = "tornooi/#/dashboard";
+})();
+
+// Mobiel: tegels openen/sluiten (één tegelijk)
+(function(){
+  var mob = window.matchMedia('(max-width:640px)');
+  document.querySelectorAll('.vak').forEach(function(v){
+    v.addEventListener('click', function(e){
+      if (!mob.matches) return;
+      if (!v.classList.contains('open')) {
+        e.preventDefault(); e.stopPropagation();
+        document.querySelectorAll('.vak.open').forEach(function(x){ x.classList.remove('open'); });
+        v.classList.add('open');
+        setTimeout(function(){ v.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, 30);
+      } else if (e.target.closest('.vak-kop')) {
+        e.preventDefault(); e.stopPropagation(); v.classList.remove('open');
+      }
+    }, true);
+  });
 })();
 </script>
 </body>
