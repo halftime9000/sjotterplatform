@@ -36,6 +36,10 @@ main{max-width:1000px;margin:0 auto;padding:6px 16px 60px}
 .raster > .blok{margin-top:0}
 .raster{display:grid;gap:14px}
 .raster.twee{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.raster.drie{grid-template-columns:repeat(3,minmax(0,1fr))}
+.blok.keuze{display:flex;flex-direction:column}
+.blok.keuze .sub{flex:1}
+.blok.keuze > .knop{align-self:flex-start}
 h1.titel{font-family:Fraunces,Georgia,serif;font-weight:600;font-variation-settings:"SOFT" 100,"opsz" 72;font-size:clamp(26px,4vw,36px);line-height:1.1;margin:10px 0 6px}
 h1.titel em{font-style:italic;color:var(--accent);font-weight:500}
 h2{font-weight:900;font-stretch:80%;text-transform:uppercase;letter-spacing:.03em;font-size:17px;margin:0 0 12px}
@@ -155,8 +159,9 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--zach
 
 .laden{color:var(--zacht);padding:30px 0;text-align:center}
 
+@media (max-width:900px){.raster.drie{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.raster.drie > .blok:first-child{grid-column:1/-1}}
 @media (max-width:700px){
-  .raster.twee,.velden{grid-template-columns:minmax(0,1fr)}
+  .raster.twee,.raster.drie,.velden{grid-template-columns:minmax(0,1fr)}
   .kop .rechts span{display:none}
   .module{display:none}
   .blok{padding:15px}
@@ -311,20 +316,20 @@ function vWelkom() {
   app().innerHTML = `
   <h1 class="titel">Je ploeg online, <em>samen</em> met je spelers.</h1>
   <p class="sub">Spelers vullen hun eigen profiel en voetbalfiche in, en na elke match beoordelen ze zichzelf, hun ploegmaats en de tegenstander. Jij ziet alles in één overzicht.</p>
-  <div class="blok" style="max-width:520px">
-    <h2>Al een account?</h2>
-    <p class="sub">Coach of speler: meld je aan en je komt meteen bij je ploeg.</p>
-    <a class="knop vol" href="#/login">Aanmelden</a>
-  </div>
-  <div class="raster twee" style="margin-top:14px">
-    <div class="blok">
+  <div class="raster drie">
+    <div class="blok keuze">
+      <h2>Al een account?</h2>
+      <p class="sub">Coach of speler: meld je aan en je komt meteen bij je ploeg.</p>
+      <a class="knop vol" href="#/login">Aanmelden</a>
+    </div>
+    <div class="blok keuze">
       <h2>Nieuwe coach</h2>
       <p class="sub">Maak gratis een account en daarna je ploeg.</p>
       <a class="knop" href="#/registreren">Account maken</a>
     </div>
-    <div class="blok">
+    <div class="blok keuze">
       <h2>Nieuwe speler</h2>
-      <p class="sub">Eerste keer? Vul de teamcode van je coach in. Dit moet maar één keer.</p>
+      <p class="sub">Eerste keer? Vul de teamcode van je coach in.</p>
       ${codeVeld("Verder")}
     </div>
   </div>`;
