@@ -325,6 +325,10 @@ h1.titel,.ploegkop .naam,.ploegkop .club,.ploegtegel .naam,h2,.evalsectie > h3,.
 .ploeglogo{width:76px!important;height:76px!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;border-radius:0!important;filter:drop-shadow(0 2px 4px rgba(14,42,47,.18))}
 .logovak img{padding:4px!important}
 @media (max-width:640px){.ploegtegel .embleem.met-logo{width:60px!important;height:60px!important}.ploeglogo{width:58px!important;height:58px!important}}
+/* Logo netjes binnen zijn vak; witte achtergrond van JPG-logo's valt weg (multiply) */
+.ploegtegel .embleem.met-logo{display:flex!important;align-items:center;justify-content:center;overflow:hidden!important}
+.ploegtegel .embleem.met-logo img,.ploeglogo{max-width:100%;max-height:100%;width:auto!important;height:auto!important;object-fit:contain;mix-blend-mode:multiply;filter:none!important}
+.ploeglogo{max-width:76px;max-height:76px}
 </style>
 </head>
 <body>
@@ -375,6 +379,31 @@ let toastTimer;
 function toast(msg, fout) {
   const t = $("#toast"); t.textContent = msg; t.className = "zicht" + (fout ? " fout" : "");
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = "", 2800);
+}
+function maakRandTransparant(c) {
+  // Witte (of bijna witte) achtergrond die aan de rand raakt wordt doorzichtig, daarna bijsnijden tot het logo.
+  const cx = c.getContext("2d"), W = c.width, H = c.height, im = cx.getImageData(0, 0, W, H), d = im.data;
+  const wit = i => d[i + 3] > 200 && d[i] > 232 && d[i + 1] > 232 && d[i + 2] > 232;
+  const hoeken = [0, (W - 1) * 4, (H - 1) * W * 4, ((H - 1) * W + W - 1) * 4];
+  if (hoeken.filter(wit).length >= 3) {
+    const gezien = new Uint8Array(W * H), stapel = [];
+    for (let x = 0; x < W; x++) { stapel.push(x, (H - 1) * W + x); }
+    for (let y = 0; y < H; y++) { stapel.push(y * W, y * W + W - 1); }
+    while (stapel.length) {
+      const p = stapel.pop(); if (gezien[p]) continue; gezien[p] = 1;
+      if (!wit(p * 4)) continue;
+      d[p * 4 + 3] = 0;
+      const x = p % W, y = (p / W) | 0;
+      if (x > 0) stapel.push(p - 1); if (x < W - 1) stapel.push(p + 1);
+      if (y > 0) stapel.push(p - W); if (y < H - 1) stapel.push(p + W);
+    }
+  }
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (d[(y * W + x) * 4 + 3] > 10) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  cx.putImageData(im, 0, 0);
+  if (x1 < 0) return;
+  const w = x1 - x0 + 1, h = y1 - y0 + 1, uit = cx.getImageData(x0, y0, w, h);
+  c.width = w; c.height = h; c.getContext("2d").putImageData(uit, 0, 0);
 }
 function logoFout(e) {
   if (/logo/.test((e && e.message) || "") && /column|kolom|schema/i.test(e.message)) return toast("Logo's zijn nog niet geactiveerd: voer sql/coach/002_logo.sql uit in Supabase.", true);
@@ -1593,7 +1622,8 @@ const A = window.A = {
       const img = await new Promise((ok, nok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => nok(new Error("Kan deze afbeelding niet lezen")); i.src = url; });
       const max = 320, sc = Math.min(1, max / Math.max(img.naturalWidth || max, img.naturalHeight || max));
       const c = document.createElement("canvas"); c.width = Math.max(1, Math.round((img.naturalWidth || max) * sc)); c.height = Math.max(1, Math.round((img.naturalHeight || max) * sc));
-      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      const cx = c.getContext("2d"); cx.drawImage(img, 0, 0, c.width, c.height);
+      maakRandTransparant(c);
       let data = c.toDataURL("image/png");
       if (data.length > 150000) data = c.toDataURL("image/webp", 0.85);
       if (data.length > 190000) return toast("Logo is te groot, probeer een kleinere afbeelding", true);
