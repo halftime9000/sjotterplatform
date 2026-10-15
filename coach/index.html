@@ -329,6 +329,9 @@ h1.titel,.ploegkop .naam,.ploegkop .club,.ploegtegel .naam,h2,.evalsectie > h3,.
 .ploegtegel .embleem.met-logo{display:flex!important;align-items:center;justify-content:center;overflow:hidden!important}
 .ploegtegel .embleem.met-logo img,.ploeglogo{max-width:100%;max-height:100%;width:auto!important;height:auto!important;object-fit:contain;mix-blend-mode:multiply;filter:none!important}
 .ploeglogo{max-width:76px;max-height:76px}
+.scorevak{display:flex;flex-direction:column;gap:3px;margin:0}
+.scorevak input{width:84px}
+.scorevak .klein{max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -828,11 +831,13 @@ function vWachten() {
 }
 
 function datumBlok(d) { const x = new Date(d + "T12:00"); return `<div class="datum"><b>${x.getDate()}</b><span class="klein">${MAANDEN[x.getMonth()].slice(0, 3)}</span></div>`; }
+// uitslag altijd als thuis–uit: bij een uitwedstrijd staat onze score als tweede
+const uitslag = (w, s) => w.thuis_uit === "uit" ? `${s.zij}-${s.wij}` : `${s.wij}-${s.zij}`;
 function scoreLabels(w) {
   return (P.ploeg.groepen || []).map(g => {
     const s = (w.scores || {})[g.id]; if (!s || s.wij == null || s.zij == null) return "";
     const res = s.wij > s.zij ? "groen" : s.wij < s.zij ? "oranje" : "geel";
-    return `<span class="label ${res}" title="${esc(g.naam)}">${(P.ploeg.groepen.length > 1 ? esc(g.naam.slice(0, 1)) + " " : "")}${s.wij}-${s.zij}</span>`;
+    return `<span class="label ${res}" title="${esc(g.naam)} · ${w.thuis_uit === "uit" ? "uit" : "thuis"}">${(P.ploeg.groepen.length > 1 ? esc(g.naam.slice(0, 1)) + " " : "")}${uitslag(w, s)}</span>`;
   }).join(" ");
 }
 const opgesteld = w => [...new Set(Object.values(w.opstelling || {}).flat())];
@@ -1166,16 +1171,17 @@ function cWedstrijdDetail(kop, wid) {
   const weg = new Set(actief.filter(s => ((P.profielen[s.id] || {}).afwezig || []).includes(w.datum)).map(s => s.id));
   const groepHtml = groepen.map(g => {
     const ids = opst[g.id] || [];
-    const sc = (w.scores || {})[g.id] || {};
+    const sc = (w.scores || {})[g.id] || {}, uitThuis = w.thuis_uit === "uit";
     return `<div class="groep" data-g="${esc(g.id)}">
       <h3><span class="stip" style="background:${esc(g.kleur || "#ccc")}"></span>${esc(g.naam)} <span class="klein teller-g" style="margin-left:auto">${ids.length}</span></h3>
       <div class="kies">${actief.map(s => {
         const aan = ids.includes(s.id), elders = !aan && ingedeeld.has(s.id);
         return `<button type="button" class="pill ${aan ? "aan" : ""} ${elders ? "elders" : ""} ${weg.has(s.id) ? "weg" : ""}" data-s="${s.id}" onclick="A.opstelKlik(this)">${esc(kortNaam(s))}${s.is_keeper ? " 🧤" : ""}</button>`;
       }).join("") || '<span class="klein">Voeg eerst spelers toe.</span>'}</div>
-      <div class="rij" style="margin-top:10px"><span class="klein">Uitslag</span>
-        <input type="number" min="0" max="99" class="sc-wij" value="${sc.wij ?? ""}" placeholder="wij" style="width:70px" aria-label="Doelpunten ${esc(g.naam)}">
-        <span>–</span><input type="number" min="0" max="99" class="sc-zij" value="${sc.zij ?? ""}" placeholder="zij" style="width:70px" aria-label="Doelpunten tegenstander"></div>
+      <div class="rij" style="margin-top:10px;align-items:flex-end"><span class="klein" style="align-self:center">Uitslag</span>
+        <label class="scorevak"><span class="klein">Thuis · ${esc(uitThuis ? w.tegenstander : P.ploeg.naam)}</span><input type="number" min="0" max="99" class="sc-thuis" value="${(uitThuis ? sc.zij : sc.wij) ?? ""}" placeholder="thuis" aria-label="Doelpunten thuisploeg"></label>
+        <span style="padding-bottom:10px">–</span>
+        <label class="scorevak"><span class="klein">Uit · ${esc(uitThuis ? P.ploeg.naam : w.tegenstander)}</span><input type="number" min="0" max="99" class="sc-uit" value="${(uitThuis ? sc.wij : sc.zij) ?? ""}" placeholder="uit" aria-label="Doelpunten uitploeg"></label></div>
     </div>`;
   }).join("");
   app().innerHTML = kop + `
@@ -1458,7 +1464,7 @@ async function sWedstrijd(kop, wid) {
     const ids = (w.opstelling || {})[gr.id] || [];
     if (!ids.length) return "";
     const sc = (w.scores || {})[gr.id];
-    return `<div class="groep"><h3><span class="stip" style="background:${esc(gr.kleur)}"></span>${esc(gr.naam)}${sc && sc.wij != null ? ` <span class="label" style="margin-left:auto">${sc.wij}-${sc.zij}</span>` : ""}</h3>
+    return `<div class="groep"><h3><span class="stip" style="background:${esc(gr.kleur)}"></span>${esc(gr.naam)}${sc && sc.wij != null ? ` <span class="label" style="margin-left:auto">${uitslag(w, sc)}</span>` : ""}</h3>
     <div class="kies">${ids.map(id => `<span class="pill ${id === ik.id ? "aan" : ""}">${esc(kortNaam(P.spelerMap[id]))}</span>`).join("")}</div></div>`;
   }).join("");
   app().innerHTML = kop + `
@@ -1592,8 +1598,10 @@ const A = window.A = {
     const opstelling = {}, scores = {};
     document.querySelectorAll("#opst .groep").forEach(g => {
       opstelling[g.dataset.g] = [...g.querySelectorAll(".pill.aan")].map(b => b.dataset.s);
-      const wij = g.querySelector(".sc-wij").value, zij = g.querySelector(".sc-zij").value;
-      if (wij !== "" && zij !== "") scores[g.dataset.g] = { wij: Number(wij), zij: Number(zij) };
+      // invoer volgt thuis – uit; opgeslagen als wij/zij (bij een uitwedstrijd is de tweede score de onze)
+      const th = g.querySelector(".sc-thuis").value, ui = g.querySelector(".sc-uit").value;
+      const uitW = ((P.wedstrijden.find(x => x.id === wid) || {}).thuis_uit) === "uit";
+      if (th !== "" && ui !== "") scores[g.dataset.g] = uitW ? { wij: Number(ui), zij: Number(th) } : { wij: Number(th), zij: Number(ui) };
     });
     try {
       await q(sb.from("cs_wedstrijden").update({ opstelling, scores, eval_open: $("#evalopen").checked }).eq("id", wid));
