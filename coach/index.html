@@ -38,6 +38,13 @@ main{max-width:1000px;margin:0 auto;padding:6px 16px 60px}
 .raster.twee{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .raster.drie{grid-template-columns:repeat(3,minmax(0,1fr))}
 .blok.keuze{display:flex;flex-direction:column}
+.uitleg{margin:40px calc(50% - 50vw) -60px;padding:40px 16px 48px;background:#F2EEE4;color:#0E2A2F}
+.uitleg-in{max-width:968px;margin:0 auto}
+.uitleg .klein{color:#4D6265}
+.uitleg a{color:#C2512F}
+.uitleg .stappen > div{border-top-color:#D5CDBC}
+.uitleg .blok{box-shadow:0 10px 30px rgba(14,42,47,.18);color:var(--tekst)}
+.uitleg .blok .klein{color:var(--zacht)}
 .stappen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .stappen > div{border-top:2px solid var(--rand);padding-top:12px}
 .stappen b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--op-accent);font-weight:900;margin-bottom:8px}
@@ -344,7 +351,8 @@ function vWelkom() {
     </div>
   </div>
 
-  <h2 style="margin:34px 0 12px">Zo werkt het</h2>
+  <section class="uitleg"><div class="uitleg-in">
+  <h2 style="margin:0 0 14px">Zo werkt het</h2>
   <div class="stappen">
     <div><b>1</b><h3>Ploeg aanmaken</h3><p class="klein">Categorie, seizoen, formaat en groepen (bv. Blauw en Geel).</p></div>
     <div><b>2</b><h3>Code delen</h3><p class="klein">Spelers maken een account met jouw teamcode, jij keurt goed.</p></div>
@@ -378,7 +386,8 @@ function vWelkom() {
       </div>
     </div>
   </div>
-  <p class="klein" style="text-align:center;margin-top:28px">Gratis voor elke coach · <a href="../">Andere Sjotter-tools</a></p>`;
+  <p class="klein" style="text-align:center;margin:28px 0 0">Gratis voor elke coach · <a href="../">Andere Sjotter-tools</a></p>
+  </div></section>`;
 }
 
 function vAuth(modus) {
