@@ -114,6 +114,11 @@ a.vak:hover{transform:translateY(-2px)}
   .inhoud{grid-template-columns:84px 1fr;gap:12px}
   .inhoud img{width:84px;padding:6px}
 }
+/* modulekleuren */
+a.vak[style*="--mod"]:hover{border-color:var(--mod)}
+.vak[style*="--mod"] .status{color:var(--mod)}
+.vak[style*="--mod"] .punten li::before{border-color:var(--mod)}
+.vak[style*="--mod"] h2{color:color-mix(in srgb,var(--mod) 35%,var(--tekst))}
 </style>
 </head>
 <body>
@@ -148,23 +153,23 @@ a.vak:hover{transform:translateY(-2px)}
   </section>
 
   <!-- 02 Coach & Speler -->
-  <a class="vak" href="coach/">
+  <a class="vak" href="coach/" style="--mod:#FF8A6B">
     <div class="vak-kop"><h2>Coach &amp; Speler</h2></div>
     <div class="inhoud">
-      <img src="assets/coach.png" alt="">
+      <img src="assets/coach-k.png" alt="">
       <div class="tekst">
-        <p>Je spelerslijst, wedstrijden en evaluaties bij elkaar. Jij kiest categorie, formaat en groepen.</p>
-        <ul class="punten"><li>Spelers en ouders uitnodigen met een code</li><li>Evaluaties na elke wedstrijd</li><li>Voor 5v5, 8v8 en 11v11</li></ul>
+        <p>Je ploeg online. Coach en spelers blijven in contact, en na elke match geven spelers zelf hun mening.</p>
+        <ul class="punten"><li>Rechtstreeks contact tussen coach en spelers</li><li>Spelers beoordelen zichzelf, hun ploegmaats en de match</li><li>Jij kiest categorie, formaat en groepen</li></ul>
         <span class="status">binnenkort</span>
       </div>
     </div>
   </a>
 
   <!-- 03 Training Hub -->
-  <a class="vak" href="training/">
+  <a class="vak" href="training/" style="--mod:#6FD6B0">
     <div class="vak-kop"><h2>Training Hub</h2></div>
     <div class="inhoud">
-      <img src="assets/training.png" alt="">
+      <img src="assets/training-k.png" alt="">
       <div class="tekst">
         <p>Je favoriete oefenvideo's per thema bewaard, plus een gedeelde bibliotheek van andere coaches.</p>
         <ul class="punten"><li>Links van YouTube, Instagram of TikTok</li><li>Opwarming, techniek, eindspel, keeper…</li><li>Zelf kiezen wat je deelt</li></ul>
@@ -174,10 +179,10 @@ a.vak:hover{transform:translateY(-2px)}
   </a>
 
   <!-- 04 ThePlayerNation -->
-  <a class="vak" href="playernation/">
+  <a class="vak" href="playernation/" style="--mod:#B79CFF">
     <div class="vak-kop"><h2>ThePlayerNation</h2></div>
     <div class="inhoud">
-      <img src="assets/playernation.png" alt="">
+      <img src="assets/playernation-k.png" alt="">
       <div class="tekst">
         <p>Iets nieuws, speciaal voor spelers. Hoe het werkt vertellen we je binnenkort.</p>
         <span class="status">wordt vervolgd</span>
