@@ -287,7 +287,6 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
 }
 @media (max-width:640px){
   .vakken:has(.vak.open){align-content:start;grid-auto-rows:auto!important}
-  .pagina:has(.vak.open){grid-template-rows:auto auto auto auto!important;align-content:start}
   .vakken:has(.vak.open) > .vak:not(.open){min-height:112px!important}
   .vakken:has(.vak.open) > .vak:not(.open) .vak-kop h2{font-size:9.5px!important;overflow-wrap:normal!important;letter-spacing:0!important}
   .vak .lint,.vak .kopstatus{display:none!important}
@@ -304,6 +303,86 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   .vakken:not(:has(.vak.open)) > .vak > .vak-kop{grid-row:3;min-height:3.6em;justify-content:flex-start}
   .vakken:not(:has(.vak.open)) .tegel img{height:clamp(70px,15svh,140px)!important;width:auto!important;max-width:100%}
   .vakken:not(:has(.vak.open)) .vak.een .tegel img{width:calc(50% - 3px)!important;height:auto!important}
+}
+@media (max-width:640px){
+  /* geopende tegel vult het scherm: groter, ruimer, geen lege zone onderaan */
+  .pagina:has(.vak.open){min-height:100vh;min-height:100svh;grid-template-rows:auto minmax(0,1fr) auto auto!important}
+  .vakken:has(.vak.open){grid-template-rows:auto minmax(0,1fr)!important;align-content:stretch!important}
+  .vakken:has(.vak.open) > .vak:not(.open){min-height:0!important;display:grid!important;grid-template-rows:1fr auto auto 1fr;justify-items:center}
+  .vakken:has(.vak.open) > .vak:not(.open) > .tegel{grid-row:2;order:0!important;height:clamp(50px,11svh,110px);align-items:flex-start!important}
+  .vakken:has(.vak.open) > .vak:not(.open) > .vak-kop{grid-row:3;min-height:3.4em}
+  .vakken:has(.vak.open) > .vak:not(.open) .tegel img{height:clamp(50px,11svh,110px)!important;width:auto!important;max-width:100%}
+  .vakken:has(.vak.open) > .vak.een:not(.open) .tegel img{width:calc(50% - 2px)!important;height:auto!important}
+  .vakken:has(.vak.open) > .vak:not(.open) .vak-kop h2{font-size:10.5px!important}
+  .vak.open{gap:12px!important;padding:16px 14px!important;justify-content:flex-start}
+  .vak.open .vak-kop h2{font-size:19px!important}
+  .vak.open.een h1{font-size:22px!important;line-height:1.2!important}
+  .vak.open .intro{font-size:15.5px!important;line-height:1.45}
+  .vak.open .punten{gap:7px!important}
+  .vak.open .punten li{font-size:14.5px!important;line-height:1.4!important}
+  .vak.open .duo{margin-top:6px!important;gap:9px!important}
+  .vak.open .deel{padding:10px 9px!important;gap:9px!important}
+  .vak.open .deel img{height:clamp(60px,10svh,90px)!important}
+  .vak.open .deel b{font-size:13px!important}
+  .vak.open .knoppen{gap:7px!important}
+  .vak.open .knoppen a,.vak.open .knop-uit,.vak.open .deel.speler button,.vak.open .deel.speler input{font-size:13.5px!important;padding:8px 4px!important}
+  .vak.open .deel{grid-template-columns:auto minmax(0,1fr)!important}
+  .vak.open .naast .status{font-size:22px!important}
+  .vak.open .deel small{display:block;font-size:12px}
+}
+@media (max-width:640px){
+  .vak.open .duo,.vak.open .duo:has(.deel.speler){grid-template-columns:1fr!important}
+  .vak.open .knoppen{display:grid!important;grid-template-columns:1fr 1fr;align-items:center}
+  .vak.open .knoppen b,.vak.open .knoppen small{grid-column:1/-1}
+  .vak.open .knoppen .knop-uit:only-of-type{grid-column:1/-1}
+  .vak.open .deel img{height:clamp(56px,9svh,80px)!important}
+  .vak.open .naast{align-self:center}
+  .vak.open .duo:has(.naast){grid-template-columns:1fr!important}
+}
+@media (max-width:640px){
+  /* kleine tegels onder een geopende tegel: enkel het icoon (dat draagt zelf de naam) */
+  .vakken:has(.vak.open) > .vak:not(.open) > .vak-kop{display:none!important}
+  .vakken:has(.vak.open) > .vak:not(.open){grid-template-rows:1fr auto 1fr!important;padding:8px 4px!important}
+  .vakken:has(.vak.open) > .vak:not(.open) > .tegel,.vakken:has(.vak.open) > .vak:not(.open) .tegel img{height:clamp(46px,10svh,110px)!important}
+}
+@media (max-width:640px) and (max-height:720px){
+  .vak.open{gap:9px!important;padding:13px 12px!important}
+  .vak.open.een h1{font-size:19px!important}
+  .vak.open .intro{font-size:14px!important}
+  .vak.open .punten li{font-size:13px!important}
+  .vak.open .punten{gap:4px!important}
+  .vak.open .deel{padding:7px 8px!important}
+  .vak.open .deel img{height:50px!important}
+  .vak.open .knoppen a,.vak.open .knop-uit,.vak.open .deel.speler button,.vak.open .deel.speler input{padding:6px 4px!important}
+}
+@media (max-width:640px){
+  /* geopende tegel krijgt de ruimte; inhoud gelijkmatig verdeeld; kleine tegels vaste hoogte */
+  .vakken:has(.vak.open){grid-template-rows:minmax(0,1fr) auto!important}
+  .vak.open{justify-content:flex-start!important;gap:clamp(8px,1.8svh,16px)!important}
+  .vak.open > .vak-kop{margin-bottom:clamp(0px,1.2svh,12px)}
+  .vak.open .duo{margin-top:auto!important}
+  .vak.open .vak-kop h2{font-size:clamp(17px,2.8svh,22px)!important}
+  .vak.open.een h1{font-size:clamp(19px,3.6svh,30px)!important}
+  .vak.open .intro{font-size:clamp(14px,2.2svh,18px)!important}
+  .vak.open .punten li{font-size:clamp(13px,2svh,16.5px)!important}
+  .vak.open .punten{gap:clamp(4px,1.1svh,10px)!important}
+  .vak.open .deel img{height:clamp(50px,10svh,96px)!important}
+  .vak.open .knoppen a,.vak.open .knop-uit,.vak.open .deel.speler button,.vak.open .deel.speler input{font-size:clamp(13px,1.9svh,15.5px)!important;padding:clamp(6px,1.2svh,11px) 4px!important}
+  .vakken:has(.vak.open) > .vak:not(.open){height:clamp(78px,13svh,120px)}
+  .vakken:has(.vak.open) > .vak:not(.open) > .tegel,.vakken:has(.vak.open) > .vak:not(.open) .tegel img{height:clamp(52px,9.5svh,96px)!important}
+  .vak.open .naast .status{font-size:26px!important}
+}
+@media (max-width:640px) and (max-height:680px){
+  .vakken:has(.vak.open) > .vak:not(.open){height:66px}
+  .vakken:has(.vak.open) > .vak:not(.open) > .tegel,.vakken:has(.vak.open) > .vak:not(.open) .tegel img{height:48px!important}
+  .vak.open .deel img{height:46px!important}
+}
+@media (max-width:640px){
+  .vak.open .knoppen{min-width:0}
+  .vak.open .knoppen > *{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .vak.open:has(.naast){justify-content:flex-start!important}
+  .vak.open:has(.naast) .intro{margin-bottom:auto}
+  .vak.open:has(.naast) .duo{margin-top:0!important}
 }
 </style>
 </head>
