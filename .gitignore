@@ -1,0 +1,4 @@
+# Exports en imports bevatten persoonsgegevens: nooit committen
+ksk-export*
+*.csv
+import*.sql

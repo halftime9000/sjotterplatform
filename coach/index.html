@@ -677,13 +677,18 @@ async function cOverzicht(kop) {
   const fiches = actief.filter(s => ficheIngevuld(P.profielen[s.id])).length;
   const spelerOpties = '<option value="">— nieuwe speler aanmaken —</option>' +
     actief.map(s => `<option value="${s.id}">${esc(naamVan(s))}${gekoppeld.has(s.id) ? " (heeft al een account)" : ""}</option>`).join("");
-  const aanvragen = wacht.map(l => `
+  const perEmail = {};
+  actief.forEach(s => { const m = ((P.profielen[s.id] || {}).ksk_email || "").toLowerCase(); if (m) perEmail[m] = s.id; });
+  const aanvragen = wacht.map(l => {
+    const match = perEmail[(l.email || "").toLowerCase()];
+    const opties = match ? spelerOpties.replace(`value="${match}"`, `value="${match}" selected`) : spelerOpties;
+    return `
     <div class="item" style="flex-wrap:wrap">
-      <div class="hoofd" style="min-width:180px"><b>${esc(l.naam || "?")}</b><span class="klein">${esc(l.email || "")}</span></div>
-      <select id="kop-${l.id}" style="width:auto;min-width:200px;flex:1" aria-label="Koppel aan speler">${spelerOpties}</select>
+      <div class="hoofd" style="min-width:180px"><b>${esc(l.naam || "?")}</b><span class="klein">${esc(l.email || "")}${match ? " · herkend uit KSK" : ""}</span></div>
+      <select id="kop-${l.id}" style="width:auto;min-width:200px;flex:1" aria-label="Koppel aan speler">${opties}</select>
       <button class="knop klein vol" onclick="A.goedkeuren('${l.id}')">Goedkeuren</button>
       <button class="knop klein gevaar" onclick="A.weigeren('${l.id}')">Weigeren</button>
-    </div>`).join("");
+    </div>`; }).join("");
   app().innerHTML = kop + `
   ${wacht.length ? `<div class="blok" style="margin-bottom:14px"><h2>Aanvragen <span class="label geel">${wacht.length}</span></h2>
     <p class="sub">Koppel elke aanvraag aan een speler uit je lijst, of laat een nieuwe speler aanmaken met de opgegeven naam.</p><div class="lijst">${aanvragen}</div></div>` : ""}
@@ -811,7 +816,9 @@ async function cSpelerDetail(kop, sid) {
   <div class="blok" style="margin-top:14px">
     <h2>Voetbalfiche van ${esc(s.voornaam)}</h2>
     ${ficheSamenvatting(data, s)}
-  </div>`;
+  </div>
+  ${data._ksk ? `<details class="blok" style="margin-top:14px"><summary style="cursor:pointer;font-weight:800">Originele gegevens uit het KSK-platform</summary>
+    <div class="tabelwrap" style="margin-top:10px"><table>${Object.entries(data._ksk).filter(([, v]) => v !== null && v !== "" && !(Array.isArray(v) && !v.length)).map(([k, v]) => `<tr><td class="klein">${esc(k)}</td><td style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(typeof v === "object" ? JSON.stringify(v) : v)}</td></tr>`).join("")}</table></div></details>` : ""}`;
   $("#spf").onsubmit = async e => {
     e.preventDefault(); const f = e.target;
     try {
@@ -934,7 +941,7 @@ function cWedstrijdDetail(kop, wid) {
 /* ---------- evaluaties (coach) ---------- */
 const EVAL_LABELS = {
   eigen_mentaliteit: "Mentaliteit", eigen_bplus: "Balbezit (B+)", eigen_bmin: "Balverlies (B−)", eigen_t1: "Omschakelen B+ → B−", eigen_t2: "Omschakelen B− → B+",
-  k_doellijn: "Doellijn en reflexen", k_1v1: "1 tegen 1 en uitkomen", k_communicatie: "Coachen en communiceren", k_opbouw: "Opbouw en uittrap",
+  k_doellijn: "Doellijn en reflexen", k_1v1: "1 tegen 1 en uitkomen", k_communicatie: "Coachen en communiceren", k_opbouw: "Opbouw en uittrap", k_uitstraling: "Uitstraling",
   team_mentaliteit: "Mentaliteit van de ploeg", team_samenspel: "Samenspel"
 };
 async function cEvaluaties(kop, wid) {
