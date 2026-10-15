@@ -157,6 +157,22 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .waarom p{font-size:13.5px;line-height:1.42}
 .voet{padding:5px 0 8px;font-size:13px}
 .voet .hand{font-size:20px}
+
+/* Kaart 1 rustiger kop, sterkere knoppen; kaart 2 badge op dezelfde lijn */
+.vak.een h1{font-size:clamp(19px,min(2vw,3.1vh),30px);line-height:1.15}
+.vak.een h1 em{padding-right:.08em}
+.duo{gap:10px}
+.deel{background:rgba(255,255,255,.04);border-color:#3A6870;padding:10px 12px;gap:14px;min-height:124px}
+.deel img{height:clamp(78px,11.2vh,118px)}
+.deel b{font-size:14px;color:#F2EFE6;letter-spacing:.05em}
+.knoppen{gap:7px!important}
+.knoppen a{font-size:14.5px;padding:8px 10px;border-color:#7FA3A8}
+.knoppen a:hover{border-color:#F2EFE6;background:rgba(255,255,255,.06)}
+.knoppen a.vol{box-shadow:0 2px 0 #B98F2A}
+.vak .intro{margin:0}
+.deel.platform{margin-top:auto;grid-template-columns:auto 1fr;align-items:center}
+.deel.platform .punten{gap:6px}
+.kopstatus{margin:0 0 0 auto!important;font-size:20px}
 @media (max-width:860px){.pagina{min-height:0;grid-template-rows:none}.vakken{grid-auto-rows:auto}.inhoud{grid-template-columns:86px 1fr}.vak p{font-size:14px}.punten li{font-size:13px}.deel img{height:70px}}
 </style>
 </head>
@@ -178,7 +194,7 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
   <!-- 01 Oefenmatch & Tornooi -->
   <section class="vak een">
     <div class="vak-kop"><h2>Oefenmatch &amp; Tornooi</h2><span class="lint">Nu open</span></div>
-    <h1>Nog geen <em>tegenstander</em> voor zaterdag of <em>tornooi</em> voor de paasvakantie?</h1>
+    <h1>Nog geen <em>tegenstander</em>&nbsp;voor zaterdag of <em>tornooi</em>&nbsp;voor de paasvakantie?</h1>
     <div class="duo">
       <div class="deel">
         <a href="tornooi/#/wedstrijden"><img src="assets/oefenmatch.png" alt="Club Friendlies"></a>
@@ -193,14 +209,11 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 
   <!-- 02 Coach & Speler -->
   <a class="vak" href="coach/" style="--mod:#FF8A6B">
-    <div class="vak-kop"><h2>Coach &amp; Speler</h2></div>
-    <div class="inhoud">
-      <img src="assets/coach-k.png" alt="">
-      <div class="tekst">
-        <p>Je ploeg online. Spelers vullen hun eigen fiche in en analyseren na elke match zichzelf, hun ploegmaats en de tegenstander.</p>
-        <ul class="punten"><li>Eigen profiel en voetbalfiche per speler</li><li>Evaluatie na elke match: zelf, ploegmaats en tegenstander</li><li>Jij kiest categorie, formaat en groepen</li></ul>
-        <span class="status">binnenkort</span>
-      </div>
+    <div class="vak-kop"><h2>Coach &amp; Speler</h2><span class="status kopstatus">binnenkort</span></div>
+    <p class="intro">Je ploeg online. Spelers vullen hun eigen fiche in en analyseren na elke match zichzelf, hun ploegmaats en de tegenstander.</p>
+    <div class="deel platform">
+      <img src="assets/coach-k.png" alt="Player Platform">
+      <ul class="punten"><li>Eigen profiel en voetbalfiche per speler</li><li>Evaluatie na elke match: zelf, ploegmaats en tegenstander</li><li>Jij kiest categorie, formaat en groepen</li></ul>
     </div>
   </a>
 
