@@ -623,11 +623,11 @@ async function cOverzicht(kop) {
   <div class="raster twee">
     <div class="blok">
       <h2>Spelers uitnodigen</h2>
-      <p class="sub">Deel deze teamcode of link met je spelers. Zij maken een account en jij keurt ze goed.</p>
+      <p class="sub">Deel deze teamcode met je spelers. Zij maken een account, vullen de code in en jij keurt ze goed.</p>
       <div class="code">${esc(P.ploeg.code)}</div>
       <div class="rij" style="margin-top:12px">
-        <button class="knop vol klein" onclick="A.kopieer(deelLink())">Link kopiëren</button>
-        <a class="knop klein" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Sluit aan bij " + P.ploeg.naam + " op Sjotter: " + deelLink())}">Delen via WhatsApp</a>
+        <button class="knop vol klein" onclick="A.kopieer(P.ploeg.code, 'Code gekopieerd')">Code kopiëren</button>
+        <a class="knop klein" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Sluit aan bij " + P.ploeg.naam + " op Sjotter. Teamcode: " + P.ploeg.code + "\n" + deelLink())}">Delen via WhatsApp</a>
       </div>
     </div>
     <div class="blok"><h2>Ploeg</h2>
@@ -1191,7 +1191,7 @@ async function bewaarFiche(melding) {
 }
 const A = window.A = {
   async uitloggen() { await sb.auth.signOut(); sessie = null; P = null; mijnLeden = []; sessionStorage.removeItem("cs_lijst"); ga("#/"); },
-  kopieer(t) { navigator.clipboard.writeText(t).then(() => toast("Link gekopieerd"), () => prompt("Kopieer deze link:", t)); },
+  kopieer(t, melding) { navigator.clipboard.writeText(t).then(() => toast(melding || "Gekopieerd"), () => prompt("Kopieer:", t)); },
   groepErbij() {
     const box = $("#groepen"), n = box.children.length;
     if (n >= 6) return toast("Maximaal 6 groepen", true);
