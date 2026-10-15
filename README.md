@@ -6,7 +6,7 @@ Eén repo, één Supabase-project (`equmwyvxbjjocwetwfcw`), meerdere modules:
 |---|---|---|
 | `/` | Hub (geen login). Stuurt oude `#/...`-links door naar `tornooi/` | ✅ |
 | `/tornooi/` | Oefenmatch & Tornooi (bestaande Sjotter) | ✅ |
-| `/coach/` | Coach & Speler (multi-team versie van het KSK-systeem) | 🚧 |
+| `/coach/` | Coach & Speler (multi-team versie van het KSK-systeem) | ✅ na SQL-migratie |
 | `/training/` | Training Hub (eigen + gedeelde links) | 🚧 |
 | `/playernation/` | ThePlayerNation | 🚧 |
 | `/shared/` | `config.js`, `sjotter.css` | ✅ |
@@ -23,3 +23,8 @@ Alle links zijn relatief, dus de site werkt zowel op `halftime9000.github.io/sjo
    - `https://sjotter.be/**`
 5. Overschakelen: verwijder het CNAME-bestand uit de oude repo. Zet daarna in deze repo onder Settings → Pages → Custom domain `sjotter.be` (dit maakt een CNAME-bestand aan). Zet Site URL in Supabase op `https://sjotter.be/tornooi/`.
 6. Rollback: zet het custom domain terug in de oude repo.
+
+## Coach & Speler activeren
+1. Supabase → SQL Editor → plak en voer `sql/coach/001_coach_speler.sql` uit (veilig om opnieuw uit te voeren).
+2. Alle tabellen beginnen met `cs_` en raken de tornooi-tabellen niet.
+3. Test op `/coach/`: account maken → ploeg aanmaken → teamcode delen → aanvraag goedkeuren.
