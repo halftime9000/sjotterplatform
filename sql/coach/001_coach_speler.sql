@@ -173,6 +173,12 @@ drop trigger if exists cs_ploeg_na_insert on public.cs_ploegen;
 create trigger cs_ploeg_na_insert after insert on public.cs_ploegen
   for each row execute function public.cs_ploeg_na_insert();
 
+-- Clublogo (klein, als data-URL). Zie ook 002_logo.sql voor bestaande installaties.
+alter table public.cs_ploegen add column if not exists logo text;
+alter table public.cs_ploegen drop constraint if exists cs_ploegen_logo_check;
+alter table public.cs_ploegen add constraint cs_ploegen_logo_check
+  check (logo is null or (logo like 'data:image/%' and char_length(logo) <= 200000));
+
 -- Eigenaar en code kunnen niet zomaar gewijzigd worden.
 create or replace function public.cs_ploeg_voor_update()
 returns trigger language plpgsql set search_path = public as $$
