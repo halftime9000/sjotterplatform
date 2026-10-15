@@ -168,6 +168,29 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--zach
 .bericht .wanneer{font-size:12px;color:var(--zacht)}
 .bericht p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
 
+
+/* Lichte, rustige stijl voor de evaluaties (leesbaar, niet vermoeiend) */
+.licht{--kaart:#FBF9F5;--kaart2:#FFFFFF;--rand:#E3DDD1;--tekst:#1F2A2C;--zacht:#6B7275;--licht:#2E3A3D;--accent:#E8714F;--accent-d:#D65F3D;--op-accent:#FFFFFF;--live:#2E7D4F;--geel:#9A6B00;color:var(--tekst)}
+.licht.blok,.licht .blok{background:var(--kaart);border-color:var(--rand)}
+.licht .scores button{background:#fff;border-color:#D9D2C4;color:#2E3A3D}
+.licht .scores button:hover:not(:disabled){border-color:#9C9384}
+.licht .scores button.aan{background:var(--accent);border-color:var(--accent);color:#fff}
+.licht .pill{background:#fff;border-color:#D9D2C4;color:#2E3A3D}
+.licht .pill.aan{background:var(--accent);border-color:var(--accent);color:#fff}
+.licht input,.licht select,.licht textarea{background:#fff;border-color:#D9D2C4;color:var(--tekst)}
+.licht .evalvraag{border-bottom-color:#E8E2D6}
+.licht .evalsectie > h3{color:#C2512F}
+.licht .knop{border-color:#C9C1B2;color:var(--tekst)}
+.licht .knop:hover{border-color:var(--tekst)}
+.licht .knop.vol{color:#fff}
+.licht .label{background:#F1ECE3;border-color:#DDD5C7;color:#5F666A}
+.licht .label.groen{color:#2E7D4F;border-color:#B9D8C3;background:#EEF7F0}
+.licht .label.geel{color:#8A5F00;border-color:#E6D3A3;background:#FBF4E2}
+.licht .label.oranje{color:#B5482A;border-color:#EDC3B4;background:#FCEFEA}
+.licht th{color:#7A7F82}
+.licht th,.licht td{border-bottom-color:#E8E2D6}
+.licht hr{border-top-color:#E3DDD1}
+.licht a{color:#C2512F}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140px);background:var(--tekst);color:var(--bg);font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .25s;z-index:50;max-width:calc(100% - 32px)}
 #toast.zicht{transform:translateX(-50%) translateY(0);visibility:visible}
 #toast:not(.zicht){visibility:hidden;transition:transform .25s,visibility 0s .25s}
@@ -979,6 +1002,7 @@ async function cEvaluaties(kop, wid) {
   window._evals = { evals, w };
   app().innerHTML = kop + `
   <a class="terug" href="#/p/${P.id}/wedstrijden/${w.id}">← ${esc(w.tegenstander)}</a>
+  <div class="licht">
   <div class="blok" style="margin-top:10px">
     <div class="rij tussen"><h2 style="margin:0">Evaluaties · ${esc(w.tegenstander)}</h2>
     <span class="klein">${evals.filter(e => e.ingediend).length} van ${ids.length} ingediend</span></div>
@@ -997,7 +1021,8 @@ async function cEvaluaties(kop, wid) {
       ${tegTekst.length ? "<hr>" + tegTekst.map(([id, a]) => `<p style="margin:0 0 8px"><span class="klein">${esc(kortNaam(P.spelerMap[id]))}:</span> ${a.teg_beste ? "beste speler: " + esc(a.teg_beste) : ""}${a.teg_beste && a.teg_extra ? " · " : ""}${esc(a.teg_extra || "")}</p>`).join("") : ""}
     </div>
   </div>
-  <div id="evaldetail"></div>`;
+  <div id="evaldetail"></div>
+  </div>`;
 }
 
 /* ---------- instellingen ---------- */
@@ -1224,7 +1249,7 @@ function evalFormulier(w, ik, g, ev, gesloten) {
   const sys = SYSTEMEN[P.ploeg.formaat] || [];
   const opties = sel => '<option value="">— kies —</option>' + iedereen.map(s => `<option value="${s.id}" ${sel === s.id ? "selected" : ""}>${esc(naamVan(s))}</option>`).join("");
   const status = gesloten ? '<span class="label">gesloten</span>' : ev && ev.ingediend ? '<span class="label groen">ingediend</span>' : ev ? '<span class="label geel">concept</span>' : "";
-  return `<form class="blok" id="evalform" data-w="${w.id}" onsubmit="return false">
+  return `<form class="blok licht" id="evalform" data-w="${w.id}" onsubmit="return false">
     <div class="rij tussen"><h2 style="margin:0">Mijn evaluatie</h2>${status}</div>
     ${uit && !gesloten ? `<p class="sub" style="margin:8px 0 0">✅ Evaluatie ingediend. <button type="button" class="knop klein" onclick="window._bewerk=true;route()">✏️ Bewerken</button></p>` : ""}
     ${gesloten ? '<p class="sub" style="margin:8px 0 0">De coach heeft de evaluaties voor deze wedstrijd gesloten.</p>' : ""}
