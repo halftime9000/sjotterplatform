@@ -1331,11 +1331,12 @@ const A = window.A = {
   toonEval(sid) {
     const { evals } = window._evals; const e = evals.find(x => x.speler_id === sid); if (!e) return;
     const a = e.antwoorden || {}, s = P.spelerMap[sid];
-    const rijen = Object.entries(EVAL_LABELS).filter(([k]) => a[k] != null).map(([k, t]) => `<tr><td>${t}</td><td><b>${esc(a[k])}</b></td><td>${esc(a[k + "_opm"] || "")}</td></tr>`).join("");
+    const rijen = Object.entries(EVAL_LABELS).filter(([k]) => a[k] != null || a[k + "_opm"]).map(([k, t]) => `<tr><td>${t}</td><td><b>${esc(a[k] ?? "–")}</b></td><td>${esc(a[k + "_opm"] || "")}</td></tr>`).join("");
     const gegeven = Object.entries(e.ratings || {}).map(([id, r]) => `${esc(kortNaam(P.spelerMap[id]))}: <b>${esc(r)}</b>`).join(" · ");
     $("#evaldetail").innerHTML = `<div class="blok" style="margin-top:14px"><div class="rij tussen"><h2 style="margin:0">Evaluatie van ${esc(naamVan(s))}</h2><button class="knop klein" onclick="this.closest('.blok').remove()">Sluiten</button></div>
       <div class="tabelwrap"><table><tr><th>Vraag</th><th>Score</th><th>Toelichting</th></tr>${rijen || '<tr><td colspan="3">Geen scores.</td></tr>'}</table></div>
       ${a.team_waarom ? `<p><span class="klein">Over de ploeg:</span> ${esc(a.team_waarom)}</p>` : ""}
+      ${[["wat_goed", "Wat ging goed"], ["wat_minder", "Wat ging minder"], ["hoe_verbeteren", "Hoe verbeteren"], ["analyse", "Analyse"]].filter(([k]) => a[k]).map(([k, t]) => `<p><span class="klein">${t}:</span> ${esc(a[k])}</p>`).join("")}
       ${a.teg_systeem || a.teg_beste || a.teg_extra ? `<p><span class="klein">Tegenstander:</span> ${esc(a.teg_systeem || "")}${a.teg_beste ? " · beste speler: " + esc(a.teg_beste) : ""}${a.teg_extra ? " · " + esc(a.teg_extra) : ""}</p>` : ""}
       ${gegeven ? `<p><span class="klein">Scores aan teamgenoten:</span> ${gegeven}</p>` : ""}
       <p class="klein">⭐ MOTM: ${e.motm ? esc(naamVan(P.spelerMap[e.motm])) : "–"}${P.ploeg.weak_link_aan ? " · 🔴 Weak link: " + (e.weak_link ? esc(naamVan(P.spelerMap[e.weak_link])) : "–") : ""}</p></div>`;

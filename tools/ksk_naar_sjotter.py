@@ -95,7 +95,10 @@ EVAL_MAP = [
     ("eigen_trans_bm_bp", "eigen_t2", True), ("eigen_trans_bm_bp_opmerking", "eigen_t2_opm", False),
     ("keeper_doellijn", "k_doellijn", True), ("keeper_1v1", "k_1v1", True),
     ("keeper_communicatie", "k_communicatie", True), ("keeper_uitstraling", "k_uitstraling", True),
-    ("keeper_opm", "k_opm", False),
+    ("keeper_doellijn_opm", "k_doellijn_opm", False), ("keeper_1v1_opm", "k_1v1_opm", False),
+    ("keeper_communicatie_opm", "k_communicatie_opm", False), ("keeper_uitstraling_opm", "k_uitstraling_opm", False),
+    ("wat_goed", "wat_goed", False), ("wat_minder", "wat_minder", False),
+    ("hoe_verbeteren", "hoe_verbeteren", False), ("analyse", "analyse", False),
     ("team_mentaliteit", "team_mentaliteit", True), ("team_samenspel", "team_samenspel", True),
     ("team_mentaliteit_waarom", "team_waarom", False),
     ("tegenstander_systeem", "teg_systeem", False), ("tegenstander_systeem_extra", "teg_extra", False),
@@ -133,9 +136,15 @@ def main():
     PID = uid("ploeg", "ksk-lovendegem")
     seizoenen = sorted({s.get("seizoen") for s in spelers if s.get("seizoen")})
     seizoen = seizoenen[-1] if seizoenen else "2026-27"
-    smap = {str(s["id"]): uid("speler", s["id"]) for s in spelers}
+    smap = {str(s["id"]): uid("speler", PID, s["id"]) for s in spelers}
     email_per = {str(r.get("speler_id")): r.get("email") for r in rollen if r.get("speler_id") and r.get("email")}
     keeper = {str(r.get("speler_id")) for r in rollen if r.get("speler_id") and str(r.get("role")) == "keeper"}
+    keeper |= {str(s["id"]) for s in spelers if str((s.get("data") or {}).get("is_keeper")).lower() in ("true", "1")}
+    trainer = {str(s["id"]) for s in spelers if str((s.get("data") or {}).get("is_trainer")).lower() in ("true", "1")}
+    trainer |= {str(r.get("speler_id")) for r in rollen if r.get("speler_id") and str(r.get("role")) in ("admin", "coach")}
+    # coach-account: opgegeven e-mail, anders de admin/coach-e-mails uit KSK
+    kandidaten = [e for e in [email] if e and e != "auto"] + [r.get("email") for r in rollen if str(r.get("role")) in ("admin", "coach") and r.get("email")]
+    kandidaten = list(dict.fromkeys(k.lower() for k in kandidaten))
 
     out = []
     w = out.append
@@ -154,8 +163,11 @@ revoke all on public.cs_import_archief from anon, authenticated;""")
     w(f"""do $import$
 declare v_coach uuid;
 begin
-  select id into v_coach from auth.users where lower(email) = lower({lit(email)});
-  if v_coach is null then raise exception 'Geen Sjotter-account gevonden voor %. Maak eerst een account op /coach/.', {lit(email)}; end if;
+  select u.id into v_coach from auth.users u
+    join unnest(array[{", ".join(lit(k) for k in kandidaten)}]::text[]) with ordinality k(mail, nr) on lower(u.email) = k.mail
+    order by k.nr limit 1;
+  if v_coach is null then raise exception 'Geen Sjotter-account gevonden voor: %. Maak eerst een coach-account op /coach/ met een van deze e-mailadressen.', {lit(", ".join(kandidaten))}; end if;
+  raise notice 'Ploeg wordt gekoppeld aan coach-account %', (select email from auth.users where id = v_coach);
   if exists (select 1 from public.cs_ploegen where id = {lit(PID)}) then raise exception 'Deze import is al uitgevoerd (ploeg bestaat al). Niets gewijzigd.'; end if;
   perform set_config('request.jwt.claim.sub', v_coach::text, true);
   perform set_config('request.jwt.claims', json_build_object('sub', v_coach)::text, true);""")
@@ -169,12 +181,12 @@ begin
         nr = d.get("rugnummer")
         nr = int(nr) if str(nr).isdigit() and 0 <= int(nr) <= 99 else None
         w(f"  insert into public.cs_spelers (id, ploeg_id, voornaam, naam, rugnummer, is_keeper, actief) values "
-          f"({lit(sid)}, {lit(PID)}, {lit((tekst(s.get('voornaam'), 60) or '?'))}, {lit(tekst(s.get('naam'), 60) or '')}, {lit(nr)}, {lit(str(s['id']) in keeper)}, true);")
+          f"({lit(sid)}, {lit(PID)}, {lit((tekst(s.get('voornaam'), 60) or '?'))}, {lit(tekst(s.get('naam'), 60) or '')}, {lit(nr)}, {lit(str(s['id']) in keeper)}, {lit(str(s['id']) not in trainer)});")
         w(f"  insert into public.cs_speler_profiel (speler_id, ploeg_id, data) values ({lit(sid)}, {lit(PID)}, {dq(profiel(d, email_per.get(str(s['id']))))});")
 
     wmap = {}
     for m in wedstrijden:
-        wid = uid("wedstrijd", m["id"]); wmap[str(m["id"])] = wid
+        wid = uid("wedstrijd", PID, m["id"]); wmap[str(m["id"])] = wid
         opst = {"blauw": [smap[i] for i in ids(m.get("blauw_spelers")) if i in smap],
                 "geel": [smap[i] for i in ids(m.get("geel_spelers")) if i in smap]}
         scores = {}
@@ -206,7 +218,7 @@ begin
             elif tekst(v): a[k] = tekst(v, 800)
         a["_ksk"] = e
         w(f"  insert into public.cs_evaluaties (wedstrijd_id, ploeg_id, speler_id, antwoorden, ratings, motm, weak_link, ingediend) values "
-          f"({lit(wid)}, {lit(PID)}, {lit(beo)}, {dq(a)}, {dq(ratings)}, {lit(motm)}, {lit(wl)}, {lit(bool(e.get('vergrendeld')))}) "
+          f"({lit(wid)}, {lit(PID)}, {lit(beo)}, {dq(a)}, {dq(ratings)}, {lit(motm)}, {lit(wl)}, {lit(bool(e.get('vergrendeld')) or bool(ratings) or any(k != '_ksk' for k in a))}) "
           f"on conflict (wedstrijd_id, speler_id) do nothing;")
 
     w(f"  raise notice 'Import klaar: % spelers, % wedstrijden, % evaluaties ({overgeslagen} zonder geldige speler/wedstrijd, wel in archief).', "
