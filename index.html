@@ -121,7 +121,7 @@ a.vak:hover{transform:translateY(-2px)}
 
   <!-- 01 Oefenmatch & Tornooi -->
   <section class="vak een">
-    <div class="vak-kop"><span class="nr">01</span><h2>Oefenmatch &amp; Tornooi</h2><span class="lint">Nu open</span></div>
+    <div class="vak-kop"><h2>Oefenmatch &amp; Tornooi</h2><span class="lint">Nu open</span></div>
     <h1>Nog geen <em>tegenstander</em> voor zaterdag of <em>tornooi</em> voor de paasvakantie?</h1>
     <div class="duo">
       <div class="deel">
@@ -129,15 +129,15 @@ a.vak:hover{transform:translateY(-2px)}
         <div class="knoppen"><b>Oefenmatch</b><a class="vol" href="tornooi/#/wedstrijden">Zoek</a><a href="tornooi/#/wedstrijden/plaatsen">Plaats</a></div>
       </div>
       <div class="deel">
-        <a href="tornooi/"><img src="assets/tornooi.png" alt="Club Tornooien"></a>
-        <div class="knoppen"><b>Tornooi</b><a class="vol" href="tornooi/">Bekijk</a><a href="tornooi/#/dashboard">Organiseer</a></div>
+        <a href="tornooi/#/toernooien"><img src="assets/tornooi.png" alt="Club Tornooien"></a>
+        <div class="knoppen"><b>Tornooi</b><a class="vol" href="tornooi/#/toernooien">Bekijk</a><a id="organiseer" href="tornooi/#/registreren">Organiseer</a></div>
       </div>
     </div>
   </section>
 
   <!-- 02 Coach & Speler -->
   <a class="vak" href="coach/">
-    <div class="vak-kop"><span class="nr">02</span><h2>Coach &amp; Speler</h2></div>
+    <div class="vak-kop"><h2>Coach &amp; Speler</h2></div>
     <div class="inhoud">
       <img src="assets/coach.png" alt="">
       <div class="tekst">
@@ -150,7 +150,7 @@ a.vak:hover{transform:translateY(-2px)}
 
   <!-- 03 Training Hub -->
   <a class="vak" href="training/">
-    <div class="vak-kop"><span class="nr">03</span><h2>Training Hub</h2></div>
+    <div class="vak-kop"><h2>Training Hub</h2></div>
     <div class="inhoud">
       <img src="assets/training.png" alt="">
       <div class="tekst">
@@ -163,7 +163,7 @@ a.vak:hover{transform:translateY(-2px)}
 
   <!-- 04 ThePlayerNation -->
   <a class="vak" href="playernation/">
-    <div class="vak-kop"><span class="nr">04</span><h2>ThePlayerNation</h2></div>
+    <div class="vak-kop"><h2>ThePlayerNation</h2></div>
     <div class="inhoud">
       <img src="assets/playernation.png" alt="">
       <div class="tekst">
@@ -195,6 +195,7 @@ a.vak:hover{transform:translateY(-2px)}
   m.textContent = C.CONTACT_EMAIL; m.href = "mailto:" + C.CONTACT_EMAIL;
   document.getElementById("jaar").textContent = new Date().getFullYear();
   var u = C.huidigeGebruiker && C.huidigeGebruiker();
+  if (u && u.email) document.getElementById("organiseer").href = "tornooi/#/dashboard";
   if (u && u.email) document.getElementById("wie").textContent = "hallo, " + u.email.split("@")[0] + "!";
 })();
 </script>
