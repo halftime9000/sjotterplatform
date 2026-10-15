@@ -2,3 +2,4 @@
 ksk-export*
 *.csv
 import*.sql
+__pycache__/
