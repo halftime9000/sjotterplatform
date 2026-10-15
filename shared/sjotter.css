@@ -1,24 +1,21 @@
 /* Gedeelde basisstijl voor Sjotter-modules */
 :root{
-  --groen:#14532D;--groen-d:#0D3B20;--gras:#22A05A;--geel:#F2C230;--hemel:#4E86E8;
-  --bg:#F4F6F2;--kaart:#fff;--tekst:#14211A;--zacht:#55635B;--lijn:#E2E7E0;
+  --papier:#F4EFE4;--papier-l:#FAF7F0;--inkt:#1C2620;--zacht:#5A5F55;
+  --gras:#2E6A3A;--gras-d:#1F4D2B;--geel:#F2C230;--hemel:#2C4F8C;--lijn:#D6CEBB;
+  /* oude namen, voor compatibiliteit */
+  --groen:#1F4D2B;--groen-d:#163A20;--bg:#F4EFE4;--kaart:#FAF7F0;--tekst:#1C2620;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--tekst);-webkit-font-smoothing:antialiased}
-a{color:var(--groen)}
-.sj-top{background:var(--groen-d);color:#fff}
-.sj-top-in{max-width:1080px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.sj-logo{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-family:Archivo,sans-serif;font-weight:900;font-size:22px;letter-spacing:-.01em}
-.sj-bal{width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 5px var(--groen-d),0 0 0 2px #fff}
-.sj-wie{font-size:13px;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
-.sj-voet{text-align:center;color:var(--zacht);font-size:14px;padding:24px 16px 40px;border-top:1px solid var(--lijn)}
-.sj-voet a{color:var(--zacht)}
-.sj-leeg{max-width:560px;margin:72px auto;padding:0 16px;text-align:center}
-.sj-leeg h1{font-family:Archivo,sans-serif;font-weight:900;font-size:34px;margin:12px 0}
-.sj-leeg p{color:var(--zacht);line-height:1.5}
-.sj-knop{display:inline-block;margin-top:16px;background:var(--groen);color:#fff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:12px}
-@media (prefers-color-scheme:dark){
-  :root{--bg:#0F1612;--kaart:#18221C;--tekst:#EAF1EC;--zacht:#A3B2A9;--lijn:#26332B}
-  a{color:#7FD3A0}
-}
+body{font-family:Archivo,system-ui,sans-serif;background:var(--papier);color:var(--inkt);-webkit-font-smoothing:antialiased}
+a{color:var(--gras-d)}
+.sj-top{border-bottom:1px solid var(--lijn)}
+.sj-top-in{max-width:1120px;margin:0 auto;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sj-logo{display:flex;align-items:center;gap:10px;color:var(--inkt);text-decoration:none;font-weight:900;font-size:22px;letter-spacing:-.02em;font-stretch:88%}
+.sj-bal{width:24px;height:24px;border-radius:50%;background:var(--papier);box-shadow:inset 0 0 0 6px var(--gras-d)}
+.sj-leeg{max-width:560px;margin:80px auto;padding:0 20px;text-align:left}
+.sj-leeg .hand{font-family:Caveat,cursive;font-size:26px;color:var(--gras-d);transform:rotate(-3deg);display:inline-block}
+.sj-leeg h1{font-weight:900;font-stretch:72%;text-transform:uppercase;font-size:56px;line-height:.92;margin:6px 0 16px}
+.sj-leeg p{color:var(--zacht);line-height:1.55;font-size:18px}
+.sj-knop{display:inline-block;margin-top:18px;border:2px solid var(--inkt);color:var(--inkt);text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px}
+.sj-knop:hover{box-shadow:4px 4px 0 var(--inkt);transform:translate(-2px,-2px)}
