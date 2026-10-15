@@ -38,6 +38,14 @@ main{max-width:1000px;margin:0 auto;padding:6px 16px 60px}
 .raster.twee{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .raster.drie{grid-template-columns:repeat(3,minmax(0,1fr))}
 .blok.keuze{display:flex;flex-direction:column}
+.stappen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stappen > div{border-top:2px solid var(--rand);padding-top:12px}
+.stappen b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--op-accent);font-weight:900;margin-bottom:8px}
+.stappen h3{margin:0 0 4px}
+.stappen p{margin:0}
+.voorbeeld .vb-kaart{margin-top:12px;background:var(--kaart2);border:1px solid var(--rand);border-radius:12px;padding:14px;pointer-events:none}
+.voorbeeld .vraag{font-weight:700;margin-bottom:8px}
+.vb-select{border:1px solid var(--rand);border-radius:10px;padding:9px 12px;color:var(--licht)}
 .blok.keuze .sub{flex:1}
 .blok.keuze > .knop{align-self:flex-start}
 h1.titel{font-family:Fraunces,Georgia,serif;font-weight:600;font-variation-settings:"SOFT" 100,"opsz" 72;font-size:clamp(26px,4vw,36px);line-height:1.1;margin:10px 0 6px}
@@ -154,14 +162,16 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--zach
 .bericht p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
 
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140px);background:var(--tekst);color:var(--bg);font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .25s;z-index:50;max-width:calc(100% - 32px)}
-#toast.zicht{transform:translateX(-50%) translateY(0)}
+#toast.zicht{transform:translateX(-50%) translateY(0);visibility:visible}
+#toast:not(.zicht){visibility:hidden;transition:transform .25s,visibility 0s .25s}
 #toast.fout{background:var(--fout);color:#2a0000}
 
 .laden{color:var(--zacht);padding:30px 0;text-align:center}
 
-@media (max-width:900px){.raster.drie{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.raster.drie > .blok:first-child{grid-column:1/-1}}
+@media (max-width:900px){.stappen{grid-template-columns:repeat(2,minmax(0,1fr))}.raster.drie{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.raster.drie > .blok:first-child{grid-column:1/-1}}
 @media (max-width:700px){
   .raster.twee,.raster.drie,.velden{grid-template-columns:minmax(0,1fr)}
+  .stappen{grid-template-columns:minmax(0,1fr)}
   .kop .rechts span{display:none}
   .module{display:none}
   .blok{padding:15px}
@@ -332,7 +342,43 @@ function vWelkom() {
       <p class="sub">Eerste keer? Vul de teamcode van je coach in.</p>
       ${codeVeld("Verder")}
     </div>
-  </div>`;
+  </div>
+
+  <h2 style="margin:34px 0 12px">Zo werkt het</h2>
+  <div class="stappen">
+    <div><b>1</b><h3>Ploeg aanmaken</h3><p class="klein">Categorie, seizoen, formaat en groepen (bv. Blauw en Geel).</p></div>
+    <div><b>2</b><h3>Code delen</h3><p class="klein">Spelers maken een account met jouw teamcode, jij keurt goed.</p></div>
+    <div><b>3</b><h3>Fiche invullen</h3><p class="klein">Elke speler vult profiel, sterke punten, werkpunten en doelen in.</p></div>
+    <div><b>4</b><h3>Na elke match</h3><p class="klein">Spelers beoordelen zichzelf, hun ploegmaats en de tegenstander.</p></div>
+  </div>
+
+  <div class="raster twee" style="margin-top:14px">
+    <div class="blok voorbeeld">
+      <span class="label groen">Wat spelers invullen</span>
+      <div class="vb-kaart">
+        <div class="vraag">Mentaliteit <span class="klein">inzet, doorzetten, positief blijven</span></div>
+        <div class="scores">${[1,2,3,4,5,6,7,8,9,10].map(n => `<button type="button" tabindex="-1" class="${n === 8 ? "aan" : ""}">${n}</button>`).join("")}</div>
+        <div class="vraag" style="margin-top:14px">Systeem tegenstander</div>
+        <div class="pills"><span class="pill aan">3-3-1</span><span class="pill">3-2-2</span><span class="pill">2-3-2</span></div>
+        <div class="vraag" style="margin-top:14px">⭐ Man of the Match</div>
+        <div class="vb-select">Lou Twee</div>
+      </div>
+    </div>
+    <div class="blok voorbeeld">
+      <span class="label oranje">Wat jij als coach ziet</span>
+      <div class="vb-kaart">
+        <table>
+          <tr><th>Speler</th><th>Ploegmaats</th><th>MOTM</th><th>Status</th></tr>
+          <tr><td><b>Lou T.</b></td><td><b>7.8</b></td><td>⭐ 4</td><td><span class="label groen">ingediend</span></td></tr>
+          <tr><td><b>Sam E.</b></td><td><b>7.2</b></td><td>⭐ 1</td><td><span class="label groen">ingediend</span></td></tr>
+          <tr><td><b>Ali V.</b></td><td><b>6.5</b></td><td></td><td><span class="label geel">concept</span></td></tr>
+          <tr><td><b>Mo D.</b></td><td><b>6.1</b></td><td></td><td><span class="label">nog niet</span></td></tr>
+        </table>
+        <p class="klein" style="margin:10px 0 0">Plus per speler: zelfbeoordeling, voetbalfiche en beschikbaarheid.</p>
+      </div>
+    </div>
+  </div>
+  <p class="klein" style="text-align:center;margin-top:28px">Gratis voor elke coach · <a href="../">Andere Sjotter-tools</a></p>`;
 }
 
 function vAuth(modus) {
