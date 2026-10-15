@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="nl-BE">
+<head>
+<meta charset="UTF-8">
+<script>
+// Oude Sjotter-links (#/p/slug, #/wedstrijden/..., #/tv/..., beheerlinks, wachtwoord-reset)
+// werken verder: elke hash-route gaat door naar de tornooi-module.
+(function () {
+  var h = location.hash || "";
+  if (h.indexOf("#/") === 0 || /access_token=|type=recovery|error_description=/.test(h)) {
+    location.replace("tornooi/" + location.search + h);
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sjotter</title>
+<meta name="description" content="Sjotter — gratis tools voor jeugdvoetbalcoaches in België: oefenwedstrijden en tornooien, spelersopvolging en trainingsoefeningen.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjE2IiBmaWxsPSIjMEQzQjIwIi8+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEwLjUiIGZpbGw9IiNmZmZmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSIxNiw5LjUgMjEuNCwxMy40IDE5LjQsMTkuNyAxMi42LDE5LjcgMTAuNiwxMy40IiBmaWxsPSIjMEQzQjIwIi8+Cjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/sjotter.css">
+<script src="shared/config.js"></script>
+<style>
+.hero{background:linear-gradient(155deg,rgba(13,59,32,.94),rgba(26,100,56,.90)),url('assets/foto-toernooi.jpg') center/cover no-repeat,var(--groen-d);color:#fff;padding:56px 16px 72px}
+.hero-in{max-width:1080px;margin:0 auto}
+.hero h1{font-family:Archivo,sans-serif;font-weight:900;font-size:clamp(34px,6vw,56px);line-height:1.02;margin:18px 0 12px;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--geel)}
+.hero p{font-size:18px;max-width:560px;opacity:.92;margin:0}
+.kaarten{max-width:1080px;margin:-44px auto 0;padding:0 16px 48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.kaart{background:var(--kaart);border-radius:18px;padding:22px;box-shadow:0 8px 28px rgba(0,0,0,.10);text-decoration:none;color:var(--tekst);display:flex;flex-direction:column;gap:10px;border-top:6px solid var(--k);transition:transform .15s,box-shadow .15s;min-height:220px}
+.kaart:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(0,0,0,.14)}
+.kaart .ico{font-size:30px}
+.kaart h2{font-family:Archivo,sans-serif;font-weight:800;font-size:21px;margin:0;line-height:1.15}
+.kaart h2 small{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--k);margin-bottom:4px}
+.kaart p{margin:0;color:var(--zacht);font-size:15px;line-height:1.45;flex:1}
+.kaart .cta{font-weight:700;color:var(--k);font-size:15px}
+.kaart.binnenkort h2,.kaart.binnenkort p,.kaart.binnenkort .ico{opacity:.72}
+.badge{display:inline-block;background:var(--geel);color:#3a2d00;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;letter-spacing:.04em;align-self:flex-start}
+.info{max-width:1080px;margin:0 auto;padding:0 16px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;color:var(--zacht)}
+.info h3{font-family:Archivo,sans-serif;color:var(--tekst);margin:0 0 6px;font-size:17px}
+.info p{margin:0;line-height:1.5}
+</style>
+</head>
+<body>
+<header class="sj-top"><div class="sj-top-in">
+  <a href="./" class="sj-logo"><span class="sj-bal"></span>Sjotter</a>
+  <span id="wie" class="sj-wie"></span>
+</div></header>
+
+<section class="hero"><div class="hero-in">
+  <span class="badge">Gratis voor alle coaches</span>
+  <h1>Alles voor je jeugdploeg,<br><em>op één plek.</em></h1>
+  <p>Oefenwedstrijden vinden, tornooien organiseren, je spelers opvolgen en trainingen voorbereiden. Kies hieronder waar je mee aan de slag wil.</p>
+</div></section>
+
+<main class="kaarten">
+  <a class="kaart" href="tornooi/" style="--k:var(--gras)">
+    <span class="ico">⚽</span>
+    <h2><small>Sjotter</small>Oefenmatch &amp; Tornooi</h2>
+    <p>Zoek of plaats een oefenwedstrijd zonder account. Organiseer je tornooi met inschrijvingen, loting, speelschema en live standen.</p>
+    <span class="cta">Openen →</span>
+  </a>
+  <a class="kaart binnenkort" href="coach/" style="--k:var(--hemel)">
+    <span class="ico">📋</span>
+    <h2><small>Sjotter</small>Coach &amp; Speler</h2>
+    <p>Je eigen spelerslijst, wedstrijden en evaluaties. Stel je ploeg zelf in: categorie, formaat en groepen.</p>
+    <span class="badge">Binnenkort</span>
+  </a>
+  <a class="kaart binnenkort" href="training/" style="--k:#E08A1E">
+    <span class="ico">🎯</span>
+    <h2><small>Sjotter</small>Training Hub</h2>
+    <p>Bewaar je favoriete oefenvideo's per thema en ontdek wat andere coaches delen in de gedeelde bibliotheek.</p>
+    <span class="badge">Binnenkort</span>
+  </a>
+  <a class="kaart binnenkort" href="playernation/" style="--k:#8B5CF6">
+    <span class="ico">🌍</span>
+    <h2><small>Sjotter</small>ThePlayerNation</h2>
+    <p>Meer info volgt binnenkort.</p>
+    <span class="badge">Binnenkort</span>
+  </a>
+</main>
+
+<section class="info">
+  <div><h3>Geen login nodig om rond te kijken</h3><p>Je maakt pas een account aan wanneer je iets wil beheren: een tornooi, je ploeg of je eigen oefeningen.</p></div>
+  <div><h3>Eén account voor alles</h3><p>Met hetzelfde e-mailadres en wachtwoord kan je in elk Sjotter-onderdeel aan de slag.</p></div>
+  <div><h3>Gemaakt door coaches</h3><p>Vragen of ideeën? Mail ons op <a id="mail" href="#"></a>.</p></div>
+</section>
+
+<footer class="sj-voet">
+  <a href="tornooi/#/privacy">Privacy</a> · <a href="tornooi/#/help">Help</a> · © <span id="jaar"></span> Sjotter
+</footer>
+
+<script>
+(function () {
+  var C = window.SJOTTER || {};
+  var m = document.getElementById("mail");
+  m.textContent = C.CONTACT_EMAIL; m.href = "mailto:" + C.CONTACT_EMAIL;
+  document.getElementById("jaar").textContent = new Date().getFullYear();
+  var u = C.huidigeGebruiker && C.huidigeGebruiker();
+  if (u && u.email) document.getElementById("wie").textContent = "Ingelogd als " + u.email;
+})();
+</script>
+</body>
+</html>
