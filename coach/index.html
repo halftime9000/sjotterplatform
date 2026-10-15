@@ -675,16 +675,17 @@ async function cOverzicht(kop) {
   const gekoppeld = new Set(P.leden.filter(l => l.speler_id).map(l => l.speler_id));
   const actief = P.spelers.filter(s => s.actief);
   const fiches = actief.filter(s => ficheIngevuld(P.profielen[s.id])).length;
-  const spelerOpties = '<option value="">— nieuwe speler aanmaken —</option>' +
+  const spelerOpties = '<option value="">— nieuwe speler aanmaken —</option><option value="__coach">Als coach (geen speler)</option>' +
     actief.map(s => `<option value="${s.id}">${esc(naamVan(s))}${gekoppeld.has(s.id) ? " (heeft al een account)" : ""}</option>`).join("");
   const perEmail = {};
-  actief.forEach(s => { const m = ((P.profielen[s.id] || {}).ksk_email || "").toLowerCase(); if (m) perEmail[m] = s.id; });
+  // KSK-trainers staan als inactieve speler met ksk_email: die herkennen we als coach
+  P.spelers.forEach(s => { const m = ((P.profielen[s.id] || {}).ksk_email || "").toLowerCase(); if (m) perEmail[m] = s.actief ? s.id : "__coach"; });
   const aanvragen = wacht.map(l => {
     const match = perEmail[(l.email || "").toLowerCase()];
     const opties = match ? spelerOpties.replace(`value="${match}"`, `value="${match}" selected`) : spelerOpties;
     return `
     <div class="item" style="flex-wrap:wrap">
-      <div class="hoofd" style="min-width:180px"><b>${esc(l.naam || "?")}</b><span class="klein">${esc(l.email || "")}${match ? " · herkend uit KSK" : ""}</span></div>
+      <div class="hoofd" style="min-width:180px"><b>${esc(l.naam || "?")}</b><span class="klein">${esc(l.email || "")}${match === "__coach" ? " · KSK-trainer" : match ? " · herkend uit KSK" : ""}</span></div>
       <select id="kop-${l.id}" style="width:auto;min-width:200px;flex:1" aria-label="Koppel aan speler">${opties}</select>
       <button class="knop klein vol" onclick="A.goedkeuren('${l.id}')">Goedkeuren</button>
       <button class="knop klein gevaar" onclick="A.weigeren('${l.id}')">Weigeren</button>
@@ -1276,6 +1277,10 @@ const A = window.A = {
   async goedkeuren(lidId) {
     const lid = P.leden.find(l => l.id === lidId), keuze = $("#kop-" + lidId).value;
     try {
+      if (keuze === "__coach") {
+        await q(sb.from("cs_leden").update({ status: "actief", rol: "coach", speler_id: null }).eq("id", lidId));
+        toast("Goedgekeurd als coach"); return herlaad();
+      }
       let sid = keuze;
       if (!sid) {
         const delen = (lid.naam || "Speler").trim().split(/\s+/);
