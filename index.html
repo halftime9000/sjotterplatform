@@ -266,6 +266,32 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   .vak.open .intro{display:block}
   .vak.open .punten{display:flex}
 }
+
+/* Mobiel v2: grote tegels die samen het scherm vullen, zonder scrollen */
+@media (max-width:640px){
+  .pagina{min-height:100vh;min-height:100svh;grid-template-rows:auto minmax(0,1fr) auto auto!important}
+  .vakken:not(:has(.vak.open)){grid-auto-rows:minmax(0,1fr)!important;align-content:stretch;padding-bottom:8px!important}
+  .vak:not(.open)::after,.vak:not(.open) .kopstatus,.vak:not(.open) .lint{display:none!important}
+  .vakken:not(:has(.vak.open)) > .vak{min-height:0!important;gap:10px!important}
+  .vakken:not(:has(.vak.open)) .tegel img{height:clamp(70px,15svh,140px)!important}
+  .vakken:not(:has(.vak.open)) .vak-kop h2{font-size:clamp(11px,3.25vw,15px)!important;letter-spacing:0!important;flex-wrap:wrap;justify-content:center;gap:2px 5px}
+  .vakken:not(:has(.vak.open)) > .vak{padding:12px 6px!important}
+  .vak .tegel{max-width:100%}
+  .vak .tegel img{max-width:100%;object-fit:contain}
+  .vakken:not(:has(.vak.open)) .vak.een .tegel img{height:auto!important;width:calc(50% - 3px);max-height:clamp(70px,14svh,130px)}
+  .waarom{padding:6px 0 2px!important;border-top:0!important}
+  .waarom > div:not(:last-child){display:none}
+  .waarom h3{font-size:14px!important;margin:0 0 2px!important}
+  .waarom p{font-size:13px!important;margin:0}
+  .voet{padding:4px 0 8px!important}
+}
+@media (max-width:640px){
+  .vakken:has(.vak.open){align-content:start;grid-auto-rows:auto!important}
+  .pagina:has(.vak.open){grid-template-rows:auto auto auto auto!important;align-content:start}
+  .vakken:has(.vak.open) > .vak:not(.open){min-height:112px!important}
+  .vakken:has(.vak.open) > .vak:not(.open) .vak-kop h2{font-size:9.5px!important;overflow-wrap:normal!important;letter-spacing:0!important}
+  .vak .lint,.vak .kopstatus{display:none!important}
+}
 </style>
 </head>
 <body>
