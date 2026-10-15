@@ -118,18 +118,38 @@ def lit(v):
     if isinstance(v, (int, float)): return str(v)
     return "'" + str(v).replace("'", "''") + "'"
 
-def main():
-    bron, email = sys.argv[1], sys.argv[2]
-    ploegnaam = sys.argv[3] if len(sys.argv) > 3 else "U13 IP"
-    raw = open(bron, encoding="utf-8-sig").read().strip()
+def lees_export(pad):
+    raw = open(pad, encoding="utf-8-sig").read().strip()
     if raw.lower().startswith("export"):                    # CSV-download uit de SQL Editor
         import csv, io
         csv.field_size_limit(10**9)
-        rijen = list(csv.reader(io.StringIO(raw)))
-        raw = rijen[1][0]
+        raw = list(csv.reader(io.StringIO(raw)))[1][0]
     if raw.startswith('"'): raw = json.loads(raw)            # soms als string geëxporteerd
     ex = json.loads(raw)
     if isinstance(ex, list) and ex and "export" in ex[0]: ex = json.loads(ex[0]["export"])
+    return ex
+
+TERUG_AUTH = """delete from auth.identities where user_id in (select sjotter_id from sjotter_backup.ksk_migratie where nieuw);
+delete from auth.users where id in (select sjotter_id from sjotter_backup.ksk_migratie where nieuw);
+do $t$ declare s text := to_char(now(), 'YYYYMMDD_HH24MI'); begin
+  execute format('alter table sjotter_backup.ksk_migratie rename to ksk_migratie_teruggedraaid_%s', s);
+  execute format('alter table sjotter_backup.auth_users_voor_ksk rename to auth_users_voor_ksk_%s', s);
+  execute format('alter table sjotter_backup.auth_identities_voor_ksk rename to auth_identities_voor_ksk_%s', s);
+  execute format('alter table sjotter_backup.cs_leden_voor_ksk rename to cs_leden_voor_ksk_%s', s);
+  raise notice 'Teruggedraaid. De back-up blijft bewaard met achtervoegsel %.', s;
+end $t$;"""
+
+def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("export"); ap.add_argument("email")
+    ap.add_argument("--ploegnaam", default="U13 IP")
+    ap.add_argument("--auth", help="export van auth.users/auth.identities uit het KSK-project: accounts mee overzetten")
+    ap.add_argument("--terugdraai", help="schrijf hier het SQL-bestand om alles ongedaan te maken")
+    arg = ap.parse_args()
+    email, ploegnaam = arg.email, arg.ploegnaam
+    ex = lees_export(arg.export)
+    auth = lees_export(arg.auth) if arg.auth else None
     spelers, wedstrijden, evals = ex.get("spelers") or [], ex.get("wedstrijden") or [], ex.get("evaluaties") or []
     rollen = ex.get("rollen") or []
 
@@ -160,6 +180,51 @@ def main():
 );
 alter table public.cs_import_archief enable row level security;
 revoke all on public.cs_import_archief from anon, authenticated;""")
+    if auth:
+        w(f"-- {len(auth.get('users') or [])} KSK-accounts · {len(auth.get('identities') or [])} identiteiten")
+        w("""-- 1) BACK-UP van de huidige toestand (blijft bewaard in schema sjotter_backup)
+create schema if not exists sjotter_backup;
+revoke all on schema sjotter_backup from anon, authenticated;
+do $b$ begin
+  if to_regclass('sjotter_backup.ksk_migratie') is not null then
+    raise exception 'De KSK-migratie is al uitgevoerd (sjotter_backup.ksk_migratie bestaat). Niets gewijzigd. Draai eerst terug als je opnieuw wil beginnen.';
+  end if;
+end $b$;
+create table sjotter_backup.auth_users_voor_ksk as select * from auth.users;
+create table sjotter_backup.auth_identities_voor_ksk as select * from auth.identities;
+create table sjotter_backup.cs_leden_voor_ksk as select * from public.cs_leden;
+create table sjotter_backup.ksk_migratie (ksk_id uuid primary key, sjotter_id uuid not null, email text, nieuw boolean not null, tijd timestamptz default now());""")
+        w(f"""-- 2) KSK-ACCOUNTS overzetten (zelfde e-mail + zelfde wachtwoord)
+do $m$
+declare r jsonb; bestaand uuid; kolommen text; n_nieuw int := 0; n_gekoppeld int := 0;
+begin
+  for r in select value from jsonb_array_elements({dq(auth.get('users') or [])}) loop
+    select id into bestaand from auth.users where lower(email) = lower(r->>'email') limit 1;
+    if bestaand is not null then
+      insert into sjotter_backup.ksk_migratie (ksk_id, sjotter_id, email, nieuw) values ((r->>'id')::uuid, bestaand, r->>'email', false);
+      n_gekoppeld := n_gekoppeld + 1;
+      continue;
+    end if;
+    if exists (select 1 from auth.users where id = (r->>'id')::uuid) then
+      raise exception 'Account-id % bestaat al in Sjotter met een ander e-mailadres. Niets gewijzigd.', r->>'id';
+    end if;
+    select string_agg(quote_ident(c.column_name), ', ' order by c.ordinal_position) into kolommen
+      from information_schema.columns c
+      where c.table_schema = 'auth' and c.table_name = 'users' and c.is_generated = 'NEVER' and r ? c.column_name;
+    execute format('insert into auth.users (%1$s) select %1$s from jsonb_populate_record(null::auth.users, $1)', kolommen) using r;
+    insert into sjotter_backup.ksk_migratie (ksk_id, sjotter_id, email, nieuw) values ((r->>'id')::uuid, (r->>'id')::uuid, r->>'email', true);
+    n_nieuw := n_nieuw + 1;
+  end loop;
+  for r in select value from jsonb_array_elements({dq(auth.get('identities') or [])}) loop
+    if exists (select 1 from sjotter_backup.ksk_migratie where sjotter_id = (r->>'user_id')::uuid and nieuw) then
+      select string_agg(quote_ident(c.column_name), ', ' order by c.ordinal_position) into kolommen
+        from information_schema.columns c
+        where c.table_schema = 'auth' and c.table_name = 'identities' and c.is_generated = 'NEVER' and r ? c.column_name;
+      execute format('insert into auth.identities (%1$s) select %1$s from jsonb_populate_record(null::auth.identities, $1) on conflict do nothing', kolommen) using r;
+    end if;
+  end loop;
+  raise notice 'Accounts: % nieuw overgezet, % bestonden al in Sjotter (gekoppeld).', n_nieuw, n_gekoppeld;
+end $m$;""")
     w(f"""do $import$
 declare v_coach uuid;
 begin
@@ -225,8 +290,28 @@ begin
       f"{len(spelers)}, {len(wedstrijden)}, {len(evals) - overgeslagen};")
     w("end $import$;")
     w(f"insert into public.cs_import_archief (bron, data) values ('ksk-lovendegem-u13', {dq(ex)});")
+    if auth:
+        w("-- 3) accounts aan de ploeg en aan hun speler koppelen (meteen actief, geen goedkeuring nodig)")
+        for r in rollen:
+            if not r.get("user_id"): continue
+            coach = str(r.get("role")) in ("admin", "coach")
+            sid = None if coach else smap.get(str(r.get("speler_id")))
+            if not coach and not sid: continue          # 'pending' of speler zonder fiche: niet koppelen
+            w(f"insert into public.cs_leden (ploeg_id, user_id, rol, status, speler_id, naam, email) "
+              f"select {lit(PID)}, m.sjotter_id, {lit('coach' if coach else 'speler')}, 'actief', {lit(sid)}, {lit(tekst(r.get('naam'), 80))}, m.email "
+              f"from sjotter_backup.ksk_migratie m where m.ksk_id = {lit(r['user_id'])} on conflict (ploeg_id, user_id) do nothing;")
+        w(f"do $c$ begin raise notice 'Leden in de ploeg: %', (select count(*) from public.cs_leden where ploeg_id = {lit(PID)}); end $c$;")
     w("commit;")
     print("\n".join(out))
+    if arg.terugdraai:
+        open(arg.terugdraai, "w", encoding="utf-8").write(
+            "-- TERUGDRAAIEN van de KSK-migratie in Sjotter\n"
+            "-- Verwijdert enkel wat de migratie toevoegde. Het KSK-project zelf werd nooit gewijzigd.\n"
+            "begin;\n"
+            f"delete from public.cs_ploegen where id = {lit(PID)};  -- ploeg + spelers, wedstrijden, evaluaties, leden\n"
+            "do $a$ begin if to_regclass('public.cs_import_archief') is not null then delete from public.cs_import_archief where bron = 'ksk-lovendegem-u13'; end if; end $a$;\n"
+            + (TERUG_AUTH + "\n" if auth else "") +
+            "commit;\n")
 
 if __name__ == "__main__":
     main()
