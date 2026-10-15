@@ -140,24 +140,24 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 [data-thema="kleedkamer"] .waarom a{color:#1F5A63}
 [data-thema="kleedkamer"] .voet{border-top-color:var(--rand)}
 
-/* Compact: alles past zonder scrollen op een gewoon laptopscherm */
-.kop{padding:8px 0 6px}
-.vakken{gap:12px;padding-bottom:12px}
-.vak{padding:13px 16px;gap:8px}
-.vak-kop h2{font-size:16px}
-.vak p{font-size:14px;line-height:1.4}
-.punten li{font-size:13px}
-.inhoud{grid-template-columns:92px 1fr;gap:14px}
-.inhoud img{width:92px;padding:6px}
-.vak.een h1{font-size:clamp(22px,2.4vw,27px);line-height:1.1}
-.deel{padding:8px}
-.deel img{height:78px}
-.knoppen a{padding:5px 8px}
+/* Vult het scherm: kaarten rekken mee met de schermhoogte, info blijft zichtbaar */
+.pagina{min-height:100vh;grid-template-rows:auto minmax(0,1fr) auto auto;align-content:stretch}
+.kop{padding:6px 0 5px}
+.vakken{gap:10px;padding-bottom:8px;align-content:stretch;grid-auto-rows:minmax(0,1fr)}
+.vak{padding:10px 17px;gap:5px}
+.vak p{font-size:clamp(14px,1.95vh,18px);line-height:1.4}
+.punten li{font-size:clamp(13px,1.8vh,16.5px);line-height:1.35}
 .status{font-size:20px}
-.voet{padding:10px 0 14px;font-size:13px}
-.voet b{color:var(--tekst);font-weight:600}
-.voet .punten-rij a{color:#1F5A63}
-@media (max-width:860px){.voet{flex-direction:column;align-items:flex-start}}
+.inhoud{grid-template-columns:clamp(80px,11.5vh,128px) 1fr;gap:clamp(14px,2vh,20px)}
+.inhoud img{width:100%;padding:5px}
+.vak.een h1{font-size:clamp(23px,min(2.6vw,4vh),40px);line-height:1.1}
+.deel img{height:clamp(64px,9vh,104px)}
+.waarom{padding:10px 0 8px;gap:20px}
+.waarom h3{font-size:15px;margin-bottom:4px}
+.waarom p{font-size:13.5px;line-height:1.42}
+.voet{padding:5px 0 8px;font-size:13px}
+.voet .hand{font-size:20px}
+@media (max-width:860px){.pagina{min-height:0;grid-template-rows:none}.vakken{grid-auto-rows:auto}.inhoud{grid-template-columns:86px 1fr}.vak p{font-size:14px}.punten li{font-size:13px}.deel img{height:70px}}
 </style>
 </head>
 <body>
@@ -170,7 +170,7 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
     <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><circle class="o1" cx="16" cy="16" r="15"/><circle class="o2" cx="16" cy="16" r="10"/><polygon class="o1" points="16,9.5 21.4,13.4 19.4,19.7 12.6,19.7 10.6,13.4"/></svg>
     Sjotter
   </a>
-  <span id="wie" class="tag">gratis voor elke jeugdcoach</span>
+  <span id="wie" class="tag">Gemaakt door jeugdcoaches, voor jeugdcoaches</span>
 </header>
 
 <main class="vakken">
@@ -230,8 +230,14 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
   </a>
 </main>
 
-<footer class="voet" id="contact">
-  <span class="punten-rij"><b>Gratis, gewoon</b> · <b>Eén account voor alles</b> · Vraag of idee? <a id="mail" href="#"></a></span>
+<section class="waarom" id="contact">
+  <div><h3>Gratis, gewoon</h3><p>Geen abonnement, geen proefperiode. Alle tools zijn gratis voor elke jeugdcoach.</p></div>
+  <div><h3>Eén account voor alles</h3><p>Rondkijken kan zonder login. Pas als je iets wil beheren vragen we een e-mailadres en wachtwoord.</p></div>
+  <div><h3>Vraag of idee?</h3><p>Mail naar <a id="mail" href="#"></a>. We lezen alles.</p></div>
+</section>
+
+<footer class="voet">
+  <span class="hand">Tot op het veld!</span>
   <span><a href="tornooi/#/privacy">Privacy</a> · <a href="tornooi/#/help">Help</a> · © <span id="jaar"></span> Sjotter</span>
 </footer>
 
@@ -246,7 +252,6 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
   document.getElementById("jaar").textContent = new Date().getFullYear();
   var u = C.huidigeGebruiker && C.huidigeGebruiker();
   if (u && u.email) document.getElementById("organiseer").href = "tornooi/#/dashboard";
-  if (u && u.email) document.getElementById("wie").textContent = "hallo, " + u.email.split("@")[0] + "!";
 })();
 </script>
 </body>
