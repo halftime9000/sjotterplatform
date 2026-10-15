@@ -390,6 +390,10 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   .vakken:not(:has(.vak.open)) > .vak > .tegel{height:min(clamp(70px,15svh,140px), calc((50vw - 46px) * 0.6))!important;gap:6px}
   .vakken:not(:has(.vak.open)) .tegel img,.vakken:not(:has(.vak.open)) .vak.een .tegel img{height:min(clamp(70px,15svh,140px), calc((50vw - 46px) * 0.6))!important;width:auto!important;max-width:none!important;max-height:none!important}
 }
+@media (max-width:640px){
+  .vak:not(.open) .vak-kop h2.duo-titel{display:flex!important;flex-direction:column;align-items:center;gap:2px!important;line-height:1.1!important}
+  .vak:not(.open) .vak-kop h2.duo-titel .hand{width:1.4em;height:1.4em;margin:0!important}
+}
 </style>
 </head>
 <body>
