@@ -170,7 +170,20 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .knoppen a:hover{border-color:#F2EFE6;background:rgba(255,255,255,.06)}
 .knoppen a.vol{box-shadow:0 2px 0 #B98F2A}
 .vak .intro{margin:0}
-.deel.onder{margin-top:auto}
+.vak .duo{margin-top:auto}
+.deel img{height:clamp(84px,12.8vh,132px);padding:4px}
+.naast{align-self:center;padding:4px 4px 4px 6px;display:flex;flex-direction:column;gap:8px}
+.naast p{margin:0}
+.deel small{font-size:12.5px;color:var(--zacht);line-height:1.3}
+.naast{align-items:center;justify-content:center}
+.naast .status{font-size:clamp(24px,3.4vh,34px)!important}
+.naast .status{margin:0;font-size:22px}
+.deel.speler{grid-template-columns:1fr}
+.deel.speler input{font:inherit;font-size:15px;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.14em;padding:6px 8px;border-radius:9px;border:1.5px solid #7FA3A8;background:rgba(0,0,0,.18);color:#F2EFE6;width:100%;box-sizing:border-box}
+.deel.speler input::placeholder{color:#8FAEB2;letter-spacing:.06em;text-transform:none;font-weight:600}
+.deel.speler input:focus{outline:none;border-color:var(--accent)}
+.deel.speler button{font:inherit;font-weight:700;font-size:14.5px;padding:6px 10px;border-radius:9px;border:1.5px solid var(--accent);background:var(--accent);color:var(--op-accent);cursor:pointer;box-shadow:0 2px 0 #B98F2A}
+.deel.speler button:hover{background:var(--accent-d)}
 .deel{min-height:110px!important;padding:8px 12px!important}
 .deel b{font-size:13px!important}
 .knoppen{gap:6px!important}
@@ -178,8 +191,7 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .vak .punten{gap:3px}
 .vak .punten li{line-height:1.3}
 .deel .knoppen{max-width:none}
-.deel{grid-template-columns:auto 1fr!important;gap:16px!important}
-.deel img{height:clamp(84px,12.8vh,132px)!important;padding:4px!important}
+.deel{gap:16px}
 .knop-uit{display:block;text-align:center;font-weight:700;font-size:14.5px;padding:8px 10px;border:1.5px dashed #5F858B;border-radius:9px;color:var(--mod,var(--zacht))}
 .vak .punten li{color:var(--licht)}
 .kopstatus{margin:0 0 0 auto!important;font-size:19px;line-height:1}
@@ -222,9 +234,14 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
     <div class="vak-kop"><h2>Coach &amp; Speler</h2><span class="status kopstatus">binnenkort</span></div>
     <p class="intro">Je ploeg online. Spelers vullen hun eigen fiche in en analyseren na elke match zichzelf, hun ploegmaats en de tegenstander.</p>
     <ul class="punten"><li>Eigen profiel en voetbalfiche per speler</li><li>Evaluatie na elke match: zelf, ploegmaats en tegenstander</li><li>Jij kiest categorie, formaat en groepen</li></ul>
-    <div class="deel onder">
-      <a href="coach/"><img src="assets/platform-k.png" alt="Player Platform"></a>
-      <div class="knoppen"><b>Player Platform</b><a class="vol" href="coach/#/nieuw">Maak je ploeg</a><a href="coach/#/login">Aanmelden</a></div>
+    <div class="duo">
+      <div class="deel">
+        <a href="coach/"><img src="assets/platform-k.png" alt="Player Platform"></a>
+        <div class="knoppen"><b>Coach</b><a class="vol" href="coach/#/nieuw">Maak je ploeg</a><a href="coach/#/login">Aanmelden</a></div>
+      </div>
+      <form class="deel speler" onsubmit="event.preventDefault();var c=this.c.value.trim().toUpperCase();if(c)location.href='coach/#/code/'+encodeURIComponent(c)">
+        <div class="knoppen"><b>Speler</b><input name="c" maxlength="6" placeholder="Teamcode" aria-label="Teamcode" autocomplete="off" required><button class="vol">Aansluiten</button></div>
+      </form>
     </div>
   </section>
 
@@ -233,19 +250,27 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
     <div class="vak-kop"><h2>Training Hub</h2><span class="status kopstatus">binnenkort</span></div>
     <p class="intro">Je favoriete oefenvideo's per thema bewaard, plus een gedeelde bibliotheek van andere coaches.</p>
     <ul class="punten"><li>Links van YouTube, Instagram of TikTok</li><li>Opwarming, techniek, eindspel, keeper…</li><li>Zelf kiezen wat je deelt</li></ul>
-    <div class="deel onder">
-      <img src="assets/training-k.png" alt="Training Hub">
-      <div class="knoppen"><b>Training Hub</b><span class="knop-uit">Binnenkort</span></div>
+    <div class="duo">
+      <div class="deel">
+        <img src="assets/training-k.png" alt="Training Hub">
+        <div class="knoppen"><b>Mijn video's</b><span class="knop-uit">Binnenkort</span></div>
+      </div>
+      <div class="deel speler">
+        <div class="knoppen"><b>Bibliotheek</b><small>Oefeningen van andere coaches</small><span class="knop-uit">Binnenkort</span></div>
+      </div>
     </div>
   </a>
 
   <!-- 04 ThePlayerNation -->
   <a class="vak" href="playernation/" style="--mod:#B79CFF">
-    <div class="vak-kop"><h2>ThePlayerNation</h2><span class="status kopstatus">wordt vervolgd</span></div>
+    <div class="vak-kop"><h2>ThePlayerNation</h2></div>
     <p class="intro">Iets nieuws, speciaal voor spelers. Hoe het werkt vertellen we je binnenkort.</p>
-    <div class="deel onder">
-      <img src="assets/playernation-k.png" alt="ThePlayerNation">
-      <div class="knoppen"><b>Voor spelers</b><span class="knop-uit">Binnenkort</span></div>
+    <div class="duo">
+      <div class="deel">
+        <img src="assets/playernation-k.png" alt="ThePlayerNation">
+        <div class="knoppen"><b>Voor spelers</b><span class="knop-uit">Binnenkort</span></div>
+      </div>
+      <div class="naast"><span class="status">wordt vervolgd…</span></div>
     </div>
   </a>
 
