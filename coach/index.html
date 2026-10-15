@@ -319,6 +319,12 @@ h2{font-size:15px;letter-spacing:.06em}
 body,button,input,select,textarea{font-family:'Exo 2',system-ui,sans-serif}
 h1.titel,.ploegkop .naam,.ploegkop .club,.ploegtegel .naam,h2,.evalsectie > h3,.merk,.module,.tabs a{font-family:'Exo 2',system-ui,sans-serif!important;font-style:italic!important;font-weight:800!important;font-stretch:100%!important;font-variation-settings:normal!important}
 .tabs a{font-weight:700!important}
+/* Logo: geen cirkel of kader, gewoon het clublogo groot en scherp */
+.ploegtegel .embleem.met-logo{background:transparent!important;box-shadow:none!important;border-radius:0!important;width:84px!important;height:84px!important;overflow:visible}
+.ploegtegel .embleem.met-logo img{padding:0!important;filter:drop-shadow(0 2px 4px rgba(14,42,47,.18))}
+.ploeglogo{width:76px!important;height:76px!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;border-radius:0!important;filter:drop-shadow(0 2px 4px rgba(14,42,47,.18))}
+.logovak img{padding:4px!important}
+@media (max-width:640px){.ploegtegel .embleem.met-logo{width:60px!important;height:60px!important}.ploeglogo{width:58px!important;height:58px!important}}
 </style>
 </head>
 <body>
@@ -1585,7 +1591,7 @@ const A = window.A = {
     try {
       const url = await new Promise((ok, nok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = nok; r.readAsDataURL(f); });
       const img = await new Promise((ok, nok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => nok(new Error("Kan deze afbeelding niet lezen")); i.src = url; });
-      const max = 256, sc = Math.min(1, max / Math.max(img.naturalWidth || max, img.naturalHeight || max));
+      const max = 320, sc = Math.min(1, max / Math.max(img.naturalWidth || max, img.naturalHeight || max));
       const c = document.createElement("canvas"); c.width = Math.max(1, Math.round((img.naturalWidth || max) * sc)); c.height = Math.max(1, Math.round((img.naturalHeight || max) * sc));
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
       let data = c.toDataURL("image/png");
