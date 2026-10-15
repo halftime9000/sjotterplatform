@@ -39,18 +39,17 @@ reset role;
 
 \echo === speler sluit aan
 select pg_temp.als('00000000-0000-0000-0000-0000000000a1');
-select pg_temp.verwacht_fout($$select cs_aansluiten('$$||:'c'||$$','Sam Een',false)$$,'zonder ouder-toestemming');
-select pg_temp.verwacht_fout($$select cs_aansluiten('XXXXXX','Sam Een',true)$$,'foute code');
-select cs_aansluiten(:'c','Sam Een',true) is not null as aangesloten;
+select pg_temp.verwacht_fout($$select cs_aansluiten('XXXXXX','Sam Een')$$,'foute code');
+select cs_aansluiten(:'c','Sam Een') is not null as aangesloten;
 select status from cs_leden;
 select count(*) as ziet_ploeg_in_wacht from cs_ploegen;
 select count(*) as ziet_spelers_in_wacht from cs_spelers;
-select pg_temp.verwacht_fout($$update cs_leden set status='actief' where user_id=auth.uid()$$,'zichzelf goedkeuren') ;
+with x as (update cs_leden set status='actief' where user_id=auth.uid() returning 1) select count(*) as zelf_goedgekeurd_moet_0_zijn from x;
 select status as nog_steeds from cs_leden;
 reset role;
 
 select pg_temp.als('00000000-0000-0000-0000-0000000000a2');
-select cs_aansluiten(:'c','Ouder Mo',true) is not null as ouder_aangesloten;
+select cs_aansluiten(:'c','Mo Drie') is not null as speler3_aangesloten;
 reset role;
 
 \echo === coach keurt goed en koppelt
@@ -91,8 +90,8 @@ reset role;
 
 select pg_temp.als('00000000-0000-0000-0000-0000000000a2');
 select pg_temp.verwacht_fout(format($$insert into cs_evaluaties(wedstrijd_id,ploeg_id,speler_id) values ('%s','%s','%s')$$,:'w1',:'pl',:'s3'),'niet in opstelling');
-select count(*) as ouder_ziet_evals from cs_evaluaties;
-select count(*) as ouder_ziet_profielen from cs_speler_profiel;
+select count(*) as speler3_ziet_evals from cs_evaluaties;
+select count(*) as speler3_ziet_profielen from cs_speler_profiel;
 reset role;
 
 \echo === weak link aan + eval gesloten
@@ -117,7 +116,7 @@ reset role;
 \echo === speler verlaat ploeg / coach verwijdert ploeg
 select pg_temp.als('00000000-0000-0000-0000-0000000000a2');
 delete from cs_leden where user_id=auth.uid();
-select count(*) as ouder_na_vertrek from cs_ploegen;
+select count(*) as speler3_na_vertrek from cs_ploegen;
 reset role;
 select pg_temp.als('00000000-0000-0000-0000-00000000000c');
 delete from cs_ploegen;

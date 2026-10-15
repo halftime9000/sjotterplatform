@@ -238,6 +238,18 @@ const CATS_KEEPER = {
   fysiek:    ["Reactiesnelheid","Explosiviteit","Wendbaarheid","Kracht","Balans","Coördinatie"],
   mentaal:   ["Winnersmentaliteit","Concentratie","Leiderschap","Zelfvertrouwen","Omgaan met tegenslagen","Inzet"]
 };
+const GEGEVENS = [
+  ["geboortedatum", "Geboortedatum", "date"], ["gsm", "GSM", "tel"], ["school", "School", "text"],
+  ["vorige_club", "Vorige club", "text"], ["sinds", "Voetbalt sinds", "text"],
+  ["allergie", "Allergieën", "text"], ["medicatie", "Medicatie", "text"], ["medisch", "Andere medische info", "area"]
+];
+function gegevensVelden(g, uit) {
+  g = g || {};
+  return '<div class="velden">' + GEGEVENS.map(([k, t, type]) => type === "area" ? "" :
+    `<div><label for="g-${k}">${t}</label><input id="g-${k}" data-geg="${k}" type="${type}" maxlength="120" value="${esc(g[k] || "")}" ${uit ? "disabled" : ""}></div>`).join("") + "</div>" +
+    `<label for="g-medisch">Andere medische info</label><textarea id="g-medisch" data-geg="medisch" maxlength="500" ${uit ? "disabled" : ""}>${esc(g.medisch || "")}</textarea>`;
+}
+function leesGegevens() { const g = {}; document.querySelectorAll("[data-geg]").forEach(el => { const v = el.value.trim(); if (v) g[el.dataset.geg] = v; }); return g; }
 const CAT_NAAM = { technisch: "Technisch", tactisch: "Tactisch", fysiek: "Fysiek", mentaal: "Mentaal" };
 const POSITIES = {
   2: [], 3: [],
@@ -303,7 +315,7 @@ function vWelkom() {
       <div class="rij"><a class="knop vol" href="#/registreren">Account maken</a><a class="knop" href="#/login">Aanmelden</a></div>
     </div>
     <div class="blok">
-      <h2>Ik ben speler of ouder</h2>
+      <h2>Ik ben speler</h2>
       <p class="sub">Kreeg je een teamcode van je coach? Vul ze hier in om aan te sluiten bij je ploeg.</p>
       ${codeVeld("Verder", "vol")}
     </div>
@@ -413,7 +425,7 @@ async function vStart() {
   </div>
   <div class="raster twee" style="margin-top:14px">
     <div class="blok"><h2>Nieuwe ploeg</h2><p class="sub">Voor coaches: maak je ploeg aan en nodig je spelers uit.</p><a class="knop vol" href="#/nieuw">Ploeg aanmaken</a></div>
-    <div class="blok"><h2>Aansluiten</h2><p class="sub">Speler of ouder? Vul de teamcode van je coach in.</p>${codeVeld("Verder")}</div>
+    <div class="blok"><h2>Aansluiten</h2><p class="sub">Speler? Vul de teamcode van je coach in.</p>${codeVeld("Verder")}</div>
   </div>`;
 }
 
@@ -489,7 +501,7 @@ async function vAansluiten(code) {
   if (!sessie) {
     sessionStorage.setItem("cs_terug", "#/code/" + code);
     app().innerHTML = `<div class="blok" style="max-width:520px;margin:20px auto"><h2>Aansluiten bij</h2><p style="font-size:18px;margin-top:0">${ploegTxt}</p>
-      <p class="sub">Maak eerst een account of meld je aan. Ben je jonger dan 16? Doe dit dan samen met een ouder, of gebruik het account van een ouder.</p>
+      <p class="sub">Maak eerst een account of meld je aan.</p>
       <div class="rij"><a class="knop vol" href="#/registreren">Account maken</a><a class="knop" href="#/login">Aanmelden</a></div></div>`;
     return;
   }
@@ -497,14 +509,14 @@ async function vAansluiten(code) {
   app().innerHTML = `<div class="blok" style="max-width:520px;margin:20px auto">
     <h2>Aansluiten bij</h2><p style="font-size:18px;margin-top:0">${ploegTxt}</p>
     <form id="af">
-      <label for="j-naam">Naam van de speler</label><input id="j-naam" name="naam" required minlength="2" maxlength="80" value="${esc(naamMeta)}" placeholder="Voornaam en naam">
-      <label class="vink"><input type="checkbox" name="ok" required> <span>Ik ben ouder of voogd van deze speler, of de speler is 16 jaar of ouder. Ik ga akkoord dat de coaches van deze ploeg gegevens over de speler (naam, wedstrijden, evaluaties) bijhouden in Sjotter. <a href="../tornooi/#/privacy" target="_blank" rel="noopener">Privacy</a></span></label>
+      <label for="j-naam">Je naam</label><input id="j-naam" name="naam" required minlength="2" maxlength="80" value="${esc(naamMeta)}" placeholder="Voornaam en naam">
+      <p class="klein">De coach krijgt je aanvraag en koppelt je aan je plaats in de ploeg.</p>
       <button class="knop vol breed">Aanvraag versturen</button>
     </form></div>`;
   $("#af").onsubmit = async e => {
     e.preventDefault();
     try {
-      const pid = await q(sb.rpc("cs_aansluiten", { p_code: code, p_naam: e.target.naam.value.trim(), p_ouder_toestemming: e.target.ok.checked }));
+      const pid = await q(sb.rpc("cs_aansluiten", { p_code: code, p_naam: e.target.naam.value.trim() }));
       toast("Aanvraag verstuurd");
       P = null;
       ga("#/p/" + pid);
@@ -595,7 +607,7 @@ function cOverzicht(kop) {
   <div class="raster twee" style="margin-top:${wacht.length ? 14 : 0}px">
     <div class="blok">
       <h2>Spelers uitnodigen</h2>
-      <p class="sub">Deel deze teamcode of link met je spelers en hun ouders. Zij maken een account en jij keurt ze goed.</p>
+      <p class="sub">Deel deze teamcode of link met je spelers. Zij maken een account en jij keurt ze goed.</p>
       <div class="code">${esc(P.ploeg.code)}</div>
       <div class="rij" style="margin-top:12px">
         <button class="knop vol klein" onclick="A.kopieer(deelLink())">Link kopiëren</button>
@@ -667,6 +679,7 @@ async function cSpelerDetail(kop, sid) {
   evals.forEach(ev => { const r = (ev.ratings || {})[sid]; if (r) ontvangen.push(r); if (ev.motm === sid) motm++; if (ev.weak_link === sid) wl++; });
   const eigenMent = evals.filter(ev => ev.speler_id === sid).map(e => e.antwoorden && e.antwoorden.eigen_mentaliteit).filter(Boolean);
 
+  window._profielCoach = { sid, data };
   app().innerHTML = kop + `
   <a class="terug" href="#/p/${P.id}/spelers">← Alle spelers</a>
   <div class="raster twee" style="margin-top:10px">
@@ -697,9 +710,15 @@ async function cSpelerDetail(kop, sid) {
   </div>
   <div class="blok" style="margin-top:14px">
     <h2>Persoonlijke boodschap</h2>
-    <p class="sub">Enkel ${esc(s.voornaam)} (en gekoppelde ouders) ziet deze boodschap op de startpagina.</p>
+    <p class="sub">Enkel ${esc(s.voornaam)} ziet deze boodschap op zijn startpagina.</p>
     <textarea id="boodschap" maxlength="2000" placeholder="bv. Sterk gespeeld zaterdag! Volgende week focus op je eerste aanname.">${esc((profiel && profiel.coach_boodschap) || "")}</textarea>
     <button class="knop vol" style="margin-top:10px" onclick="A.boodschap('${s.id}')">Boodschap opslaan</button>
+  </div>
+  <div class="blok" style="margin-top:14px">
+    <h2>Gegevens</h2>
+    <p class="sub">Enkel coaches en ${esc(s.voornaam)} zelf zien dit. ${esc(s.voornaam)} kan dit ook zelf aanvullen.</p>
+    ${gegevensVelden(data.gegevens)}
+    <button class="knop vol" style="margin-top:12px" onclick="A.gegevensCoach('${s.id}')">Gegevens opslaan</button>
   </div>
   <div class="blok" style="margin-top:14px">
     <h2>Profiel volgens ${esc(s.voornaam)}</h2>
@@ -928,7 +947,7 @@ function cInstellingen(kop) {
   <div class="blok"><h2>Leden en rechten</h2>
     <p class="sub">Maak een assistent ook coach, zodat hij opstellingen en evaluaties kan beheren.</p>
     <div class="lijst">${leden.map(l => `<div class="item" style="flex-wrap:wrap"><div class="hoofd" style="min-width:160px"><b>${esc(l.naam || "")}</b><span class="klein">${esc(l.email || "")}${l.speler_id && P.spelerMap[l.speler_id] ? " · " + esc(naamVan(P.spelerMap[l.speler_id])) : ""}</span></div>
-      ${l.user_id === P.ploeg.eigenaar ? '<span class="label oranje">Eigenaar</span>' : `<select onchange="A.rol('${l.id}',this.value)" style="width:auto" aria-label="Rol"><option value="speler" ${l.rol === "speler" ? "selected" : ""}>Speler / ouder</option><option value="coach" ${l.rol === "coach" ? "selected" : ""}>Coach</option></select>
+      ${l.user_id === P.ploeg.eigenaar ? '<span class="label oranje">Eigenaar</span>' : `<select onchange="A.rol('${l.id}',this.value)" style="width:auto" aria-label="Rol"><option value="speler" ${l.rol === "speler" ? "selected" : ""}>Speler</option><option value="coach" ${l.rol === "coach" ? "selected" : ""}>Coach</option></select>
       <button class="knop klein gevaar" onclick="A.lidWeg('${l.id}')">Verwijder</button>`}</div>`).join("")}</div></div>
   ${eigenaar ? `<div class="blok"><h2>Ploeg verwijderen</h2><p class="sub">Verwijdert de ploeg met alle spelers, wedstrijden, evaluaties en berichten. Dit kan niet ongedaan gemaakt worden.</p><button class="knop gevaar" onclick="A.ploegWeg()">Ploeg definitief verwijderen</button></div>`
     : `<div class="blok"><h2>Ploeg verlaten</h2><button class="knop gevaar" onclick="A.verlaten()">Ik verlaat deze ploeg</button></div>`}`;
@@ -1110,6 +1129,7 @@ async function sProfiel(kop) {
     </div>
     <div class="blok"><h2>Wanneer ben ik er niet?</h2><p class="sub">Tik op de dagen dat je niet kan spelen. De coach ziet dit bij de opstelling.</p><div id="kal"></div></div>
   </div>
+  <div class="blok" style="margin-top:14px"><h2>Mijn gegevens</h2><p class="sub">Enkel jij en je coach zien dit.</p>${gegevensVelden(profielData.gegevens)}</div>
   <div class="rij" style="margin-top:14px"><button class="knop vol" onclick="A.profielBewaar()">Profiel opslaan</button></div>`;
   tekenKalender();
 }
@@ -1169,6 +1189,14 @@ const A = window.A = {
     try {
       await q(sb.from("cs_speler_profiel").upsert({ speler_id: sid, ploeg_id: P.id, coach_boodschap: $("#boodschap").value.trim() || null }, { onConflict: "speler_id" }));
       toast("Boodschap opgeslagen");
+    } catch (e) { foutMelding(e); }
+  },
+  async gegevensCoach(sid) {
+    const huidig = (window._profielCoach && window._profielCoach.sid === sid && window._profielCoach.data) || {};
+    const data = Object.assign({}, huidig, { gegevens: leesGegevens() });
+    try {
+      await q(sb.from("cs_speler_profiel").upsert({ speler_id: sid, ploeg_id: P.id, data }, { onConflict: "speler_id" }));
+      window._profielCoach.data = data; toast("Gegevens opgeslagen");
     } catch (e) { foutMelding(e); }
   },
   async wedstrijdWeg(wid) {
@@ -1256,6 +1284,7 @@ const A = window.A = {
   async profielBewaar() {
     const ik = mijnSpeler();
     profielData.doel = ($("#doel").value || "").trim();
+    profielData.gegevens = leesGegevens();
     profielData.afwezig = profielData.afwezig.filter(x => x >= vandaag()).sort();
     try {
       await q(sb.from("cs_speler_profiel").upsert({ speler_id: ik.id, ploeg_id: P.id, data: profielData }, { onConflict: "speler_id" }));

@@ -77,11 +77,11 @@ create table if not exists public.cs_leden (
   speler_id          uuid references public.cs_spelers(id) on delete set null,
   naam               text check (naam is null or char_length(naam) <= 80),
   email              text,
-  ouder_toestemming  boolean not null default false,
   created_at         timestamptz not null default now(),
   unique (ploeg_id, user_id)
 );
 create index if not exists cs_leden_user_idx on public.cs_leden(user_id);
+alter table public.cs_leden drop column if exists ouder_toestemming;
 
 create table if not exists public.cs_wedstrijden (
   id           uuid primary key default gen_random_uuid(),
@@ -167,9 +167,9 @@ end $$;
 create or replace function public.cs_ploeg_na_insert()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  insert into cs_leden (ploeg_id, user_id, rol, status, naam, email, ouder_toestemming)
+  insert into cs_leden (ploeg_id, user_id, rol, status, naam, email)
   select new.id, new.eigenaar, 'coach', 'actief',
-         coalesce(u.raw_user_meta_data->>'naam', split_part(u.email, '@', 1)), u.email, true
+         coalesce(u.raw_user_meta_data->>'naam', split_part(u.email, '@', 1)), u.email
   from auth.users u where u.id = new.eigenaar
   on conflict (ploeg_id, user_id) do nothing;
   return new;
@@ -404,26 +404,22 @@ language sql stable security definer set search_path = public as $$
   where code = upper(trim(p_code)) limit 1;
 $$;
 
--- Aansluiten bij een ploeg (speler of ouder). Status 'wacht' tot de coach goedkeurt.
-create or replace function public.cs_aansluiten(p_code text, p_naam text, p_ouder_toestemming boolean)
+-- Aansluiten bij een ploeg als speler. Status 'wacht' tot de coach goedkeurt.
+drop function if exists public.cs_aansluiten(text, text, boolean);
+create or replace function public.cs_aansluiten(p_code text, p_naam text)
 returns uuid language plpgsql security definer set search_path = public as $$
 declare
   pl cs_ploegen%rowtype;
-  lid_id uuid;
 begin
   if auth.uid() is null then raise exception 'Log eerst in'; end if;
-  if not coalesce(p_ouder_toestemming, false) then
-    raise exception 'Toestemming van een ouder is nodig';
-  end if;
   if p_naam is null or char_length(trim(p_naam)) < 2 then raise exception 'Vul je naam in'; end if;
   select * into pl from cs_ploegen where code = upper(trim(p_code));
   if not found then raise exception 'Deze teamcode bestaat niet'; end if;
 
-  insert into cs_leden (ploeg_id, user_id, rol, status, naam, email, ouder_toestemming)
-  select pl.id, auth.uid(), 'speler', 'wacht', left(trim(p_naam), 80), u.email, true
+  insert into cs_leden (ploeg_id, user_id, rol, status, naam, email)
+  select pl.id, auth.uid(), 'speler', 'wacht', left(trim(p_naam), 80), u.email
   from auth.users u where u.id = auth.uid()
-  on conflict (ploeg_id, user_id) do update set naam = excluded.naam
-  returning id into lid_id;
+  on conflict (ploeg_id, user_id) do update set naam = excluded.naam;
   return pl.id;
 end $$;
 
@@ -448,8 +444,8 @@ grant select, insert, update, delete on public.cs_ploegen, public.cs_spelers, pu
 
 revoke execute on function public.cs_code_genereren(), public.cs_is_lid(uuid), public.cs_is_coach(uuid),
        public.cs_is_mijn_speler(uuid), public.cs_heeft_aanvraag(uuid), public.cs_ploeg_via_code(text),
-       public.cs_aansluiten(text, text, boolean), public.cs_code_vernieuwen(uuid) from public, anon;
+       public.cs_aansluiten(text, text), public.cs_code_vernieuwen(uuid) from public, anon;
 grant execute on function public.cs_is_lid(uuid), public.cs_is_coach(uuid), public.cs_is_mijn_speler(uuid), public.cs_heeft_aanvraag(uuid),
-      public.cs_ploeg_via_code(text), public.cs_aansluiten(text, text, boolean),
+      public.cs_ploeg_via_code(text), public.cs_aansluiten(text, text),
       public.cs_code_vernieuwen(uuid) to authenticated;
 grant execute on function public.cs_ploeg_via_code(text) to anon;
