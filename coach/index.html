@@ -162,6 +162,7 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--zach
 .tabelwrap{overflow-x:auto}
 
 .cijfers{display:flex;gap:22px;flex-wrap:wrap}
+.wie{font-weight:700;color:#2F7A84;font-size:14px}
 .ovz th,.ovz td{text-align:center;padding:8px 6px}
 .ovz tbody tr{cursor:pointer}
 .ovz tbody tr:hover{background:var(--kaart2)}
@@ -1191,11 +1192,11 @@ async function cEvaluaties(kop, wid) {
   <div class="raster twee" style="margin-top:14px">
     <div class="blok"><h2>De ploeg volgens de spelers</h2>
       <p style="margin:0">Mentaliteit: <b>${tel("team_mentaliteit")}</b> · Samenspel: <b>${tel("team_samenspel")}</b></p>
-      ${waarom.length ? "<hr>" + waarom.map(([id, t]) => `<p style="margin:0 0 8px"><span class="klein">${esc(kortNaam(P.spelerMap[id]))}:</span> ${esc(t)}</p>`).join("") : ""}
+      ${waarom.length ? "<hr>" + waarom.map(([id, t]) => `<p style="margin:0 0 8px"><span class="wie">${esc(kortNaam(P.spelerMap[id]))}:</span> ${esc(t)}</p>`).join("") : ""}
     </div>
     <div class="blok"><h2>Tegenstander</h2>
       ${Object.keys(systemen).length ? `<p style="margin:0">Systeem: ${Object.entries(systemen).sort((a, b) => b[1] - a[1]).map(([s, n]) => `<b>${esc(s)}</b> (${n})`).join(", ")}</p>` : '<p class="sub" style="margin:0">Nog geen antwoorden.</p>'}
-      ${tegTekst.length ? "<hr>" + tegTekst.map(([id, a]) => `<p style="margin:0 0 8px"><span class="klein">${esc(kortNaam(P.spelerMap[id]))}:</span> ${a.teg_beste ? "beste speler: " + esc(a.teg_beste) : ""}${a.teg_beste && a.teg_extra ? " · " : ""}${esc(a.teg_extra || "")}</p>`).join("") : ""}
+      ${tegTekst.length ? "<hr>" + tegTekst.map(([id, a]) => `<p style="margin:0 0 8px"><span class="wie">${esc(kortNaam(P.spelerMap[id]))}:</span> ${a.teg_beste ? "beste speler: " + esc(a.teg_beste) : ""}${a.teg_beste && a.teg_extra ? " · " : ""}${esc(a.teg_extra || "")}</p>`).join("") : ""}
     </div>
   </div>
   <div id="evaldetail"></div>
