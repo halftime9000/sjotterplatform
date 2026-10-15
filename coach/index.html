@@ -749,31 +749,29 @@ async function cOverzicht(kop) {
     <p class="sub">Koppel elke aanvraag aan een speler uit je lijst, of laat een nieuwe speler aanmaken met de opgegeven naam.</p><div class="lijst">${aanvragen}</div></div>` : ""}
   <div class="raster twee">
     <div class="blok">
-      <h2>Spelers uitnodigen</h2>
-      <p class="sub">Deel deze teamcode met je spelers. Zij maken een account, vullen de code in en jij keurt ze goed.</p>
-      <div class="code">${esc(P.ploeg.code)}</div>
-      <div class="rij" style="margin-top:12px">
-        <button class="knop vol klein" onclick="A.kopieer(P.ploeg.code, 'Code gekopieerd')">Code kopiëren</button>
-        <a class="knop klein" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Sluit aan bij " + P.ploeg.naam + " op Sjotter. Teamcode: " + P.ploeg.code + "\n" + deelLink())}">Delen via WhatsApp</a>
-      </div>
-    </div>
-    <div class="blok"><h2>Ploeg</h2>
-      <div class="cijfers"><div><b>${actief.length}</b><span class="klein">spelers</span></div>
-      <div><b>${actief.filter(s => gekoppeld.has(s.id)).length}</b><span class="klein">met account</span></div>
-      <div><b>${fiches}</b><span class="klein">fiche ingevuld</span></div></div>
-      <a class="knop klein" style="margin-top:12px" href="#/p/${P.id}/spelers">${actief.length ? "Naar spelers" : "Spelers toevoegen"}</a>
-    </div>
-    <div class="blok">
       <h2>Volgende wedstrijd</h2>
       ${komend ? `<p style="margin:0 0 4px;font-size:18px"><b>${esc(komend.tegenstander)}</b> <span class="label">${komend.thuis_uit}</span></p>
-        <p class="sub">${datumMooi(komend.datum)}</p><a class="knop klein" href="#/p/${P.id}/wedstrijden/${komend.id}">Opstelling maken</a>`
+        <p class="sub">${datumMooi(komend.datum)}</p><a class="knop klein vol" href="#/p/${P.id}/wedstrijden/${komend.id}">Opstelling maken</a>`
       : `<p class="sub">Nog geen wedstrijd gepland.</p><a class="knop klein vol" href="#/p/${P.id}/wedstrijden/nieuw">Wedstrijd toevoegen</a>`}
     </div>
     <div class="blok" id="laatste-eval">
       <h2>Laatste evaluaties</h2>
       ${laatste ? `<p style="margin:0 0 4px;font-size:18px"><b>${esc(laatste.tegenstander)}</b> ${scoreLabels(laatste)}</p><p class="sub" id="eval-teller">${datumMooi(laatste.datum)}</p>
-        <a class="knop klein" href="#/p/${P.id}/wedstrijden/${laatste.id}/evaluaties">Bekijk evaluaties</a>` : '<p class="sub" style="margin:0">Nog geen gespeelde wedstrijd met opstelling.</p>'}
+        <a class="knop klein vol" href="#/p/${P.id}/wedstrijden/${laatste.id}/evaluaties">Bekijk evaluaties</a>` : '<p class="sub" style="margin:0">Nog geen gespeelde wedstrijd met opstelling.</p>'}
     </div>
+    <div class="blok" style="grid-column:1/-1">
+      <div class="rij tussen"><h2 style="margin:0">Ploeg</h2><a class="knop klein" href="#/p/${P.id}/spelers">${actief.length ? "Naar spelers" : "Spelers toevoegen"}</a></div>
+      <div class="cijfers" style="margin-top:12px"><div><b>${actief.length}</b><span class="klein">spelers</span></div>
+      <div><b>${actief.filter(s => gekoppeld.has(s.id)).length}</b><span class="klein">met account</span></div>
+      <div><b>${fiches}</b><span class="klein">fiche ingevuld</span></div></div>
+    </div>
+  </div>
+  <div class="bijzaak">
+    <span>Spelers uitnodigen · teamcode <b style="font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.15em;color:var(--geel);font-size:15px">${esc(P.ploeg.code)}</b></span>
+    <span class="rij" style="gap:8px">
+      <button class="knop klein" onclick="A.kopieer(P.ploeg.code, 'Code gekopieerd')">Code kopiëren</button>
+      <a class="knop klein" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Sluit aan bij " + P.ploeg.naam + " op Sjotter. Teamcode: " + P.ploeg.code + "\n" + deelLink())}">Delen via WhatsApp</a>
+    </span>
   </div>`;
   if (laatste) {
     try {
