@@ -11,7 +11,7 @@
 @font-face{font-family:Fraunces;src:url('../assets/fonts/fraunces.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:Fraunces;src:url('../assets/fonts/fraunces-italic.woff2') format('woff2');font-weight:100 900;font-style:italic;font-display:swap}
 :root{
-  --bg:#0E2A2F;--kaart:#15393F;--kaart2:#113238;--rand:#24525A;--tekst:#F2EFE6;--zacht:#A3BCBF;--licht:#DCE8E9;
+  --bg:#0A1F23;--kaart:#163E45;--kaart2:#0F2D33;--rand:#2C626B;--tekst:#F2EFE6;--zacht:#A3BCBF;--licht:#DCE8E9;
   --accent:#FF8A6B;--accent-d:#F0704F;--op-accent:#0E2A2F;--geel:#F4C95D;--live:#79D6A5;--fout:#FF7B7B;
 }
 *{box-sizing:border-box}
@@ -191,6 +191,29 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--zach
 .licht th,.licht td{border-bottom-color:#E8E2D6}
 .licht hr{border-top-color:#E3DDD1}
 .licht a{color:#C2512F}
+
+/* Mijn ploegen: ploeg als duidelijke tegel, de rest op de achtergrond */
+.ploegtegels{display:grid;gap:14px}
+.ploegtegel{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;padding:22px 24px;border-radius:18px;
+  background:#1D4A52;border:1.5px solid #3C7A84;border-left:6px solid var(--accent);color:var(--tekst);text-decoration:none;
+  box-shadow:0 10px 28px rgba(0,0,0,.28);transition:transform .15s,border-color .15s,box-shadow .15s}
+.ploegtegel:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.ploegtegel .embleem{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--op-accent);
+  font-weight:900;font-stretch:80%;font-size:22px;letter-spacing:.02em;box-shadow:inset 0 0 0 3px rgba(255,255,255,.25)}
+.ploegtegel .naam{font-family:Fraunces,Georgia,serif;font-weight:600;font-variation-settings:"SOFT" 100,"opsz" 72;font-size:30px;line-height:1.05}
+.ploegtegel .meta{color:#C3D6D8;font-size:15px;margin-top:4px}
+.ploegtegel .rechts{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.ploegtegel.wacht{border-left-color:var(--geel);opacity:.85}
+.ploegtegel.wacht .embleem{background:#3A5A5F;color:var(--geel)}
+.bijzaak{margin-top:26px;padding:16px 18px;border:1px dashed var(--rand);border-radius:14px;display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;color:var(--zacht);font-size:14px}
+.bijzaak form{display:flex;gap:8px;align-items:center}
+.bijzaak input{width:150px;padding:7px 10px;font-size:14px}
+@media (max-width:600px){
+  .ploegtegel{grid-template-columns:auto 1fr;gap:14px;padding:18px}
+  .ploegtegel .rechts{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}
+  .ploegtegel .embleem{width:52px;height:52px;font-size:18px}
+  .ploegtegel .naam{font-size:24px}
+}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140px);background:var(--tekst);color:var(--bg);font-weight:700;padding:11px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .25s;z-index:50;max-width:calc(100% - 32px)}
 #toast.zicht{transform:translateX(-50%) translateY(0);visibility:visible}
 #toast:not(.zicht){visibility:hidden;transition:transform .25s,visibility 0s .25s}
@@ -496,19 +519,27 @@ async function vStart() {
     sessionStorage.setItem("cs_lijst", "1");
     return ga("#/p/" + mijnLeden[0].ploeg_id);
   }
-  const rijen = mijnLeden.map(l => {
-    const p = l.cs_ploegen || {};
-    const st = l.status === "wacht" ? '<span class="label geel">Wacht op goedkeuring</span>'
+  const embleem = p => {
+    const woorden = String(p.club || p.naam || "?").replace(/[^\p{L}\p{N} ]/gu, " ").split(/\s+/).filter(Boolean);
+    return esc((woorden.length > 1 ? woorden[0][0] + woorden[woorden.length - 1][0] : (woorden[0] || "?").slice(0, 2)).toUpperCase());
+  };
+  const tegels = mijnLeden.map(l => {
+    const p = l.cs_ploegen || {}, wacht = l.status === "wacht";
+    const rol = wacht ? '<span class="label geel">Wacht op goedkeuring</span>'
       : l.rol === "coach" ? '<span class="label oranje">Coach</span>' : '<span class="label groen">Speler</span>';
-    return `<a class="item" href="#/p/${l.ploeg_id}">
-      <div class="hoofd"><b>${esc(p.naam || "Ploeg")}</b><span class="klein">${esc([p.club, p.categorie, p.seizoen].filter(Boolean).join(" · "))}</span></div>${st}</a>`;
+    return `<a class="ploegtegel ${wacht ? "wacht" : ""}" href="#/p/${l.ploeg_id}">
+      <span class="embleem" aria-hidden="true">${embleem(p)}</span>
+      <div style="min-width:0"><div class="naam">${esc(p.naam || "Ploeg")}</div><div class="meta">${esc([p.club, p.categorie, p.seizoen].filter(Boolean).join(" · "))}</div></div>
+      <div class="rechts">${rol}<span class="knop vol klein">${wacht ? "Bekijk" : "Openen →"}</span></div></a>`;
   }).join("");
   app().innerHTML = `
   <h1 class="titel">Mijn <em>ploegen</em></h1>
-  <div class="blok">${rijen ? '<div class="lijst">' + rijen + "</div>" : '<div class="leeg">Je bent nog bij geen enkele ploeg.</div>'}</div>
-  <div class="raster twee" style="margin-top:14px">
-    <div class="blok"><h2>Nieuwe ploeg</h2><p class="sub">Voor coaches: maak je ploeg aan en nodig je spelers uit.</p><a class="knop vol" href="#/nieuw">Ploeg aanmaken</a></div>
-    <div class="blok"><h2>Aansluiten</h2><p class="sub">Speler? Vul de teamcode van je coach in.</p>${codeVeld("Verder")}</div>
+  ${tegels ? `<div class="ploegtegels">${tegels}</div>` : `<div class="blok leeg">Je bent nog bij geen enkele ploeg.<br><br><a class="knop vol" href="#/nieuw">Ploeg aanmaken</a></div>`}
+  <div class="bijzaak">
+    <span>Nog een ploeg? <a href="#/nieuw">Nieuwe ploeg aanmaken</a></span>
+    <span class="rij" style="gap:8px">Speler bij een andere ploeg?
+      <form onsubmit="event.preventDefault();ga('#/code/'+encodeURIComponent(this.c.value.trim().toUpperCase()))"><input name="c" placeholder="Teamcode" maxlength="6" aria-label="Teamcode" style="text-transform:uppercase;letter-spacing:.12em" required><button class="knop klein">Verder</button></form>
+    </span>
   </div>`;
 }
 
