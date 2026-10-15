@@ -1159,17 +1159,17 @@ async function cEvaluaties(kop, wid) {
     if (e.weak_link) wl[e.weak_link] = (wl[e.weak_link] || 0) + 1;
   });
   const sorteer = id => ontv[id] && ontv[id].length ? Number(gemiddelde(ontv[id])) : -1;
+  const eigenGem = e => { if (!e || !e.ingediend) return "–"; const v = Object.entries(e.antwoorden || {}).filter(([k]) => /^(eigen_|k_)/.test(k) && !/_opm$/.test(k)).map(([, x]) => parseFloat(x)).filter(n => !isNaN(n)); return v.length ? (v.reduce((a, b) => a + b, 0) / v.length).toFixed(1) : "–"; };
   const rijen = ids.map(id => P.spelerMap[id]).filter(Boolean)
     .sort((a, b) => sorteer(b.id) - sorteer(a.id))
     .map(s => {
       const e = perSpeler[s.id], a = (e && e.antwoorden) || {};
       return `<tr>
-        <td><b>${esc(naamVan(s))}</b></td>
-        <td>${e ? (e.ingediend ? '<span class="label groen">ingediend</span>' : '<span class="label geel">concept</span>') : '<span class="label">nog niet</span>'}</td>
+        <td><b style="color:${e && e.ingediend ? "#1E7A45" : "var(--fout)"}" title="${e && e.ingediend ? "Ingediend" : e ? "Nog niet ingediend (concept)" : "Nog niet ingevuld"}">${esc(naamVan(s))}</b>${e && !e.ingediend ? ' <span class="klein">concept</span>' : ""}</td>
         <td><b>${gemiddelde(ontv[s.id])}</b> <span class="klein">(${(ontv[s.id] || []).length})</span></td>
+        <td><b>${eigenGem(e)}</b></td>
         <td>${motm[s.id] ? "⭐ " + motm[s.id] : ""}</td>
         ${P.ploeg.weak_link_aan ? `<td>${wl[s.id] || ""}</td>` : ""}
-        <td>${a.eigen_mentaliteit || "–"}</td>
         <td>${e ? `<button class="knop klein" onclick="A.toonEval('${s.id}')">Bekijk</button>` : ""}</td></tr>`;
     }).join("");
   const tel = k => gemiddelde(evals.map(e => e.antwoorden && Number(e.antwoorden[k])).filter(Boolean));
@@ -1184,7 +1184,7 @@ async function cEvaluaties(kop, wid) {
     <div class="rij tussen"><h2 style="margin:0">Evaluaties · ${esc(w.tegenstander)}</h2>
     <span class="klein">${evals.filter(e => e.ingediend).length} van ${ids.length} ingediend</span></div>
     <div class="tabelwrap" style="margin-top:10px"><table>
-      <tr><th>Speler</th><th>Status</th><th>Score ploegmaats</th><th>MOTM</th>${P.ploeg.weak_link_aan ? "<th>Weak link</th>" : ""}<th>Eigen ment.</th><th></th></tr>
+      <tr><th>Speler</th><th>Score ploegmaats</th><th title="Gemiddelde van de eigen scores">Eigen score</th><th>MOTM</th>${P.ploeg.weak_link_aan ? "<th>Weak link</th>" : ""}<th></th></tr>
       ${rijen || '<tr><td colspan="7" class="leeg">Nog niemand opgesteld.</td></tr>'}
     </table></div>
   </div>
