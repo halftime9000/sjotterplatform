@@ -1,17 +1,19 @@
 /* Gedeelde basisstijl voor Sjotter-modules */
 /* Zelf gehoste fonts (geen Google Fonts nodig) */
 @font-face{font-family:Archivo;src:url('../assets/fonts/archivo.woff2') format('woff2');font-weight:100 900;font-stretch:62% 125%;font-display:swap}
+@font-face{font-family:Rubik;src:url('../assets/fonts/rubik.woff2') format('woff2');font-weight:300 900;font-display:swap}
 @font-face{font-family:Caveat;src:url('../assets/fonts/caveat.woff2') format('woff2');font-weight:400 700;font-display:swap}
 
 :root{
-  --papier:#F4EFE4;--papier-l:#FAF7F0;--inkt:#1C2620;--zacht:#5A5F55;
-  --gras:#2E6A3A;--gras-d:#1F4D2B;--geel:#F2C230;--hemel:#2C4F8C;--lijn:#D6CEBB;
+  /* Kleedkamer licht */
+  --papier:#EAF0F6;--papier-l:#FFFFFF;--inkt:#172435;--zacht:#5A6B80;
+  --gras:#2B7FD0;--gras-d:#1F6CB8;--geel:#F2C230;--hemel:#2B7FD0;--lijn:#D3DEEA;
   /* oude namen, voor compatibiliteit */
-  --groen:#1F4D2B;--groen-d:#163A20;--bg:#F4EFE4;--kaart:#FAF7F0;--tekst:#1C2620;
+  --groen:#1F6CB8;--groen-d:#172435;--bg:#EAF0F6;--kaart:#FFFFFF;--tekst:#172435;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{font-family:Archivo,system-ui,sans-serif;background:var(--papier);color:var(--inkt);-webkit-font-smoothing:antialiased}
+body{font-family:Rubik,system-ui,sans-serif;background:var(--papier);color:var(--inkt);-webkit-font-smoothing:antialiased}
 a{color:var(--gras-d)}
 .sj-top{border-bottom:1px solid var(--lijn)}
 .sj-top-in{max-width:1120px;margin:0 auto;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}

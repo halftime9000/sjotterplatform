@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl-BE" data-thema="petrol">
+<html lang="nl-BE" data-thema="kleedkamer">
 <head>
 <meta charset="UTF-8">
 <script>
@@ -17,10 +17,11 @@
 <meta name="description" content="Sjotter — gratis tools voor jeugdvoetbalcoaches: oefenmatchen en tornooien, coach &amp; speler, Training Hub en ThePlayerNation.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjE2IiBmaWxsPSIjMEQzQjIwIi8+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEwLjUiIGZpbGw9IiNmZmZmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSIxNiw5LjUgMjEuNCwxMy40IDE5LjQsMTkuNyAxMi42LDE5LjcgMTAuNiwxMy40IiBmaWxsPSIjMEQzQjIwIi8+Cjwvc3ZnPg==">
 <link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/rubik.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="shared/sjotter.css">
 <script src="shared/config.js"></script>
 <style>
+@font-face{font-family:Rubik;src:url('assets/fonts/rubik.woff2') format('woff2');font-weight:300 900;font-display:swap}
 @font-face{font-family:Fraunces;src:url('assets/fonts/fraunces.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:Fraunces;src:url('assets/fonts/fraunces-italic.woff2') format('woff2');font-weight:100 900;font-style:italic;font-display:swap}
 
@@ -46,6 +47,9 @@
 [data-thema="petrol"]{ /* petrol + zachtgeel */
   --bg:#0E2A2F;--kaart:#15393F;--rand:#24525A;--tekst:#F2EFE6;--zacht:#A3BCBF;--licht:#DCE8E9;
   --accent:#F4C95D;--accent-d:#DDB042;--op-accent:#0E2A2F;--live:#79D6A5;--tegel:#282e32;--knoprand:#3E6A71}
+[data-thema="kleedkamer"]{ /* Kleedkamer licht: ijsblauw + wit + blauw (zelfde als Coach & Speler) */
+  --bg:#EAF0F6;--kaart:#FFFFFF;--rand:#D3DEEA;--tekst:#172435;--zacht:#5A6B80;--licht:#2A3A4E;
+  --accent:#2B7FD0;--accent-d:#1F6CB8;--op-accent:#FFFFFF;--live:#2E7D4F;--tegel:#282e32;--knoprand:#C3D1E0;--hl:#1F6CB8}
 :root{--breed:1000px}
 
 html,body{overflow-x:clip}
@@ -119,6 +123,19 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .vak[style*="--mod"] .status{color:var(--mod)}
 .vak[style*="--mod"] .punten li::before{border-color:var(--mod)}
 .vak[style*="--mod"] h2{color:color-mix(in srgb,var(--mod) 35%,var(--tekst))}
+
+/* Kleedkamer licht: Rubik + lichte kaarten */
+[data-thema="kleedkamer"] body{font-family:Rubik,system-ui,sans-serif}
+[data-thema="kleedkamer"] .merk,[data-thema="kleedkamer"] .vak-kop h2,[data-thema="kleedkamer"] .deel b{font-stretch:100%}
+[data-thema="kleedkamer"] .vak-kop h2{font-size:17px;letter-spacing:.04em}
+[data-thema="kleedkamer"] .vak.een h1{font-family:Rubik,system-ui,sans-serif;font-variation-settings:normal;font-weight:700}
+[data-thema="kleedkamer"] .vak.een h1 em{font-weight:700}
+[data-thema="kleedkamer"] .vak{box-shadow:0 1px 4px rgba(23,36,53,.06)}
+[data-thema="kleedkamer"] a.vak:hover{box-shadow:0 10px 26px rgba(23,36,53,.12)}
+[data-thema="kleedkamer"] a.vak[href="coach/"]{--mod:#D2563A}
+[data-thema="kleedkamer"] a.vak[href="training/"]{--mod:#1F8F6A}
+[data-thema="kleedkamer"] a.vak[href="playernation/"]{--mod:#7452D1}
+[data-thema="kleedkamer"] .vak[style*="--mod"] h2{color:var(--tekst)}
 </style>
 </head>
 <body>

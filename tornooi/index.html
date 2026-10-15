@@ -11,23 +11,25 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
+@font-face{font-family:Rubik;src:url('../assets/fonts/rubik.woff2') format('woff2');font-weight:300 900;font-display:swap}
 :root{
-  --groen:#14532D; --groen-d:#0D3B20; --gras:#22A05A; --gras-l:#E7F5EC;
-  --inkt:#101B14; --grijs:#5B6660; --papier:#F4F6F3; --wit:#FFFFFF;
-  --lijn:#DDE3DC; --geel:#F2C230; --rood:#C6402E; --rood-l:#FBEBE8;
+  /* Kleedkamer licht (zelfde palet als de rest van Sjotter) */
+  --groen:#1F6CB8; --groen-d:#172435; --gras:#2B7FD0; --gras-l:#EEF5FC;
+  --inkt:#172435; --grijs:#5A6B80; --papier:#EAF0F6; --wit:#FFFFFF;
+  --lijn:#D3DEEA; --geel:#F2C230; --rood:#C6402E; --rood-l:#FBEBE8;
   --blauw-d:#16233F; --blauw:#2C4F8C; --hemel:#4E86E8;
   --r:12px; --shadow:0 1px 2px rgba(16,27,20,.06),0 4px 16px rgba(16,27,20,.05);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 html,body{overflow-x:hidden;max-width:100%}
-body{font-family:'Inter',sans-serif;background:var(--papier);color:var(--inkt);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-h1,h2,h3,h4{font-family:'Archivo',sans-serif;letter-spacing:-.01em;line-height:1.15}
+body{font-family:Rubik,'Inter',sans-serif;background:var(--papier);color:var(--inkt);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:Rubik,'Archivo',sans-serif;letter-spacing:-.01em;line-height:1.15}
 .kaart h3:first-of-type{border-left:4px solid var(--gras);padding-left:12px;margin-bottom:16px;font-size:17px}
 a{color:var(--groen);text-decoration:none}
 button{font-family:inherit;cursor:pointer}
 input,select,textarea{font-family:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--lijn);border-radius:8px;background:var(--papier);width:100%;color:var(--inkt);transition:.15s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gras);box-shadow:0 0 0 3px rgba(46,138,79,.14);background:var(--wit)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gras);box-shadow:0 0 0 3px rgba(43,127,208,.14);background:var(--wit)}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--gras);outline-offset:1px;border-color:var(--gras)}
 label{display:block;font-size:13px;font-weight:600;color:var(--grijs);margin:14px 0 5px;text-transform:uppercase;letter-spacing:.04em}
 .mono{font-family:'IBM Plex Mono',monospace}
@@ -35,7 +37,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--grijs);margin:14p
 /* ---------- layout ---------- */
 .topbar{background:var(--inkt);color:#fff;position:sticky;top:0;z-index:50}
 .topbar-in{max-width:1080px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;gap:18px}
-.logo{font-family:'Archivo';font-weight:900;font-size:20px;color:#fff;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.logo{font-family:Rubik,'Archivo';font-weight:900;font-size:20px;color:#fff;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
 .logo .bal{width:22px;height:22px;border-radius:50%;background:#fff;position:relative;display:inline-block}
 .slogan{font-family:'Caveat',cursive;font-weight:700;font-size:19px;color:var(--geel);margin-left:-12px;white-space:nowrap}
 .logo .bal::after{content:'';position:absolute;inset:6px;border-radius:2px;background:var(--inkt);clip-path:polygon(50% 0,100% 38%,81% 100%,19% 100%,0 38%)}
@@ -47,7 +49,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--grijs);margin:14p
 
 /* ---------- knoppen ---------- */
 .btn{display:inline-flex;align-items:center;gap:8px;justify-content:center;font-weight:700;font-size:14px;padding:11px 20px;border-radius:9px;border:none;transition:.15s}
-.btn-p{background:var(--gras);color:#fff;box-shadow:0 1px 3px rgba(46,138,79,.25)}
+.btn-p{background:var(--gras);color:#fff;box-shadow:0 1px 3px rgba(43,127,208,.25)}
 .btn-p:hover{background:var(--groen)}
 .btn-p:hover{background:#1B8A4C}
 .btn-d{background:var(--groen-d);color:#fff}
@@ -178,7 +180,7 @@ td.num,th.num{text-align:center;width:42px}
 .split{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 60px)}
 .paneel{position:relative;overflow:hidden;color:#fff;padding:76px 52px;display:flex;flex-direction:column;justify-content:center}
 .paneel::before{content:'';position:absolute;width:560px;height:560px;border:2px dashed rgba(255,255,255,.13);border-radius:50%;top:-170px;right:-170px;pointer-events:none}
-.paneel-t{background:linear-gradient(155deg,rgba(13,59,32,.93) 0%,rgba(26,100,56,.90) 100%),url('../assets/foto-toernooi.jpg') center/cover no-repeat,linear-gradient(155deg,var(--groen-d),#1A6438)}
+.paneel-t{background:linear-gradient(155deg,rgba(23,36,53,.93) 0%,rgba(31,108,184,.88) 100%),url('../assets/foto-toernooi.jpg') center/cover no-repeat,linear-gradient(155deg,var(--groen-d),#1F6CB8)}
 .paneel-w{background:linear-gradient(155deg,rgba(22,35,63,.93) 0%,rgba(44,79,140,.90) 100%),url('../assets/foto-oefenmatch.jpg') center/cover no-repeat,linear-gradient(155deg,var(--blauw-d),var(--blauw))}
 .paneel .tag{font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-bottom:14px}
 .paneel h2{font-size:clamp(26px,3.4vw,40px);font-weight:800;letter-spacing:-.005em;word-spacing:.12em;margin-bottom:14px}
