@@ -292,6 +292,11 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   .vakken:has(.vak.open) > .vak:not(.open) .vak-kop h2{font-size:9.5px!important;overflow-wrap:normal!important;letter-spacing:0!important}
   .vak .lint,.vak .kopstatus{display:none!important}
 }
+@media (max-width:640px){
+  .vak.een:not(.open) .vak-kop h2{display:flex;flex-direction:column;align-items:center;gap:0!important;line-height:1.1!important}
+  .vak.een:not(.open) .vak-kop h2 .amp{display:block;font-size:.85em}
+  .vakken:not(:has(.vak.open)) .vak.een .tegel{align-items:flex-end}
+}
 </style>
 </head>
 <body>
@@ -311,16 +316,16 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
 
   <!-- 01 Oefenmatch & Tornooi -->
   <section class="vak een">
-    <div class="vak-kop"><h2>Oefenmatch &amp; Tornooi</h2><span class="lint">Nu open</span></div>
-    <div class="tegel"><img src="assets/oefenmatch.png" alt=""><img src="assets/tornooi.png" alt=""></div>
+    <div class="vak-kop"><h2>Oefenmatch <span class="amp">&amp;</span> Tornooi</h2><span class="lint">Nu open</span></div>
+    <div class="tegel"><img src="assets/oefenmatch-k.png" alt=""><img src="assets/tornooi-k.png" alt=""></div>
     <h1>Nog geen <em>tegenstander</em>&nbsp;voor zaterdag of <em>tornooi</em>&nbsp;voor de paasvakantie?</h1>
     <div class="duo">
       <div class="deel">
-        <a href="tornooi/#/wedstrijden"><img src="assets/oefenmatch.png" alt="Club Friendlies"></a>
+        <a href="tornooi/#/wedstrijden"><img src="assets/oefenmatch-k.png" alt="Club Friendlies"></a>
         <div class="knoppen"><b>Oefenmatch</b><a class="vol" href="tornooi/#/wedstrijden">Zoek</a><a href="tornooi/#/wedstrijden/plaatsen">Plaats</a></div>
       </div>
       <div class="deel">
-        <a href="tornooi/#/toernooien"><img src="assets/tornooi.png" alt="Club Tornooien"></a>
+        <a href="tornooi/#/toernooien"><img src="assets/tornooi-k.png" alt="Club Tornooien"></a>
         <div class="knoppen"><b>Tornooi</b><a class="vol" href="tornooi/#/toernooien">Bekijk</a><a id="organiseer" href="tornooi/#/registreren">Organiseer</a></div>
       </div>
     </div>
