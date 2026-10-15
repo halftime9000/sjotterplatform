@@ -162,6 +162,18 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--zach
 .tabelwrap{overflow-x:auto}
 
 .cijfers{display:flex;gap:22px;flex-wrap:wrap}
+.ovz th,.ovz td{text-align:center;padding:8px 6px}
+.ovz tbody tr{cursor:pointer}
+.ovz tbody tr:hover{background:var(--kaart2)}
+.legende{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--zacht)}
+.balkrij{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px}
+.balkrij[onclick]{cursor:pointer}
+.balkrij .rang{width:20px;text-align:center;color:var(--zacht);font-size:12px;font-weight:700}
+.balkrij .nm{flex:0 0 150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.balk{flex:1;height:8px;background:var(--kaart2);border:1px solid var(--rand);border-radius:99px;overflow:hidden}
+.balk i{display:block;height:100%;border-radius:99px}
+.zelfgem b{font-size:22px}
+
 .cijfers b{display:block;font-size:26px;font-weight:900;line-height:1.1}
 
 .melding{background:var(--kaart2);border:1px solid var(--rand);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px}
@@ -651,7 +663,7 @@ function vNieuwePloeg() {
       await q(sb.from("cs_ploegen").insert(rij));
       sessionStorage.setItem("cs_lijst", "1");
       toast("Ploeg aangemaakt");
-      ga("#/p/" + rij.id + "/overzicht");
+      ga("#/p/" + rij.id + "/home");
     } catch (err) { foutMelding(err); knop.disabled = false; }
   };
 }
@@ -731,7 +743,7 @@ async function vPloeg(id, tab, sub, sub2) {
   }
   if (!P) { app().innerHTML = '<div class="blok leeg">Deze ploeg bestaat niet of je hebt er geen toegang toe. <a href="#/">Terug</a></div>'; return; }
   if (!P.actief) return vWachten();
-  if (P.coach) return vCoach(tab || "overzicht", sub, sub2);
+  if (P.coach) return vCoach(tab || "home", sub, sub2);
   return vSpeler(tab || "home", sub, sub2);
 }
 function herlaad() { if (P) P._verouderd = true; route(); }
@@ -770,15 +782,15 @@ function ficheIngevuld(d) { return !!(d && (Object.values(d.sterk || {}).flat().
    ===================================================================== */
 function vCoach(tab, sub, sub2) {
   const wacht = P.leden.filter(l => l.status === "wacht").length;
-  const tabs = [["overzicht", "Overzicht", wacht], ["spelers", "Spelers"], ["wedstrijden", "Wedstrijden"], ["instellingen", "Instellingen"]];
+  const tabs = [["home", "Home", wacht], ["overzicht", "Overzicht"], ["spelers", "Spelers"], ["wedstrijden", "Wedstrijden"], ["instellingen", "Instellingen"]];
   const kop = ploegKop(tabs, tab);
-  const views = { overzicht: cOverzicht, spelers: cSpelers, wedstrijden: cWedstrijden, instellingen: cInstellingen };
-  return (views[tab] || cOverzicht)(kop, sub, sub2);
+  const views = { home: cHome, overzicht: cOverzicht, spelers: cSpelers, wedstrijden: cWedstrijden, instellingen: cInstellingen };
+  return (views[tab] || cHome)(kop, sub, sub2);
 }
 
 function deelLink() { return location.origin + location.pathname + "#/code/" + P.ploeg.code; }
 
-async function cOverzicht(kop) {
+async function cHome(kop) {
   const wacht = P.leden.filter(l => l.status === "wacht");
   const nu = vandaag();
   const komend = P.wedstrijden.filter(w => w.datum >= nu).sort((a, b) => a.datum.localeCompare(b.datum))[0];
@@ -836,6 +848,82 @@ async function cOverzicht(kop) {
       const el = $("#eval-teller"); if (el) el.textContent = datumMooi(laatste.datum) + " · " + ev.length + " van " + opgesteld(laatste).length + " ingediend";
     } catch (e) { console.warn(e); }
   }
+}
+
+/* ---------- overzicht: alle spelers in één oogopslag (zoals het KSK-beheer) ---------- */
+const scoreKleur = v => v == null ? "var(--zacht)" : v >= 9 ? "#1E7A45" : v >= 7 ? "#3FA36B" : v >= 6 ? "#D9822B" : "var(--fout)";
+const pctKleur = p => p >= 100 ? "#1E7A45" : p >= 70 ? "#3FA36B" : p >= 40 ? "#D9822B" : "var(--fout)";
+const gem = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+const getal = v => { const n = parseFloat(v); return isNaN(n) ? null : n; };
+async function cOverzicht(kop) {
+  app().innerHTML = kop + '<div class="laden">Laden…</div>';
+  const evals = await q(sb.from("cs_evaluaties").select("wedstrijd_id,speler_id,ratings,motm,weak_link,antwoorden,ingediend").eq("ploeg_id", P.id));
+  const nu = vandaag();
+  const gespeeldeW = P.wedstrijden.filter(w => w.datum <= nu);
+  const spelers = P.spelers.filter(s => s.actief).sort((a, b) => naamVan(a).localeCompare(naamVan(b)));
+  const wl = P.ploeg.weak_link_aan;
+
+  // per speler: gespeeld, eigen gemiddelde, score van ploegmaats, motm, weak link, invulgraad
+  const rij = spelers.map(s => {
+    const wIds = gespeeldeW.filter(w => opgesteld(w).includes(s.id)).map(w => w.id);
+    const eigen = evals.filter(e => e.speler_id === s.id && e.ingediend);
+    const eigenScores = [];
+    eigen.forEach(e => Object.entries(e.antwoorden || {}).forEach(([k, v]) => { if (/^(eigen_|k_)/.test(k) && !/_opm$/.test(k)) { const n = getal(v); if (n != null) eigenScores.push(n); } }));
+    const peer = []; let motm = 0, weak = 0;
+    evals.forEach(e => { if (e.speler_id === s.id) return; const n = getal((e.ratings || {})[s.id]); if (n != null) peer.push(n); if (e.motm === s.id) motm++; if (e.weak_link === s.id) weak++; });
+    const ingevuld = new Set(eigen.map(e => e.wedstrijd_id).filter(id => wIds.includes(id))).size;
+    return { s, gespeeld: wIds.length, eigen: gem(eigenScores), peer: gem(peer), peerN: peer.length, motm, weak, ingevuld, pct: wIds.length ? Math.round(ingevuld / wIds.length * 100) : null };
+  });
+  const cijfer = v => v == null ? '<span class="klein">—</span>' : `<b style="color:${scoreKleur(v)}">${v.toFixed(1)}</b>`;
+  const tabel = `<div class="tabelwrap"><table class="ovz">
+    <thead><tr><th style="text-align:left">Speler</th><th title="Wedstrijden in de opstelling">Gespeeld</th><th title="Gemiddelde van de eigen scores">Ø Eigen</th><th title="Gemiddelde score van ploegmaats">Ø Ploegmaats</th><th title="Speler van de match">⭐ MOTM</th>${wl ? '<th title="Weak link">🔴 W. link</th>' : ""}</tr></thead>
+    <tbody>${rij.map(r => `<tr onclick="ga('#/p/${P.id}/spelers/${r.s.id}')">
+      <td style="text-align:left"><b>${esc(naamVan(r.s))}</b>${r.s.is_keeper ? " 🧤" : ""}</td>
+      <td>${r.gespeeld || '<span class="klein">—</span>'}</td>
+      <td>${cijfer(r.eigen)}</td>
+      <td>${cijfer(r.peer)}${r.peerN ? `<div class="klein">${r.peerN}×</div>` : ""}</td>
+      <td>${r.motm ? `<b style="color:#1E7A45">${r.motm}</b>` : '<span class="klein">—</span>'}</td>
+      ${wl ? `<td>${r.weak ? `<b style="color:var(--fout)">${r.weak}</b>` : '<span class="klein">—</span>'}</td>` : ""}
+    </tr>`).join("")}</tbody></table></div>
+    <div class="legende"><span>Ø score:</span><span style="color:var(--fout)">● 1-5</span><span style="color:#D9822B">● 6</span><span style="color:#3FA36B">● 7-8</span><span style="color:#1E7A45">● 9-10</span></div>`;
+
+  // invulgraad evaluaties (ranglijst)
+  const rang = rij.filter(r => r.gespeeld).sort((a, b) => (b.pct - a.pct) || naamVan(a.s).localeCompare(naamVan(b.s)));
+  const totI = rang.reduce((t, r) => t + r.ingevuld, 0), totG = rang.reduce((t, r) => t + r.gespeeld, 0);
+  const teamPct = totG ? Math.round(totI / totG * 100) : 0;
+  const balk = (pct, kleur) => `<div class="balk"><i style="width:${pct}%;background:${kleur}"></i></div>`;
+  const invul = rang.length ? rang.map((r, i) => `<div class="balkrij" onclick="ga('#/p/${P.id}/spelers/${r.s.id}')"><span class="rang">${i + 1}</span><span class="nm">${esc(naamVan(r.s))}</span>${balk(r.pct, pctKleur(r.pct))}<b style="color:${pctKleur(r.pct)};width:42px;text-align:right">${r.pct}%</b><span class="klein" style="width:40px;text-align:right">${r.ingevuld}/${r.gespeeld}</span></div>`).join("")
+    + `<div class="rij tussen" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--rand)"><span class="klein">Team totaal</span><b style="color:${pctKleur(teamPct)}">${teamPct}% <span class="klein">(${totI}/${totG})</span></b></div>`
+    : '<p class="sub" style="margin:0">Nog geen gespeelde wedstrijden met opstelling.</p>';
+
+  // zelfbeoordeling + sterke/werkpunten uit de voetbalfiches
+  const fiches = spelers.map(s => P.profielen[s.id] || {});
+  const zelf = ZELF.map(([k, t]) => { const v = gem(fiches.map(d => getal(d[k])).filter(n => n != null)); return `<div><b style="color:${scoreKleur(v)}">${v == null ? "—" : v.toFixed(1) + "/10"}</b><span class="klein">${t}</span></div>`; }).join("");
+  const veld = new Set(Object.values(CATS).flat()); const keeperOnly = new Set(Object.values(CATS_KEEPER).flat().filter(v => !veld.has(v)));
+  const telPunten = soort => {
+    const n = {}; Object.keys(CATS).forEach(c => [...CATS[c], ...(CATS_KEEPER[c] || [])].forEach(v => { n[v] = 0; }));
+    fiches.forEach(d => Object.values(d[soort] || {}).flat().forEach(v => { n[v] = (n[v] || 0) + 1; }));
+    return Object.entries(n).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  };
+  const puntenBlok = (soort, titel, kleur) => {
+    const lijst = telPunten(soort); const max = (lijst[0] && lijst[0][1]) || 1;
+    const regel = ([l, c]) => `<div class="balkrij"><span class="nm" style="${keeperOnly.has(l) ? "color:var(--accent-d)" : ""}">${esc(l)}${keeperOnly.has(l) ? " 🧤" : ""}</span>${balk(Math.round(c / max * 100), keeperOnly.has(l) ? "var(--accent)" : kleur)}<b style="color:${c ? kleur : "var(--zacht)"};width:30px;text-align:right">${c}×</b></div>`;
+    const met = lijst.filter(x => x[1]), zonder = lijst.filter(x => !x[1]);
+    return `<div class="blok"><h2>${titel}</h2>${met.length ? met.map(regel).join("") : '<p class="sub" style="margin:0">Nog geen fiches ingevuld.</p>'}
+      ${zonder.length ? `<details style="margin-top:8px"><summary class="klein" style="cursor:pointer">Nooit gekozen (${zonder.length})</summary>${zonder.map(regel).join("")}</details>` : ""}</div>`;
+  };
+
+  app().innerHTML = kop + `
+  <div class="blok"><div class="rij tussen"><h2 style="margin:0">Alle spelers</h2><span class="klein">Klik op een speler voor het detail</span></div>${tabel}</div>
+  <div class="raster twee" style="margin-top:14px">
+    <div class="blok"><h2>📋 Evaluaties ingevuld</h2>${invul}</div>
+    <div class="blok"><h2>🔍 Zelfbeoordeling team gemiddeld</h2><div class="cijfers zelfgem">${zelf}</div>
+      <p class="sub" style="margin:12px 0 0">${fiches.filter(ficheIngevuld).length} van ${spelers.length} spelers hebben hun voetbalfiche ingevuld.</p></div>
+  </div>
+  <div class="raster twee" style="margin-top:14px">
+    ${puntenBlok("sterk", "🌟 Meest genoemde sterke punten", "#1E7A45")}
+    ${puntenBlok("werk", "📈 Meest genoemde werkpunten", "var(--fout)")}
+  </div>`;
 }
 
 /* ---------- spelers ---------- */
