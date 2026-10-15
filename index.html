@@ -142,8 +142,8 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 
 /* Vult het scherm: kaarten rekken mee met de schermhoogte, info blijft zichtbaar */
 .pagina{min-height:100vh;grid-template-rows:auto minmax(0,1fr) auto auto;align-content:stretch}
-.kop{padding:6px 0 5px}
-.vakken{gap:10px;padding-bottom:8px;align-content:stretch;grid-auto-rows:minmax(0,1fr)}
+.kop{padding:5px 0 4px}
+.vakken{gap:10px;padding-bottom:4px;align-content:stretch;grid-auto-rows:minmax(0,1fr)}
 .vak{padding:10px 17px;gap:5px}
 .vak p{font-size:clamp(14px,1.95vh,18px);line-height:1.4}
 .punten li{font-size:clamp(13px,1.8vh,16.5px);line-height:1.35}
@@ -152,7 +152,7 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .inhoud img{width:100%;padding:5px}
 .vak.een h1{font-size:clamp(23px,min(2.6vw,4vh),40px);line-height:1.1}
 .deel img{height:clamp(64px,9vh,104px)}
-.waarom{padding:10px 0 8px;gap:20px}
+.waarom{padding:8px 0 6px;gap:20px}
 .waarom h3{font-size:15px;margin-bottom:4px}
 .waarom p{font-size:13.5px;line-height:1.42}
 .voet{padding:5px 0 8px;font-size:13px}
@@ -177,7 +177,9 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .knoppen a,.knop-uit{padding:6px 10px!important}
 .vak .punten{gap:3px}
 .vak .punten li{line-height:1.3}
-.deel .knoppen{max-width:200px}
+.deel .knoppen{max-width:none}
+.deel{grid-template-columns:auto 1fr!important;gap:16px!important}
+.deel img{height:clamp(84px,12.8vh,132px)!important;padding:4px!important}
 .knop-uit{display:block;text-align:center;font-weight:700;font-size:14.5px;padding:8px 10px;border:1.5px dashed #5F858B;border-radius:9px;color:var(--mod,var(--zacht))}
 .vak .punten li{color:var(--licht)}
 .kopstatus{margin:0 0 0 auto!important;font-size:19px;line-height:1}
