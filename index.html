@@ -384,6 +384,12 @@ body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler butt
   .vak.open:has(.naast) .intro{margin-bottom:auto}
   .vak.open:has(.naast) .duo{margin-top:0!important}
 }
+@media (max-width:640px){
+  /* 2x2 tegels: alle iconen even hoog (ook de twee van Oefenmatch & Tornooi) en op één lijn */
+  .vakken:not(:has(.vak.open)) > .vak{padding:12px 6px!important}
+  .vakken:not(:has(.vak.open)) > .vak > .tegel{height:min(clamp(70px,15svh,140px), calc((50vw - 46px) * 0.6))!important;gap:6px}
+  .vakken:not(:has(.vak.open)) .tegel img,.vakken:not(:has(.vak.open)) .vak.een .tegel img{height:min(clamp(70px,15svh,140px), calc((50vw - 46px) * 0.6))!important;width:auto!important;max-width:none!important;max-height:none!important}
+}
 </style>
 </head>
 <body>
