@@ -139,6 +139,25 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 [data-thema="kleedkamer"] .waarom{border-top-color:var(--rand)}
 [data-thema="kleedkamer"] .waarom a{color:#1F5A63}
 [data-thema="kleedkamer"] .voet{border-top-color:var(--rand)}
+
+/* Compact: alles past zonder scrollen op een gewoon laptopscherm */
+.kop{padding:8px 0 6px}
+.vakken{gap:12px;padding-bottom:12px}
+.vak{padding:13px 16px;gap:8px}
+.vak-kop h2{font-size:16px}
+.vak p{font-size:14px;line-height:1.4}
+.punten li{font-size:13px}
+.inhoud{grid-template-columns:92px 1fr;gap:14px}
+.inhoud img{width:92px;padding:6px}
+.vak.een h1{font-size:clamp(22px,2.4vw,27px);line-height:1.1}
+.deel{padding:8px}
+.deel img{height:78px}
+.knoppen a{padding:5px 8px}
+.status{font-size:20px}
+.voet{padding:10px 0 14px;font-size:13px}
+.voet b{color:var(--tekst);font-weight:600}
+.voet .punten-rij a{color:#1F5A63}
+@media (max-width:860px){.voet{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
 <body>
@@ -211,14 +230,8 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
   </a>
 </main>
 
-<section class="waarom" id="contact">
-  <div><h3>Gratis, gewoon</h3><p>Geen abonnement, geen proefperiode. Sjotter is gemaakt door jeugdcoaches, voor jeugdcoaches.</p></div>
-  <div><h3>Eén account voor alles</h3><p>Rondkijken kan zonder login. Pas als je iets wil beheren vragen we een e-mailadres en wachtwoord.</p></div>
-  <div><h3>Vraag of idee?</h3><p>Mail naar <a id="mail" href="#"></a>. We lezen alles.</p></div>
-</section>
-
-<footer class="voet">
-  <span class="hand">Tot op het veld!</span>
+<footer class="voet" id="contact">
+  <span class="punten-rij"><b>Gratis, gewoon</b> · <b>Eén account voor alles</b> · Vraag of idee? <a id="mail" href="#"></a></span>
   <span><a href="tornooi/#/privacy">Privacy</a> · <a href="tornooi/#/help">Help</a> · © <span id="jaar"></span> Sjotter</span>
 </footer>
 
