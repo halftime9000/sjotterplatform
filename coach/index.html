@@ -8,11 +8,14 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjE2IiBmaWxsPSIjMEQzQjIwIi8+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEwLjUiIGZpbGw9IiNmZmZmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSIxNiw5LjUgMjEuNCwxMy40IDE5LjQsMTkuNyAxMi42LDE5LjcgMTAuNiwxMy40IiBmaWxsPSIjMEQzQjIwIi8+Cjwvc3ZnPg==">
 <link rel="stylesheet" href="../shared/sjotter.css">
 <style>
+@font-face{font-family:Rubik;src:url('../assets/fonts/rubik.woff2') format('woff2');font-weight:300 900;font-display:swap}
 @font-face{font-family:Fraunces;src:url('../assets/fonts/fraunces.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:Fraunces;src:url('../assets/fonts/fraunces-italic.woff2') format('woff2');font-weight:100 900;font-style:italic;font-display:swap}
 :root{
-  --bg:#0A1F23;--kaart:#163E45;--kaart2:#0F2D33;--rand:#2C626B;--tekst:#F2EFE6;--zacht:#A3BCBF;--licht:#DCE8E9;
-  --accent:#FF8A6B;--accent-d:#F0704F;--op-accent:#0E2A2F;--geel:#F4C95D;--live:#79D6A5;--fout:#FF7B7B;
+  /* Kleedkamer licht */
+  --bg:#EAF0F6;--kaart:#FFFFFF;--kaart2:#F3F7FB;--rand:#D3DEEA;--tekst:#172435;--zacht:#5A6B80;--licht:#2A3A4E;
+  --accent:#2B7FD0;--accent-d:#1F6CB8;--op-accent:#FFFFFF;--geel:#9C6A00;--live:#2E7D4F;--fout:#C0392B;
+  --knoprand:#C3D1E0;--f-tekst:Rubik,system-ui,sans-serif;
 }
 *{box-sizing:border-box}
 html,body{overflow-x:clip}
@@ -229,6 +232,59 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--zach
   .module{display:none}
   .blok{padding:15px}
 }
+
+/* ===== Kleedkamer licht: alles rustig, licht en goed leesbaar ===== */
+body{font-family:var(--f-tekst)}
+h1.titel,.ploegkop .naam,.ploegtegel .naam{font-family:var(--f-tekst);font-variation-settings:normal;font-weight:700;letter-spacing:-.01em}
+h1.titel em{color:var(--accent)}
+h2,.module,.evalsectie > h3,.merk{font-family:var(--f-tekst);font-stretch:100%}
+h2{font-size:15px;letter-spacing:.06em}
+.blok{box-shadow:0 1px 4px rgba(23,36,53,.06)}
+.knop{border-color:var(--knoprand);color:var(--tekst)}
+.knop.vol{color:var(--op-accent)}
+.knop.gevaar{border-color:#EBC1BC;color:var(--fout)}
+.knop.gevaar:hover{border-color:var(--fout)}
+.tabs a{color:var(--zacht)}
+.tabs a.aan{color:var(--op-accent);background:var(--accent)}
+.tabs .teller{background:#F4C95D;color:#3A2C00}
+.label{background:var(--kaart2);border-color:var(--rand);color:var(--zacht)}
+.label.groen{color:#2E7D4F;border-color:#BFDCC8;background:#EEF7F1}
+.label.geel{color:#8A5F00;border-color:#E8D5A6;background:#FBF5E4}
+.label.oranje{color:#1F6CB8;border-color:#BCD5EF;background:#EEF5FC}
+.code{color:#1F6CB8;border-color:#BCD5EF;background:#F3F8FD}
+.melding{background:#fff}
+.kal .dag{background:#fff}
+.kal .dag.weg{background:#FDE8E6;border-color:#EDB2AB;color:#9B2C22}
+.ploegtegel{background:#fff;border-color:var(--rand);border-left-color:var(--accent);box-shadow:0 8px 24px rgba(23,36,53,.10)}
+.ploegtegel:hover{border-color:var(--accent);box-shadow:0 12px 30px rgba(23,36,53,.14)}
+.ploegtegel .meta{color:var(--zacht)}
+.ploegtegel .embleem{color:#fff;box-shadow:inset 0 0 0 3px rgba(255,255,255,.35)}
+.ploegtegel.wacht{border-left-color:#E0B341}
+.ploegtegel.wacht .embleem{background:#E6EDF5;color:#8A5F00}
+.uitleg{background:#DCE6F1;color:var(--tekst)}
+.uitleg .klein{color:var(--zacht)}
+.uitleg a{color:var(--accent-d)}
+.uitleg .stappen > div{border-top-color:#BFCDDD}
+.uitleg .blok{box-shadow:0 10px 30px rgba(23,36,53,.12)}
+#toast{background:var(--tekst);color:#fff}
+/* Evaluaties: zelfde blauwe palet, iets warmer wit */
+.licht{--kaart:#FFFFFF;--kaart2:#F6F9FC;--rand:#D3DEEA;--tekst:#172435;--zacht:#5A6B80;--licht:#2A3A4E;--accent:#2B7FD0;--accent-d:#1F6CB8;--op-accent:#FFFFFF;--live:#2E7D4F;--geel:#8A5F00}
+.licht .scores button{background:#fff;border-color:#C9D6E4;color:#26364A}
+.licht .scores button:hover:not(:disabled){border-color:#7E93AC}
+.licht .scores button.aan{background:var(--accent);border-color:var(--accent);color:#fff}
+.licht .pill{background:#fff;border-color:#C9D6E4;color:#26364A}
+.licht .pill.aan{background:var(--accent);border-color:var(--accent);color:#fff}
+.licht input,.licht select,.licht textarea{background:#F9FBFD;border-color:#C9D6E4}
+.licht .evalvraag{border-bottom-color:#E3EAF2}
+.licht .evalsectie > h3{color:var(--accent-d)}
+.licht .knop{border-color:#C3D1E0}
+.licht .label{background:#F1F5F9;border-color:#D3DEEA;color:#5A6B80}
+.licht .label.groen{color:#2E7D4F;border-color:#BFDCC8;background:#EEF7F1}
+.licht .label.geel{color:#8A5F00;border-color:#E8D5A6;background:#FBF5E4}
+.licht .label.oranje{color:#1F6CB8;border-color:#BCD5EF;background:#EEF5FC}
+.licht th,.licht td{border-bottom-color:#E3EAF2}
+.licht hr{border-top-color:#D3DEEA}
+.licht a{color:var(--accent-d)}
 </style>
 </head>
 <body>
@@ -767,7 +823,7 @@ async function cOverzicht(kop) {
     </div>
   </div>
   <div class="bijzaak">
-    <span>Spelers uitnodigen · teamcode <b style="font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.15em;color:var(--geel);font-size:15px">${esc(P.ploeg.code)}</b></span>
+    <span>Spelers uitnodigen · teamcode <b style="font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.15em;color:var(--accent-d);font-size:15px">${esc(P.ploeg.code)}</b></span>
     <span class="rij" style="gap:8px">
       <button class="knop klein" onclick="A.kopieer(P.ploeg.code, 'Code gekopieerd')">Code kopiëren</button>
       <a class="knop klein" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Sluit aan bij " + P.ploeg.naam + " op Sjotter. Teamcode: " + P.ploeg.code + "\n" + deelLink())}">Delen via WhatsApp</a>
