@@ -11,6 +11,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
+@font-face{font-family:Caveat;src:url('../assets/fonts/caveat.woff2') format('woff2');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Exo 2';src:url('../assets/fonts/exo2.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Exo 2';src:url('../assets/fonts/exo2-italic.woff2') format('woff2');font-weight:100 900;font-style:italic;font-display:swap}
+
 @font-face{font-family:Rubik;src:url('../assets/fonts/rubik.woff2') format('woff2');font-weight:300 900;font-display:swap}
 :root{
   /* Kleedkamer licht (zelfde palet als de rest van Sjotter) */
@@ -219,6 +223,9 @@ td.num,th.num{text-align:center;width:42px}
 /* Sjotter groen-geel */
 .btn-p{background:#F4C95D;color:#14302F;box-shadow:0 1px 3px rgba(185,143,42,.35)}
 .btn-p:hover{background:#E9BB47;color:#14302F}
+/* Exo 2 overal: tekst recht, koppen italic */
+body,button,input,select,textarea{font-family:'Exo 2',system-ui,sans-serif}
+h1,h2,h3,h4,.logo,.poule-kop,.kop-balk,.stat .n,.tv-cat{font-family:'Exo 2',system-ui,sans-serif!important;font-style:italic!important;font-weight:800!important;font-stretch:100%!important;font-variation-settings:normal!important}
 </style>
 </head>
 <body>

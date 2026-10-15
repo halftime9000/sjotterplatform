@@ -21,6 +21,9 @@
 <link rel="stylesheet" href="shared/sjotter.css">
 <script src="shared/config.js"></script>
 <style>
+@font-face{font-family:'Exo 2';src:url('assets/fonts/exo2.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Exo 2';src:url('assets/fonts/exo2-italic.woff2') format('woff2');font-weight:100 900;font-style:italic;font-display:swap}
+
 @font-face{font-family:Rubik;src:url('assets/fonts/rubik.woff2') format('woff2');font-weight:300 900;font-display:swap}
 @font-face{font-family:Fraunces;src:url('assets/fonts/fraunces.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:Fraunces;src:url('assets/fonts/fraunces-italic.woff2') format('woff2');font-weight:100 900;font-style:italic;font-display:swap}
@@ -196,6 +199,12 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .vak .punten li{color:var(--licht)}
 .kopstatus{margin:0 0 0 auto!important;font-size:19px;line-height:1}
 @media (max-width:860px){.pagina{min-height:0;grid-template-rows:none}.vakken{grid-auto-rows:auto}.inhoud{grid-template-columns:86px 1fr}.vak p{font-size:14px}.punten li{font-size:13px}.deel img{height:70px}}
+/* Exo 2 overal: tekst recht, koppen italic */
+body,.vak p,.punten li,.knoppen a,.knop-uit,.deel.speler input,.deel.speler button,.waarom p,.voet{font-family:'Exo 2',system-ui,sans-serif!important}
+.vak.een h1,.merk,.vak-kop h2,.deel b,.waarom h3{font-family:'Exo 2',system-ui,sans-serif!important;font-style:italic!important;font-weight:800!important;font-stretch:100%!important;font-variation-settings:normal!important}
+.vak.een h1 em{font-style:italic!important}
+.vak-kop h2{font-size:18px!important;letter-spacing:.03em!important}
+.kop .tag{color:#D69A00!important}
 </style>
 </head>
 <body>
