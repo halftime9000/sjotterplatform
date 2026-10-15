@@ -170,9 +170,17 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
 .knoppen a:hover{border-color:#F2EFE6;background:rgba(255,255,255,.06)}
 .knoppen a.vol{box-shadow:0 2px 0 #B98F2A}
 .vak .intro{margin:0}
-.deel.platform{margin-top:auto;grid-template-columns:auto 1fr;align-items:center}
-.deel.platform .punten{gap:6px}
-.kopstatus{margin:0 0 0 auto!important;font-size:20px}
+.deel.onder{margin-top:auto}
+.deel{min-height:110px!important;padding:8px 12px!important}
+.deel b{font-size:13px!important}
+.knoppen{gap:6px!important}
+.knoppen a,.knop-uit{padding:6px 10px!important}
+.vak .punten{gap:3px}
+.vak .punten li{line-height:1.3}
+.deel .knoppen{max-width:200px}
+.knop-uit{display:block;text-align:center;font-weight:700;font-size:14.5px;padding:8px 10px;border:1.5px dashed #5F858B;border-radius:9px;color:var(--mod,var(--zacht))}
+.vak .punten li{color:var(--licht)}
+.kopstatus{margin:0 0 0 auto!important;font-size:19px;line-height:1}
 @media (max-width:860px){.pagina{min-height:0;grid-template-rows:none}.vakken{grid-auto-rows:auto}.inhoud{grid-template-columns:86px 1fr}.vak p{font-size:14px}.punten li{font-size:13px}.deel img{height:70px}}
 </style>
 </head>
@@ -208,39 +216,37 @@ a.vak[style*="--mod"]:hover{border-color:var(--mod)}
   </section>
 
   <!-- 02 Coach & Speler -->
-  <a class="vak" href="coach/" style="--mod:#FF8A6B">
+  <section class="vak" style="--mod:#FF8A6B">
     <div class="vak-kop"><h2>Coach &amp; Speler</h2><span class="status kopstatus">binnenkort</span></div>
     <p class="intro">Je ploeg online. Spelers vullen hun eigen fiche in en analyseren na elke match zichzelf, hun ploegmaats en de tegenstander.</p>
-    <div class="deel platform">
-      <img src="assets/coach-k.png" alt="Player Platform">
-      <ul class="punten"><li>Eigen profiel en voetbalfiche per speler</li><li>Evaluatie na elke match: zelf, ploegmaats en tegenstander</li><li>Jij kiest categorie, formaat en groepen</li></ul>
+    <ul class="punten"><li>Eigen profiel en voetbalfiche per speler</li><li>Evaluatie na elke match: zelf, ploegmaats en tegenstander</li><li>Jij kiest categorie, formaat en groepen</li></ul>
+    <div class="deel onder">
+      <a href="coach/"><img src="assets/platform-k.png" alt="Player Platform"></a>
+      <div class="knoppen"><b>Player Platform</b><a class="vol" href="coach/#/nieuw">Maak je ploeg</a><a href="coach/#/login">Aanmelden</a></div>
     </div>
-  </a>
+  </section>
 
   <!-- 03 Training Hub -->
   <a class="vak" href="training/" style="--mod:#6FD6B0">
-    <div class="vak-kop"><h2>Training Hub</h2></div>
-    <div class="inhoud">
-      <img src="assets/training-k.png" alt="">
-      <div class="tekst">
-        <p>Je favoriete oefenvideo's per thema bewaard, plus een gedeelde bibliotheek van andere coaches.</p>
-        <ul class="punten"><li>Links van YouTube, Instagram of TikTok</li><li>Opwarming, techniek, eindspel, keeper…</li><li>Zelf kiezen wat je deelt</li></ul>
-        <span class="status">binnenkort</span>
-      </div>
+    <div class="vak-kop"><h2>Training Hub</h2><span class="status kopstatus">binnenkort</span></div>
+    <p class="intro">Je favoriete oefenvideo's per thema bewaard, plus een gedeelde bibliotheek van andere coaches.</p>
+    <ul class="punten"><li>Links van YouTube, Instagram of TikTok</li><li>Opwarming, techniek, eindspel, keeper…</li><li>Zelf kiezen wat je deelt</li></ul>
+    <div class="deel onder">
+      <img src="assets/training-k.png" alt="Training Hub">
+      <div class="knoppen"><b>Training Hub</b><span class="knop-uit">Binnenkort</span></div>
     </div>
   </a>
 
   <!-- 04 ThePlayerNation -->
   <a class="vak" href="playernation/" style="--mod:#B79CFF">
-    <div class="vak-kop"><h2>ThePlayerNation</h2></div>
-    <div class="inhoud">
-      <img src="assets/playernation-k.png" alt="">
-      <div class="tekst">
-        <p>Iets nieuws, speciaal voor spelers. Hoe het werkt vertellen we je binnenkort.</p>
-        <span class="status">wordt vervolgd</span>
-      </div>
+    <div class="vak-kop"><h2>ThePlayerNation</h2><span class="status kopstatus">wordt vervolgd</span></div>
+    <p class="intro">Iets nieuws, speciaal voor spelers. Hoe het werkt vertellen we je binnenkort.</p>
+    <div class="deel onder">
+      <img src="assets/playernation-k.png" alt="ThePlayerNation">
+      <div class="knoppen"><b>Voor spelers</b><span class="knop-uit">Binnenkort</span></div>
     </div>
   </a>
+
 </main>
 
 <section class="waarom" id="contact">

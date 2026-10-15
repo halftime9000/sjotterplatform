@@ -408,6 +408,7 @@ async function route() {
     if (d[0] === "wachtwoord") return vWachtwoordVergeten();
     if (d[0] === "nieuw-wachtwoord") return vNieuwWachtwoord();
     if (d[0] === "code") return await vAansluiten(d[1] || "");
+    if (!sessie && d[0] === "nieuw") { try { sessionStorage.setItem("cs_terug", "#/nieuw"); } catch (_) {} return vAuth("registreren"); }
     if (!sessie) return vWelkom();
     if (d[0] === "nieuw") return vNieuwePloeg();
     if (d[0] === "p" && d[1]) return await vPloeg(d[1], d[2] || "", d[3] || "", d[4] || "");
