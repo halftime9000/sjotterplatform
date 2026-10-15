@@ -60,10 +60,9 @@ select naam,status,speler_id is not null as gekoppeld from cs_leden order by naa
 select pg_temp.verwacht_fout($$delete from cs_leden where user_id='00000000-0000-0000-0000-00000000000c'$$,'eigenaar verwijderen');
 update cs_leden set rol='speler' where user_id='00000000-0000-0000-0000-00000000000c';
 select rol as eigenaar_blijft from cs_leden where user_id='00000000-0000-0000-0000-00000000000c';
-insert into cs_speler_profiel(speler_id,ploeg_id,data,coach_boodschap) values (:'s1',:'pl','{"positie":"9"}','Goed bezig Sam!');
+insert into cs_speler_profiel(speler_id,ploeg_id,data) values (:'s1',:'pl','{"positie":"9"}');
 insert into cs_speler_profiel(speler_id,ploeg_id,data) values (:'s2',:'pl','{}');
 insert into cs_wedstrijden(ploeg_id,datum,tegenstander,opstelling) values (:'pl','2026-10-17','FC Test',jsonb_build_object('a',jsonb_build_array(:'s1',:'s2'),'b',jsonb_build_array()));
-insert into cs_berichten(ploeg_id,tekst) values (:'pl','Zaterdag 9u verzamelen');
 reset role;
 select id as w1 from cs_wedstrijden \gset
 
@@ -71,11 +70,9 @@ select id as w1 from cs_wedstrijden \gset
 select pg_temp.als('00000000-0000-0000-0000-0000000000a1');
 select count(*) as ziet_spelers from cs_spelers;
 select count(*) as ziet_profielen from cs_speler_profiel;
-update cs_speler_profiel set data='{"positie":"7"}', coach_boodschap='hack' where speler_id=:'s1';
-select data->>'positie' as pos, coach_boodschap from cs_speler_profiel;
+update cs_speler_profiel set data='{"positie":"7"}' where speler_id=:'s1';
+select data->>'positie' as pos from cs_speler_profiel;
 update cs_speler_profiel set data='{"x":1}' where speler_id=:'s2';
-select count(*) as berichten from cs_berichten;
-select pg_temp.verwacht_fout($$insert into cs_berichten(ploeg_id,tekst) values ('$$||:'pl'||$$','hoi')$$,'speler post bericht');
 select count(*) as leden_zichtbaar from cs_leden;
 
 \echo === speler: evaluatie

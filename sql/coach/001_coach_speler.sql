@@ -63,10 +63,10 @@ create table if not exists public.cs_speler_profiel (
   speler_id        uuid primary key references public.cs_spelers(id) on delete cascade,
   ploeg_id         uuid not null references public.cs_ploegen(id) on delete cascade,
   data             jsonb not null default '{}'::jsonb check (jsonb_typeof(data) = 'object'),
-  coach_boodschap  text check (coach_boodschap is null or char_length(coach_boodschap) <= 2000),
   updated_at       timestamptz not null default now()
 );
 create index if not exists cs_profiel_ploeg_idx on public.cs_speler_profiel(ploeg_id);
+alter table public.cs_speler_profiel drop column if exists coach_boodschap;
 
 create table if not exists public.cs_leden (
   id                 uuid primary key default gen_random_uuid(),
@@ -87,17 +87,15 @@ create table if not exists public.cs_wedstrijden (
   id           uuid primary key default gen_random_uuid(),
   ploeg_id     uuid not null references public.cs_ploegen(id) on delete cascade,
   datum        date not null,
-  aanvang      time,
   tegenstander text not null check (char_length(tegenstander) between 1 and 80),
   thuis_uit    text not null default 'thuis' check (thuis_uit in ('thuis', 'uit')),
-  locatie      text check (locatie is null or char_length(locatie) <= 120),
   opstelling   jsonb not null default '{}'::jsonb check (jsonb_typeof(opstelling) = 'object'),
   scores       jsonb not null default '{}'::jsonb check (jsonb_typeof(scores) = 'object'),
-  notities     text check (notities is null or char_length(notities) <= 2000),
   eval_open    boolean not null default true,
   created_at   timestamptz not null default now()
 );
 create index if not exists cs_wedstrijden_ploeg_idx on public.cs_wedstrijden(ploeg_id, datum);
+alter table public.cs_wedstrijden drop column if exists aanvang, drop column if exists locatie, drop column if exists notities;
 
 create table if not exists public.cs_evaluaties (
   id            uuid primary key default gen_random_uuid(),
@@ -115,15 +113,8 @@ create table if not exists public.cs_evaluaties (
 );
 create index if not exists cs_evaluaties_ploeg_idx on public.cs_evaluaties(ploeg_id);
 
-create table if not exists public.cs_berichten (
-  id          uuid primary key default gen_random_uuid(),
-  ploeg_id    uuid not null references public.cs_ploegen(id) on delete cascade,
-  auteur      uuid default auth.uid() references auth.users(id) on delete set null,
-  tekst       text not null check (char_length(tekst) between 1 and 2000),
-  vastgepind  boolean not null default false,
-  created_at  timestamptz not null default now()
-);
-create index if not exists cs_berichten_ploeg_idx on public.cs_berichten(ploeg_id, created_at desc);
+-- (berichten zijn geschrapt: communicatie loopt via WhatsApp)
+drop table if exists public.cs_berichten;
 
 -- ---------------------------------------------------------------------
 -- Rechten-hulpfuncties (security definer → geen RLS-lussen)
@@ -229,15 +220,12 @@ create trigger cs_lid_niet_eigenaar_verwijderen before delete on public.cs_leden
   for each row when (pg_trigger_depth() = 0)
   execute function public.cs_lid_niet_eigenaar_verwijderen();
 
--- Profiel: ploeg_id volgt de speler; enkel een coach mag de boodschap zetten.
+-- Profiel: ploeg_id volgt altijd de speler.
 create or replace function public.cs_profiel_controle()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
   select ploeg_id into new.ploeg_id from cs_spelers where id = new.speler_id;
   if new.ploeg_id is null then raise exception 'Onbekende speler'; end if;
-  if not cs_is_coach(new.ploeg_id) then
-    new.coach_boodschap := case when tg_op = 'UPDATE' then old.coach_boodschap else null end;
-  end if;
   new.updated_at := now();
   return new;
 end $$;
@@ -311,7 +299,6 @@ alter table public.cs_speler_profiel enable row level security;
 alter table public.cs_leden          enable row level security;
 alter table public.cs_wedstrijden    enable row level security;
 alter table public.cs_evaluaties     enable row level security;
-alter table public.cs_berichten      enable row level security;
 
 -- ploegen
 drop policy if exists cs_ploegen_lezen on public.cs_ploegen;
@@ -384,14 +371,6 @@ drop policy if exists cs_evaluaties_verwijderen on public.cs_evaluaties;
 create policy cs_evaluaties_verwijderen on public.cs_evaluaties for delete to authenticated
   using (cs_is_coach(ploeg_id));
 
--- berichten (eenrichting: coach schrijft, ploeg leest)
-drop policy if exists cs_berichten_lezen on public.cs_berichten;
-create policy cs_berichten_lezen on public.cs_berichten for select to authenticated
-  using (cs_is_lid(ploeg_id));
-drop policy if exists cs_berichten_beheer on public.cs_berichten;
-create policy cs_berichten_beheer on public.cs_berichten for all to authenticated
-  using (cs_is_coach(ploeg_id)) with check (cs_is_coach(ploeg_id));
-
 -- ---------------------------------------------------------------------
 -- RPC's
 -- ---------------------------------------------------------------------
@@ -438,9 +417,9 @@ end $$;
 -- Rechten
 -- ---------------------------------------------------------------------
 revoke all on public.cs_ploegen, public.cs_spelers, public.cs_speler_profiel, public.cs_leden,
-              public.cs_wedstrijden, public.cs_evaluaties, public.cs_berichten from anon;
+              public.cs_wedstrijden, public.cs_evaluaties from anon;
 grant select, insert, update, delete on public.cs_ploegen, public.cs_spelers, public.cs_speler_profiel,
-      public.cs_leden, public.cs_wedstrijden, public.cs_evaluaties, public.cs_berichten to authenticated;
+      public.cs_leden, public.cs_wedstrijden, public.cs_evaluaties to authenticated;
 
 revoke execute on function public.cs_code_genereren(), public.cs_is_lid(uuid), public.cs_is_coach(uuid),
        public.cs_is_mijn_speler(uuid), public.cs_heeft_aanvraag(uuid), public.cs_ploeg_via_code(text),

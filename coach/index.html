@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coach &amp; Speler · Sjotter</title>
-<meta name="description" content="Sjotter Coach & Speler — je ploeg online: spelerslijst, wedstrijden, opstellingen en evaluaties door spelers.">
+<meta name="description" content="Sjotter Coach & Speler — spelers vullen hun voetbalfiche in en evalueren na elke match zichzelf, hun ploegmaats en de tegenstander.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjE2IiBmaWxsPSIjMEQzQjIwIi8+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEwLjUiIGZpbGw9IiNmZmZmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSIxNiw5LjUgMjEuNCwxMy40IDE5LjQsMTkuNyAxMi42LDE5LjcgMTAuNiwxMy40IiBmaWxsPSIjMEQzQjIwIi8+Cjwvc3ZnPg==">
 <link rel="stylesheet" href="../shared/sjotter.css">
 <style>
@@ -180,9 +180,13 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--zach
 <script>
 "use strict";
 /* =====================================================================
-   Sjotter · Coach & Speler
+   Sjotter · Coach & Speler  (gebaseerd op het KSK-spelersplatform)
+   Speler: profiel, voetbalfiche (zelfbeoordeling), evaluaties na elke
+   wedstrijd (zichzelf, ploegmaats, tegenstander), vakantiekalender.
+   Coach: ploeg, teamcode + goedkeuren, spelers, wedstrijden, opstelling
+   per groep, overzicht van alle evaluaties.
    Tabellen: cs_ploegen, cs_leden, cs_spelers, cs_speler_profiel,
-             cs_wedstrijden, cs_evaluaties, cs_berichten  (zie sql/coach)
+             cs_wedstrijden, cs_evaluaties  (zie sql/coach)
    ===================================================================== */
 const CFG = window.SJOTTER;
 const sb = supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
@@ -199,11 +203,9 @@ function datumMooi(d, kort) {
   const x = new Date(d + "T12:00:00");
   return kort ? x.getDate() + " " + MAANDEN[x.getMonth()].slice(0, 3) : DAGEN[x.getDay()] + " " + x.getDate() + " " + MAANDEN[x.getMonth()] + " " + x.getFullYear();
 }
-const uur = t => t ? String(t).slice(0, 5) : "";
 const naamVan = s => s ? (s.voornaam + (s.naam ? " " + s.naam : "")) : "?";
 const kortNaam = s => s ? (s.voornaam + (s.naam ? " " + s.naam[0] + "." : "")) : "?";
 const gemiddelde = a => a && a.length ? (a.reduce((x, y) => x + y, 0) / a.length).toFixed(1) : "–";
-const tijdstip = t => new Date(t).toLocaleString("nl-BE", { dateStyle: "medium", timeStyle: "short" });
 
 let toastTimer;
 function toast(msg, fout) {
@@ -228,44 +230,45 @@ async function q(promise) { const { data, error } = await promise; if (error) th
 /* ---------- vaste lijsten ---------- */
 const CATS = {
   technisch: ["Dribbelen","Passen","Eerste aanname","Balcontrole","Schieten","Koppen","1 tegen 1","Overzicht","Vrijlopen"],
-  tactisch:  ["Positiespel","Omschakeling","Pressing","Ruimte maken","Ruimte dichtlopen","Spel lezen","Communiceren","Coachen"],
+  tactisch:  ["Positiespel","Omschakeling","Pressing","Ruimte maken","Ruimte dichtlopen","Spel lezen","Communiceren / roepen","Coachen"],
   fysiek:    ["Snelheid","Conditie","Kracht","Wendbaarheid","Explosiviteit","Coördinatie","Balans"],
   mentaal:   ["Winnersmentaliteit","Doorzetten","Concentratie","Leiderschap","Teamspeler","Zelfvertrouwen","Inzet","Omgaan met tegenslagen"]
 };
 const CATS_KEEPER = {
-  technisch: ["Vangen","Wegstompen","Uittrap","Uitgooien","Positie in doel","Duiken","Reflexen","Hoge ballen"],
-  tactisch:  ["Uitkomen","Coachen","Spel lezen","Communiceren","1 tegen 1"],
-  fysiek:    ["Reactiesnelheid","Explosiviteit","Wendbaarheid","Kracht","Balans","Coördinatie"],
-  mentaal:   ["Winnersmentaliteit","Concentratie","Leiderschap","Zelfvertrouwen","Omgaan met tegenslagen","Inzet"]
+  technisch: ["Vangen","Wegslaan","Uittrap","Gooien","Positie in doel","Duiken","Reflexen","Hoge ballen vangen"],
+  tactisch:  ["Uitkomen op de bal","Coachen","Spel lezen","Communiceren / roepen","Hoge ballen","1 tegen 1"],
+  fysiek:    ["Reactiesnelheid","Explosiviteit","Wendbaarheid","Kracht","Balans","Coördinatie","Snelheid"],
+  mentaal:   ["Winnersmentaliteit","Concentratie","Leiderschap","Zelfvertrouwen","Omgaan met tegenslagen","Inzet","Doorzetten","Teamspeler"]
 };
-const GEGEVENS = [
-  ["geboortedatum", "Geboortedatum", "date"], ["gsm", "GSM", "tel"], ["school", "School", "text"],
-  ["vorige_club", "Vorige club", "text"], ["sinds", "Voetbalt sinds", "text"],
-  ["allergie", "Allergieën", "text"], ["medicatie", "Medicatie", "text"], ["medisch", "Andere medische info", "area"]
-];
-function gegevensVelden(g, uit) {
-  g = g || {};
-  return '<div class="velden">' + GEGEVENS.map(([k, t, type]) => type === "area" ? "" :
-    `<div><label for="g-${k}">${t}</label><input id="g-${k}" data-geg="${k}" type="${type}" maxlength="120" value="${esc(g[k] || "")}" ${uit ? "disabled" : ""}></div>`).join("") + "</div>" +
-    `<label for="g-medisch">Andere medische info</label><textarea id="g-medisch" data-geg="medisch" maxlength="500" ${uit ? "disabled" : ""}>${esc(g.medisch || "")}</textarea>`;
-}
-function leesGegevens() { const g = {}; document.querySelectorAll("[data-geg]").forEach(el => { const v = el.value.trim(); if (v) g[el.dataset.geg] = v; }); return g; }
-const CAT_NAAM = { technisch: "Technisch", tactisch: "Tactisch", fysiek: "Fysiek", mentaal: "Mentaal" };
+const CAT_NAAM = { technisch: "⚙️ Technisch", tactisch: "🧠 Tactisch", fysiek: "💪 Fysiek", mentaal: "❤️ Mentaal" };
 const POSITIES = {
   2: [], 3: [],
   5: ["Keeper","Achter","Links","Rechts","Voor"],
-  8: ["1 · Keeper","2 · Rechtsachter","3 · Centraal achter","5 · Linksachter","7 · Rechtsmidden","8 · Centraal midden","11 · Linksmidden","9 · Spits"],
-  11: ["1 · Keeper","2 · Rechtsachter","3 · Linksachter","4 · Centrale verdediger","5 · Centrale verdediger","6 · Verdedigende middenvelder","8 · Centrale middenvelder","10 · Aanvallende middenvelder","7 · Rechtsbuiten","11 · Linksbuiten","9 · Spits"]
+  8: ["1","2","3","5","7","8","9","11"],
+  11: ["1","2","3","4","5","6","7","8","9","10","11"]
 };
 const SYSTEMEN = { 5: ["2-2","1-2-1","2-1-1"], 8: ["3-3-1","3-2-2","2-3-2","3-1-3","2-4-1"], 11: ["4-3-3","4-4-2","4-2-3-1","3-5-2","3-4-3","5-3-2"] };
 const CATEGORIEEN = ["U6","U7","U8","U9","U10","U11","U12","U13","U14","U15","U16","U17","U19","U21","Senioren","Dames","Veteranen"];
 const GROEP_KLEUREN = ["#F4C95D","#6FB7FF","#FF8A6B","#79D6A5","#B79CFF","#F2F1EC"];
 function seizoenNu() { const d = new Date(), j = d.getFullYear(), s = d.getMonth() >= 6 ? j : j - 1; return s + "-" + String(s + 1).slice(2); }
 
+/* Persoonlijke gegevens (profiel) — speler vult zelf in, coach ziet alles */
+const GEGEVENS_SPELER = [["geboortedatum", "Geboortedatum", "date"], ["gsm", "GSM nr", "tel"], ["school", "Naam school", "text"], ["jaren", "Jaren bij de club", "text"]];
+const GEGEVENS_COACH = [["allergie", "Allergieën", "text"], ["medicatie", "Medicatie", "text"], ["medisch", "Medische info", "text"]];
+/* Voetbalfiche — zoals in het KSK-platform */
+const VOETBAL_TEKST = {
+  vorige_clubs: "Vorige club(s)", fav_ploeg: "Favoriete ploeg", fav_speler: "Favoriete voetballer",
+  leuk: "Wat vind je leuk bij voetballen?", droom: "Wat is jouw voetbaldroom? ⚽", herinnering: "Wat is jouw mooiste voetbalherinnering? 🌟",
+  goed: "Wat gaat al goed bij jou als voetballer?", beter: "Wat wil jij dit seizoen nog beter leren?", verwacht: "Wat verwacht je van je trainer?"
+};
+const ZELF = [["zb_inzet", "Inzet op training"], ["zb_wedstrijd", "Inzet op wedstrijden"], ["zb_gedrag", "Gedrag in de groep"], ["zb_coach", "Luisteren naar de coach"]];
+
 /* ---------- toestand ---------- */
 let sessie = null;        // supabase-sessie
 let mijnLeden = [];       // lidmaatschappen van de ingelogde gebruiker
 let P = null;             // huidige ploegcontext
+let fiche = null;         // profieldata van de speler die bewerkt wordt
+let kalMaand = null;
 
 /* ---------- router ---------- */
 function deel() { return (location.hash.replace(/^#\/?/, "") || "").split("/").filter(Boolean).map(decodeURIComponent); }
@@ -301,22 +304,22 @@ function renderGebruiker() {
    AUTH
    ===================================================================== */
 const codeVeld = (knop, klasse) => `<form class="rij" onsubmit="event.preventDefault();ga('#/code/'+encodeURIComponent(this.c.value.trim().toUpperCase()))">
-  <input name="c" placeholder="Teamcode, bv. K7M2QX" maxlength="6" autocapitalize="characters" style="flex:1;min-width:150px;text-transform:uppercase;letter-spacing:.15em" required>
+  <input name="c" placeholder="Teamcode, bv. K7M2QX" maxlength="6" autocapitalize="characters" style="flex:1;min-width:150px;text-transform:uppercase;letter-spacing:.15em" required aria-label="Teamcode">
   <button class="knop ${klasse || ""}">${knop}</button></form>`;
 
 function vWelkom() {
   app().innerHTML = `
   <h1 class="titel">Je ploeg online, <em>samen</em> met je spelers.</h1>
-  <p class="sub">Spelerslijst, wedstrijden en opstellingen voor de coach. Na elke match geven spelers zelf hun mening over zichzelf, hun ploegmaats en de wedstrijd.</p>
+  <p class="sub">Spelers vullen hun eigen profiel en voetbalfiche in, en na elke match beoordelen ze zichzelf, hun ploegmaats en de tegenstander. Jij ziet alles in één overzicht.</p>
   <div class="raster twee">
     <div class="blok">
       <h2>Ik ben coach</h2>
-      <p class="sub">Maak gratis je ploeg aan, nodig je spelers uit met een teamcode en keur hun aanvraag goed.</p>
+      <p class="sub">Maak gratis je ploeg aan en nodig je spelers uit met een teamcode.</p>
       <div class="rij"><a class="knop vol" href="#/registreren">Account maken</a><a class="knop" href="#/login">Aanmelden</a></div>
     </div>
     <div class="blok">
       <h2>Ik ben speler</h2>
-      <p class="sub">Kreeg je een teamcode van je coach? Vul ze hier in om aan te sluiten bij je ploeg.</p>
+      <p class="sub">Kreeg je een teamcode van je coach? Vul ze hier in.</p>
       ${codeVeld("Verder", "vol")}
     </div>
   </div>`;
@@ -394,19 +397,13 @@ function vNieuwWachtwoord() {
 /* =====================================================================
    START: mijn ploegen
    ===================================================================== */
-async function laadMijnLeden() {
-  mijnLeden = await q(sb.from("cs_leden")
-    .select("id,ploeg_id,rol,status,speler_id,naam,cs_ploegen(id,naam,club,categorie,seizoen,formaat)")
-    .eq("user_id", sessie.user.id).order("created_at"));
-  return mijnLeden;
-}
-
 async function vStart() {
   app().innerHTML = '<div class="laden">Laden…</div>';
-  await laadMijnLeden();
+  mijnLeden = await q(sb.from("cs_leden")
+    .select("id,ploeg_id,rol,status,speler_id,naam,cs_ploegen(id,naam,club,categorie,seizoen)")
+    .eq("user_id", sessie.user.id).order("created_at"));
   const terug = sessionStorage.getItem("cs_terug");
   if (terug) { sessionStorage.removeItem("cs_terug"); return ga(terug); }
-  // Eén ploeg? Meteen openen (één keer per sessie).
   if (mijnLeden.length === 1 && mijnLeden[0].status === "actief" && !sessionStorage.getItem("cs_lijst")) {
     sessionStorage.setItem("cs_lijst", "1");
     return ga("#/p/" + mijnLeden[0].ploeg_id);
@@ -420,9 +417,7 @@ async function vStart() {
   }).join("");
   app().innerHTML = `
   <h1 class="titel">Mijn <em>ploegen</em></h1>
-  <div class="blok">
-    ${rijen ? '<div class="lijst">' + rijen + "</div>" : '<div class="leeg">Je bent nog bij geen enkele ploeg.</div>'}
-  </div>
+  <div class="blok">${rijen ? '<div class="lijst">' + rijen + "</div>" : '<div class="leeg">Je bent nog bij geen enkele ploeg.</div>'}</div>
   <div class="raster twee" style="margin-top:14px">
     <div class="blok"><h2>Nieuwe ploeg</h2><p class="sub">Voor coaches: maak je ploeg aan en nodig je spelers uit.</p><a class="knop vol" href="#/nieuw">Ploeg aanmaken</a></div>
     <div class="blok"><h2>Aansluiten</h2><p class="sub">Speler? Vul de teamcode van je coach in.</p>${codeVeld("Verder")}</div>
@@ -431,7 +426,7 @@ async function vStart() {
 
 /* ---------- ploeg aanmaken / instellingen ---------- */
 function ploegFormulier(p) {
-  p = p || { naam: "", club: "", categorie: "U13", seizoen: seizoenNu(), formaat: 8, groepen: [{ id: "a", naam: "Groep A", kleur: GROEP_KLEUREN[0] }], weak_link_aan: false };
+  p = p || { naam: "", club: "", categorie: "U13", seizoen: seizoenNu(), formaat: 8, groepen: [{ id: "a", naam: "Blauw", kleur: "#6FB7FF" }, { id: "b", naam: "Geel", kleur: "#F4C95D" }], weak_link_aan: false };
   const cat = CATEGORIEEN.map(c => `<option ${c === p.categorie ? "selected" : ""}>${c}</option>`).join("");
   const fm = [[2, "2 tegen 2"], [3, "3 tegen 3"], [5, "5 tegen 5"], [8, "8 tegen 8"], [11, "11 tegen 11"]]
     .map(([v, t]) => `<option value="${v}" ${v === Number(p.formaat) ? "selected" : ""}>${t}</option>`).join("");
@@ -444,10 +439,10 @@ function ploegFormulier(p) {
     <div><label for="p-fm">Wedstrijdformaat</label><select id="p-fm" name="formaat">${fm}</select></div>
   </div>
   <label>Groepen binnen je ploeg</label>
-  <p class="klein" style="margin:0 0 8px">Speel je met twee ploegen tegelijk (bv. Blauw en Geel)? Maak dan twee groepen. Eén groep is ook goed.</p>
+  <p class="klein" style="margin:0 0 8px">Speel je met twee ploegen tegelijk (bv. Blauw en Geel)? Laat dan twee groepen staan. Eén groep kan ook.</p>
   <div id="groepen" class="stapel">${(p.groepen || []).map(groepRij).join("")}</div>
   <button type="button" class="knop klein" style="margin-top:8px" onclick="A.groepErbij()">+ Groep</button>
-  <label class="vink"><input type="checkbox" name="weak_link" ${p.weak_link_aan ? "checked" : ""}> <span>“Weak link”-vraag aanzetten in de evaluatie <span class="klein">(standaard uit; spelers kiezen dan ook de minst goede ploegmaat, enkel coaches zien het resultaat)</span></span></label>`;
+  <label class="vink"><input type="checkbox" name="weak_link" ${p.weak_link_aan ? "checked" : ""}> <span>“Weak link”-vraag in de evaluatie <span class="klein">(standaard uit; enkel coaches zien het resultaat)</span></span></label>`;
 }
 function groepRij(g) {
   return `<div class="rij groeprij" data-id="${esc(g.id)}">
@@ -534,14 +529,20 @@ async function laadPloeg(id) {
   if (!ploeg) return null;
   const ctx = { id, ploeg, lid, coach: lid.status === "actief" && lid.rol === "coach", actief: lid.status === "actief" };
   if (!ctx.actief) return ctx;
-  const [spelers, wedstrijden, berichten] = await Promise.all([
+  const [spelers, wedstrijden] = await Promise.all([
     q(sb.from("cs_spelers").select("*").eq("ploeg_id", id).order("voornaam").order("naam")),
-    q(sb.from("cs_wedstrijden").select("*").eq("ploeg_id", id).order("datum", { ascending: false })),
-    q(sb.from("cs_berichten").select("*").eq("ploeg_id", id).order("vastgepind", { ascending: false }).order("created_at", { ascending: false }).limit(50))
+    q(sb.from("cs_wedstrijden").select("*").eq("ploeg_id", id).order("datum", { ascending: false }))
   ]);
-  Object.assign(ctx, { spelers, wedstrijden, berichten });
+  Object.assign(ctx, { spelers, wedstrijden });
   ctx.spelerMap = Object.fromEntries(spelers.map(s => [s.id, s]));
-  if (ctx.coach) ctx.leden = await q(sb.from("cs_leden").select("*").eq("ploeg_id", id).order("created_at"));
+  if (ctx.coach) {
+    const [leden, profielen] = await Promise.all([
+      q(sb.from("cs_leden").select("*").eq("ploeg_id", id).order("created_at")),
+      q(sb.from("cs_speler_profiel").select("speler_id,data").eq("ploeg_id", id))
+    ]);
+    ctx.leden = leden;
+    ctx.profielen = Object.fromEntries(profielen.map(p => [p.speler_id, p.data || {}]));
+  }
   return ctx;
 }
 
@@ -575,25 +576,40 @@ function vWachten() {
   <button class="knop gevaar" onclick="A.verlaten()">Aanvraag intrekken</button></div></div>`;
 }
 
+function datumBlok(d) { const x = new Date(d + "T12:00"); return `<div class="datum"><b>${x.getDate()}</b><span class="klein">${MAANDEN[x.getMonth()].slice(0, 3)}</span></div>`; }
+function scoreLabels(w) {
+  return (P.ploeg.groepen || []).map(g => {
+    const s = (w.scores || {})[g.id]; if (!s || s.wij == null || s.zij == null) return "";
+    const res = s.wij > s.zij ? "groen" : s.wij < s.zij ? "oranje" : "geel";
+    return `<span class="label ${res}" title="${esc(g.naam)}">${(P.ploeg.groepen.length > 1 ? esc(g.naam.slice(0, 1)) + " " : "")}${s.wij}-${s.zij}</span>`;
+  }).join(" ");
+}
+const opgesteld = w => [...new Set(Object.values(w.opstelling || {}).flat())];
+function ficheIngevuld(d) { return !!(d && (Object.values(d.sterk || {}).flat().length || ZELF.some(([k]) => d[k]))); }
+
 /* =====================================================================
    COACH
    ===================================================================== */
 function vCoach(tab, sub, sub2) {
   const wacht = P.leden.filter(l => l.status === "wacht").length;
-  const tabs = [["overzicht", "Overzicht", wacht], ["spelers", "Spelers"], ["wedstrijden", "Wedstrijden"], ["berichten", "Berichten"], ["instellingen", "Instellingen"]];
+  const tabs = [["overzicht", "Overzicht", wacht], ["spelers", "Spelers"], ["wedstrijden", "Wedstrijden"], ["instellingen", "Instellingen"]];
   const kop = ploegKop(tabs, tab);
-  const views = { overzicht: cOverzicht, spelers: cSpelers, wedstrijden: cWedstrijden, berichten: cBerichten, instellingen: cInstellingen };
+  const views = { overzicht: cOverzicht, spelers: cSpelers, wedstrijden: cWedstrijden, instellingen: cInstellingen };
   return (views[tab] || cOverzicht)(kop, sub, sub2);
 }
 
 function deelLink() { return location.origin + location.pathname + "#/code/" + P.ploeg.code; }
 
-function cOverzicht(kop) {
+async function cOverzicht(kop) {
   const wacht = P.leden.filter(l => l.status === "wacht");
-  const komend = P.wedstrijden.filter(w => w.datum >= vandaag()).sort((a, b) => a.datum.localeCompare(b.datum))[0];
+  const nu = vandaag();
+  const komend = P.wedstrijden.filter(w => w.datum >= nu).sort((a, b) => a.datum.localeCompare(b.datum))[0];
+  const laatste = P.wedstrijden.filter(w => w.datum <= nu && opgesteld(w).length)[0];
   const gekoppeld = new Set(P.leden.filter(l => l.speler_id).map(l => l.speler_id));
+  const actief = P.spelers.filter(s => s.actief);
+  const fiches = actief.filter(s => ficheIngevuld(P.profielen[s.id])).length;
   const spelerOpties = '<option value="">— nieuwe speler aanmaken —</option>' +
-    P.spelers.filter(s => s.actief).map(s => `<option value="${s.id}">${esc(naamVan(s))}${gekoppeld.has(s.id) ? " (heeft al een account)" : ""}</option>`).join("");
+    actief.map(s => `<option value="${s.id}">${esc(naamVan(s))}${gekoppeld.has(s.id) ? " (heeft al een account)" : ""}</option>`).join("");
   const aanvragen = wacht.map(l => `
     <div class="item" style="flex-wrap:wrap">
       <div class="hoofd" style="min-width:180px"><b>${esc(l.naam || "?")}</b><span class="klein">${esc(l.email || "")}</span></div>
@@ -602,9 +618,9 @@ function cOverzicht(kop) {
       <button class="knop klein gevaar" onclick="A.weigeren('${l.id}')">Weigeren</button>
     </div>`).join("");
   app().innerHTML = kop + `
-  ${wacht.length ? `<div class="blok"><h2>Aanvragen <span class="label geel">${wacht.length}</span></h2>
+  ${wacht.length ? `<div class="blok" style="margin-bottom:14px"><h2>Aanvragen <span class="label geel">${wacht.length}</span></h2>
     <p class="sub">Koppel elke aanvraag aan een speler uit je lijst, of laat een nieuwe speler aanmaken met de opgegeven naam.</p><div class="lijst">${aanvragen}</div></div>` : ""}
-  <div class="raster twee" style="margin-top:${wacht.length ? 14 : 0}px">
+  <div class="raster twee">
     <div class="blok">
       <h2>Spelers uitnodigen</h2>
       <p class="sub">Deel deze teamcode of link met je spelers. Zij maken een account en jij keurt ze goed.</p>
@@ -614,24 +630,30 @@ function cOverzicht(kop) {
         <a class="knop klein" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Sluit aan bij " + P.ploeg.naam + " op Sjotter: " + deelLink())}">Delen via WhatsApp</a>
       </div>
     </div>
+    <div class="blok"><h2>Ploeg</h2>
+      <div class="cijfers"><div><b>${actief.length}</b><span class="klein">spelers</span></div>
+      <div><b>${actief.filter(s => gekoppeld.has(s.id)).length}</b><span class="klein">met account</span></div>
+      <div><b>${fiches}</b><span class="klein">fiche ingevuld</span></div></div>
+      <a class="knop klein" style="margin-top:12px" href="#/p/${P.id}/spelers">${actief.length ? "Naar spelers" : "Spelers toevoegen"}</a>
+    </div>
     <div class="blok">
       <h2>Volgende wedstrijd</h2>
       ${komend ? `<p style="margin:0 0 4px;font-size:18px"><b>${esc(komend.tegenstander)}</b> <span class="label">${komend.thuis_uit}</span></p>
-        <p class="sub">${datumMooi(komend.datum)}${komend.aanvang ? " · " + uur(komend.aanvang) : ""}${komend.locatie ? " · " + esc(komend.locatie) : ""}</p>
-        <a class="knop klein" href="#/p/${P.id}/wedstrijden/${komend.id}">Opstelling maken</a>`
+        <p class="sub">${datumMooi(komend.datum)}</p><a class="knop klein" href="#/p/${P.id}/wedstrijden/${komend.id}">Opstelling maken</a>`
       : `<p class="sub">Nog geen wedstrijd gepland.</p><a class="knop klein vol" href="#/p/${P.id}/wedstrijden/nieuw">Wedstrijd toevoegen</a>`}
     </div>
-    <div class="blok"><h2>Ploeg</h2>
-      <div class="cijfers"><div><b>${P.spelers.filter(s => s.actief).length}</b><span class="klein">spelers</span></div>
-      <div><b>${P.leden.filter(l => l.status === "actief" && l.speler_id).length}</b><span class="klein">gekoppelde accounts</span></div>
-      <div><b>${P.wedstrijden.length}</b><span class="klein">wedstrijden</span></div></div>
-      ${!P.spelers.length ? `<a class="knop klein" style="margin-top:12px" href="#/p/${P.id}/spelers">Spelers toevoegen</a>` : ""}
-    </div>
-    <div class="blok"><h2>Laatste bericht</h2>
-      ${P.berichten[0] ? `<p style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere">${esc(P.berichten[0].tekst.slice(0, 180))}</p>` : '<p class="sub" style="margin:0">Nog geen berichten.</p>'}
-      <a class="knop klein" style="margin-top:10px" href="#/p/${P.id}/berichten">Bericht schrijven</a>
+    <div class="blok" id="laatste-eval">
+      <h2>Laatste evaluaties</h2>
+      ${laatste ? `<p style="margin:0 0 4px;font-size:18px"><b>${esc(laatste.tegenstander)}</b> ${scoreLabels(laatste)}</p><p class="sub" id="eval-teller">${datumMooi(laatste.datum)}</p>
+        <a class="knop klein" href="#/p/${P.id}/wedstrijden/${laatste.id}/evaluaties">Bekijk evaluaties</a>` : '<p class="sub" style="margin:0">Nog geen gespeelde wedstrijd met opstelling.</p>'}
     </div>
   </div>`;
+  if (laatste) {
+    try {
+      const ev = await q(sb.from("cs_evaluaties").select("speler_id").eq("wedstrijd_id", laatste.id).eq("ingediend", true));
+      const el = $("#eval-teller"); if (el) el.textContent = datumMooi(laatste.datum) + " · " + ev.length + " van " + opgesteld(laatste).length + " ingediend";
+    } catch (e) { console.warn(e); }
+  }
 }
 
 /* ---------- spelers ---------- */
@@ -641,7 +663,8 @@ function cSpelers(kop, sub) {
   const rijen = P.spelers.map(s => `
     <a class="item" href="#/p/${P.id}/spelers/${s.id}" style="${s.actief ? "" : "opacity:.5"}">
       <span class="nr">${s.rugnummer ?? "–"}</span>
-      <div class="hoofd"><b>${esc(naamVan(s))}</b><span class="klein">${s.is_keeper ? "Keeper · " : ""}${accounts(s.id) ? accounts(s.id) + " account(s) gekoppeld" : "nog geen account"}${s.actief ? "" : " · inactief"}</span></div>
+      <div class="hoofd"><b>${esc(naamVan(s))}${s.is_keeper ? " 🧤" : ""}</b><span class="klein">${accounts(s.id) ? "account gekoppeld" : "nog geen account"}${s.actief ? "" : " · inactief"}</span></div>
+      ${ficheIngevuld(P.profielen[s.id]) ? '<span class="label groen">fiche ✓</span>' : '<span class="label">fiche leeg</span>'}
       <span class="klein">›</span></a>`).join("");
   app().innerHTML = kop + `
   <div class="blok">
@@ -665,21 +688,26 @@ function cSpelers(kop, sub) {
   };
 }
 
+function veldenHtml(lijst, waarden, uit) {
+  waarden = waarden || {};
+  return '<div class="velden">' + lijst.map(([k, t, type]) =>
+    `<div><label for="g-${k}">${t}</label><input id="g-${k}" data-geg="${k}" type="${type}" maxlength="120" value="${esc(waarden[k] || "")}" ${uit ? "disabled" : ""}></div>`).join("") + "</div>";
+}
+function leesGegevens(basis) { const g = Object.assign({}, basis || {}); document.querySelectorAll("[data-geg]").forEach(el => { const v = el.value.trim(); if (v) g[el.dataset.geg] = v; else delete g[el.dataset.geg]; }); return g; }
+
 async function cSpelerDetail(kop, sid) {
   const s = P.spelerMap[sid];
   if (!s) { app().innerHTML = kop + '<div class="blok leeg">Speler niet gevonden.</div>'; return; }
   app().innerHTML = kop + '<div class="laden">Laden…</div>';
-  const [profiel, evals] = await Promise.all([
-    q(sb.from("cs_speler_profiel").select("*").eq("speler_id", sid).maybeSingle()),
-    q(sb.from("cs_evaluaties").select("wedstrijd_id,speler_id,ratings,motm,weak_link,antwoorden,ingediend").eq("ploeg_id", P.id))
-  ]);
-  const data = (profiel && profiel.data) || {};
+  const evals = await q(sb.from("cs_evaluaties").select("wedstrijd_id,speler_id,ratings,motm,weak_link,antwoorden,ingediend").eq("ploeg_id", P.id));
+  const data = P.profielen[sid] || {};
   const accounts = P.leden.filter(l => l.speler_id === sid);
   const ontvangen = []; let motm = 0, wl = 0;
   evals.forEach(ev => { const r = (ev.ratings || {})[sid]; if (r) ontvangen.push(r); if (ev.motm === sid) motm++; if (ev.weak_link === sid) wl++; });
-  const eigenMent = evals.filter(ev => ev.speler_id === sid).map(e => e.antwoorden && e.antwoorden.eigen_mentaliteit).filter(Boolean);
+  const eigen = evals.filter(ev => ev.speler_id === sid && ev.ingediend);
+  const eigenMent = eigen.map(e => e.antwoorden && e.antwoorden.eigen_mentaliteit).filter(Boolean);
+  const gespeeld = P.wedstrijden.filter(w => w.datum <= vandaag() && opgesteld(w).includes(sid)).length;
 
-  window._profielCoach = { sid, data };
   app().innerHTML = kop + `
   <a class="terug" href="#/p/${P.id}/spelers">← Alle spelers</a>
   <div class="raster twee" style="margin-top:10px">
@@ -693,6 +721,10 @@ async function cSpelerDetail(kop, sid) {
       <label class="vink"><input type="checkbox" name="keeper" ${s.is_keeper ? "checked" : ""}> Keeper</label>
       <label class="vink"><input type="checkbox" name="actief" ${s.actief ? "checked" : ""}> Actief in de ploeg</label>
       <div class="rij"><button class="knop vol">Opslaan</button><button type="button" class="knop gevaar" onclick="A.spelerWeg('${s.id}')">Verwijderen</button></div>
+      <hr>
+      <h3>Account</h3>
+      ${accounts.length ? accounts.map(l => `<div class="item"><div class="hoofd"><b>${esc(l.naam || "")}</b><span class="klein">${esc(l.email || "")}</span></div>
+        ${l.user_id === P.ploeg.eigenaar ? "" : `<button type="button" class="knop klein gevaar" onclick="A.ontkoppel('${l.id}')">Ontkoppel</button>`}</div>`).join("") : '<p class="sub" style="margin:0">Nog geen account gekoppeld. Deel de teamcode met deze speler.</p>'}
     </form>
     <div class="blok">
       <h2>Evaluaties</h2>
@@ -700,29 +732,18 @@ async function cSpelerDetail(kop, sid) {
         <div><span class="klein">Score van ploegmaats</span><b>${gemiddelde(ontvangen)}</b><span class="klein">${ontvangen.length} scores</span></div>
         <div><span class="klein">Man van de match</span><b>${motm}</b><span class="klein">stemmen</span></div>
         <div><span class="klein">Eigen mentaliteit</span><b>${gemiddelde(eigenMent)}</b><span class="klein">gemiddeld</span></div>
-        ${P.ploeg.weak_link_aan ? `<div><span class="klein">Weak link</span><b>${wl}</b><span class="klein">enkel coaches</span></div>` : ""}
+        <div><span class="klein">Ingevuld</span><b>${eigen.length}/${gespeeld}</b><span class="klein">wedstrijden</span></div>
+        ${P.ploeg.weak_link_aan ? `<div><span class="klein">Weak link</span><b>${wl}</b><span class="klein">stemmen</span></div>` : ""}
       </div>
       <hr>
-      <h3>Gekoppelde accounts</h3>
-      ${accounts.length ? accounts.map(l => `<div class="item"><div class="hoofd"><b>${esc(l.naam || "")}</b><span class="klein">${esc(l.email || "")}</span></div>
-        ${l.user_id === P.ploeg.eigenaar ? "" : `<button class="knop klein gevaar" onclick="A.ontkoppel('${l.id}')">Ontkoppel</button>`}</div>`).join("") : '<p class="sub" style="margin:0">Nog geen account gekoppeld. Deel de teamcode met deze speler.</p>'}
+      <h3>Persoonlijke gegevens</h3>
+      ${veldenHtml(GEGEVENS_SPELER.concat(GEGEVENS_COACH), data.gegevens)}
+      <button class="knop vol" style="margin-top:12px" onclick="A.gegevensCoach('${s.id}')">Gegevens opslaan</button>
     </div>
   </div>
   <div class="blok" style="margin-top:14px">
-    <h2>Persoonlijke boodschap</h2>
-    <p class="sub">Enkel ${esc(s.voornaam)} ziet deze boodschap op zijn startpagina.</p>
-    <textarea id="boodschap" maxlength="2000" placeholder="bv. Sterk gespeeld zaterdag! Volgende week focus op je eerste aanname.">${esc((profiel && profiel.coach_boodschap) || "")}</textarea>
-    <button class="knop vol" style="margin-top:10px" onclick="A.boodschap('${s.id}')">Boodschap opslaan</button>
-  </div>
-  <div class="blok" style="margin-top:14px">
-    <h2>Gegevens</h2>
-    <p class="sub">Enkel coaches en ${esc(s.voornaam)} zelf zien dit. ${esc(s.voornaam)} kan dit ook zelf aanvullen.</p>
-    ${gegevensVelden(data.gegevens)}
-    <button class="knop vol" style="margin-top:12px" onclick="A.gegevensCoach('${s.id}')">Gegevens opslaan</button>
-  </div>
-  <div class="blok" style="margin-top:14px">
-    <h2>Profiel volgens ${esc(s.voornaam)}</h2>
-    ${profielSamenvatting(data)}
+    <h2>Voetbalfiche van ${esc(s.voornaam)}</h2>
+    ${ficheSamenvatting(data, s)}
   </div>`;
   $("#spf").onsubmit = async e => {
     e.preventDefault(); const f = e.target;
@@ -733,29 +754,28 @@ async function cSpelerDetail(kop, sid) {
   };
 }
 
-function profielSamenvatting(d) {
-  const blok = (titel, obj) => {
-    const items = Object.values(obj || {}).flat().map(x => `<span class="pill">${esc(x)}</span>`);
-    return `<h3 style="margin-top:12px">${titel}</h3>${items.length ? '<div class="pills">' + items.join("") + "</div>" : '<p class="klein" style="margin:0">Nog niet ingevuld.</p>'}`;
-  };
+function ficheSamenvatting(d) {
+  if (!ficheIngevuld(d) && !Object.keys(VOETBAL_TEKST).some(k => d[k])) return '<p class="sub" style="margin:0">Nog niet ingevuld door de speler.</p>';
+  const pills = arr => (arr || []).length ? '<div class="pills">' + arr.map(x => `<span class="pill">${esc(x)}</span>`).join("") + "</div>" : '<span class="klein">–</span>';
+  const tekst = k => d[k] ? `<div style="margin-bottom:10px"><div class="klein">${VOETBAL_TEKST[k]}</div><div style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(d[k])}</div></div>` : "";
   const weg = (d.afwezig || []).filter(x => x >= vandaag()).sort();
-  return `
-    ${d.posities && d.posities.length ? `<h3>Favoriete posities</h3><div class="pills">${d.posities.map(p => `<span class="pill">${esc(p)}</span>`).join("")}</div>` : ""}
-    ${blok("Sterke punten", d.sterk)}${blok("Werkpunten", d.werk)}
-    ${d.doel ? `<h3 style="margin-top:12px">Persoonlijk doel</h3><p style="margin:0">${esc(d.doel)}</p>` : ""}
-    <h3 style="margin-top:12px">Niet beschikbaar</h3>${weg.length ? `<div class="pills">${weg.map(x => `<span class="pill">${datumMooi(x, true)}</span>`).join("")}</div>` : '<p class="klein" style="margin:0">Geen data doorgegeven.</p>'}`;
+  return `<div class="raster twee">
+    <div>
+      <h3>Basisinfo</h3>
+      <div class="klein">Favoriete positie</div>${pills(d.pos_fav)}
+      <div class="klein" style="margin-top:8px">Meest gespeelde positie</div>${pills(d.pos_meest)}
+      <div class="klein" style="margin-top:8px">Voorkeurspoot</div><div>${esc(d.voet || "–")}</div>
+      <h3 style="margin-top:16px">Zelfbeoordeling</h3>
+      <table>${ZELF.map(([k, t]) => `<tr><td>${t}</td><td style="text-align:right"><b>${d[k] || "–"}</b></td></tr>`).join("")}</table>
+      <h3 style="margin-top:16px">Sterke punten</h3>${pills(Object.values(d.sterk || {}).flat())}
+      <h3 style="margin-top:12px">Werkpunten</h3>${pills(Object.values(d.werk || {}).flat())}
+      <h3 style="margin-top:12px">Niet beschikbaar</h3>${weg.length ? pills(weg.map(x => datumMooi(x, true))) : '<span class="klein">Geen data doorgegeven.</span>'}
+    </div>
+    <div>${Object.keys(VOETBAL_TEKST).map(tekst).join("") || '<p class="klein">Geen antwoorden.</p>'}</div>
+  </div>`;
 }
 
 /* ---------- wedstrijden ---------- */
-function datumBlok(d) { const x = new Date(d + "T12:00"); return `<div class="datum"><b>${x.getDate()}</b><span class="klein">${MAANDEN[x.getMonth()].slice(0, 3)}</span></div>`; }
-function scoreLabels(w) {
-  return (P.ploeg.groepen || []).map(g => {
-    const s = (w.scores || {})[g.id]; if (!s || s.wij == null || s.zij == null) return "";
-    const res = s.wij > s.zij ? "groen" : s.wij < s.zij ? "oranje" : "geel";
-    return `<span class="label ${res}" title="${esc(g.naam)}">${s.wij}-${s.zij}</span>`;
-  }).join(" ");
-}
-
 function cWedstrijden(kop, sub, sub2) {
   if (sub === "nieuw") return cWedstrijdFormulier(kop, null);
   if (sub && sub2 === "bewerk") return cWedstrijdFormulier(kop, P.wedstrijden.find(w => w.id === sub));
@@ -765,9 +785,9 @@ function cWedstrijden(kop, sub, sub2) {
   const komend = P.wedstrijden.filter(w => w.datum >= nu).sort((a, b) => a.datum.localeCompare(b.datum));
   const voorbij = P.wedstrijden.filter(w => w.datum < nu);
   const rij = w => {
-    const aantal = Object.values(w.opstelling || {}).reduce((n, a) => n + a.length, 0);
+    const aantal = opgesteld(w).length;
     return `<a class="item" href="#/p/${P.id}/wedstrijden/${w.id}">${datumBlok(w.datum)}
-      <div class="hoofd"><b>${esc(w.tegenstander)}</b><span class="klein">${w.thuis_uit}${w.aanvang ? " · " + uur(w.aanvang) : ""} · ${aantal ? aantal + " opgesteld" : "nog geen opstelling"}</span></div>
+      <div class="hoofd"><b>${esc(w.tegenstander)}</b><span class="klein">${w.thuis_uit} · ${aantal ? aantal + " opgesteld" : "nog geen opstelling"}</span></div>
       ${scoreLabels(w)}</a>`;
   };
   app().innerHTML = kop + `
@@ -779,25 +799,22 @@ function cWedstrijden(kop, sub, sub2) {
 }
 
 function cWedstrijdFormulier(kop, w) {
-  const n = !w; w = w || { datum: vandaag(), aanvang: "", tegenstander: "", thuis_uit: "thuis", locatie: "", notities: "" };
+  const n = !w; w = w || { datum: vandaag(), tegenstander: "", thuis_uit: "thuis" };
   app().innerHTML = kop + `
   <a class="terug" href="#/p/${P.id}/wedstrijden${n ? "" : "/" + w.id}">← Terug</a>
   <form class="blok" id="wf" style="margin-top:10px">
     <h2>${n ? "Nieuwe wedstrijd" : "Wedstrijd bewerken"}</h2>
     <div class="velden">
       <div><label for="w-teg">Tegenstander</label><input id="w-teg" name="teg" required maxlength="80" value="${esc(w.tegenstander)}"></div>
-      <div><label for="w-tu">Thuis of uit</label><select id="w-tu" name="tu"><option value="thuis" ${w.thuis_uit === "thuis" ? "selected" : ""}>Thuis</option><option value="uit" ${w.thuis_uit === "uit" ? "selected" : ""}>Uit</option></select></div>
       <div><label for="w-d">Datum</label><input id="w-d" name="datum" type="date" required value="${w.datum}"></div>
-      <div><label for="w-a">Aanvang</label><input id="w-a" name="aanvang" type="time" value="${uur(w.aanvang)}"></div>
+      <div><label for="w-tu">Thuis of uit</label><select id="w-tu" name="tu"><option value="thuis" ${w.thuis_uit === "thuis" ? "selected" : ""}>Thuis</option><option value="uit" ${w.thuis_uit === "uit" ? "selected" : ""}>Uit</option></select></div>
     </div>
-    <label for="w-l">Locatie</label><input id="w-l" name="locatie" maxlength="120" value="${esc(w.locatie || "")}" placeholder="bv. Sportpark, veld 2">
-    <label for="w-n">Notities voor de ploeg</label><textarea id="w-n" name="notities" maxlength="2000" placeholder="bv. Verzamelen 45 min voor de aftrap, witte kousen.">${esc(w.notities || "")}</textarea>
-    <div class="rij" style="margin-top:14px"><button class="knop vol">${n ? "Toevoegen" : "Opslaan"}</button>
+    <div class="rij" style="margin-top:16px"><button class="knop vol">${n ? "Toevoegen" : "Opslaan"}</button>
     ${n ? "" : `<button type="button" class="knop gevaar" onclick="A.wedstrijdWeg('${w.id}')">Verwijderen</button>`}</div>
   </form>`;
   $("#wf").onsubmit = async e => {
     e.preventDefault(); const f = e.target;
-    const rij = { tegenstander: f.teg.value.trim(), thuis_uit: f.tu.value, datum: f.datum.value, aanvang: f.aanvang.value || null, locatie: f.locatie.value.trim() || null, notities: f.notities.value.trim() || null };
+    const rij = { tegenstander: f.teg.value.trim(), thuis_uit: f.tu.value, datum: f.datum.value };
     try {
       if (n) { rij.id = uuid(); rij.ploeg_id = P.id; await q(sb.from("cs_wedstrijden").insert(rij)); }
       else await q(sb.from("cs_wedstrijden").update(rij).eq("id", w.id));
@@ -813,6 +830,7 @@ function cWedstrijdDetail(kop, wid) {
   const opst = w.opstelling || {};
   const ingedeeld = new Set(Object.values(opst).flat());
   const actief = P.spelers.filter(s => s.actief || ingedeeld.has(s.id));
+  const weg = new Set(actief.filter(s => ((P.profielen[s.id] || {}).afwezig || []).includes(w.datum)).map(s => s.id));
   const groepHtml = groepen.map(g => {
     const ids = opst[g.id] || [];
     const sc = (w.scores || {})[g.id] || {};
@@ -820,7 +838,7 @@ function cWedstrijdDetail(kop, wid) {
       <h3><span class="stip" style="background:${esc(g.kleur || "#ccc")}"></span>${esc(g.naam)} <span class="klein teller-g" style="margin-left:auto">${ids.length}</span></h3>
       <div class="kies">${actief.map(s => {
         const aan = ids.includes(s.id), elders = !aan && ingedeeld.has(s.id);
-        return `<button type="button" class="pill ${aan ? "aan" : ""} ${elders ? "elders" : ""}" data-s="${s.id}" onclick="A.opstelKlik(this)">${esc(kortNaam(s))}${s.is_keeper ? " 🧤" : ""}</button>`;
+        return `<button type="button" class="pill ${aan ? "aan" : ""} ${elders ? "elders" : ""} ${weg.has(s.id) ? "weg" : ""}" data-s="${s.id}" onclick="A.opstelKlik(this)">${esc(kortNaam(s))}${s.is_keeper ? " 🧤" : ""}</button>`;
       }).join("") || '<span class="klein">Voeg eerst spelers toe.</span>'}</div>
       <div class="rij" style="margin-top:10px"><span class="klein">Uitslag</span>
         <input type="number" min="0" max="99" class="sc-wij" value="${sc.wij ?? ""}" placeholder="wij" style="width:70px" aria-label="Doelpunten ${esc(g.naam)}">
@@ -831,40 +849,33 @@ function cWedstrijdDetail(kop, wid) {
   <a class="terug" href="#/p/${P.id}/wedstrijden">← Alle wedstrijden</a>
   <div class="blok" style="margin-top:10px">
     <div class="rij tussen">
-      <div><h2 style="margin:0">${esc(w.tegenstander)} <span class="label">${w.thuis_uit}</span></h2>
-      <div class="klein">${datumMooi(w.datum)}${w.aanvang ? " · " + uur(w.aanvang) : ""}${w.locatie ? " · " + esc(w.locatie) : ""}</div></div>
+      <div><h2 style="margin:0">${esc(w.tegenstander)} <span class="label">${w.thuis_uit}</span></h2><div class="klein">${datumMooi(w.datum)}</div></div>
       <div class="rij"><a class="knop klein" href="#/p/${P.id}/wedstrijden/${w.id}/bewerk">Bewerken</a>
       <a class="knop klein vol" href="#/p/${P.id}/wedstrijden/${w.id}/evaluaties">Evaluaties</a></div>
     </div>
-    ${w.notities ? `<p style="white-space:pre-wrap;margin:12px 0 0">${esc(w.notities)}</p>` : ""}
   </div>
   <div class="blok">
     <h2>Opstelling${groepen.length > 1 ? " per groep" : ""}</h2>
     <p class="sub">Tik op een speler om hem in een groep te zetten. Wie opgesteld staat, kan na de match de evaluatie invullen.</p>
-    <div id="beschikbaar" class="klein" style="margin-bottom:10px"></div>
+    ${weg.size ? `<p class="klein" style="margin:-6px 0 12px">⚠️ Niet beschikbaar volgens de kalender: <b>${[...weg].map(id => esc(kortNaam(P.spelerMap[id]))).join(", ")}</b></p>` : ""}
     <div class="groepen" id="opst">${groepHtml}</div>
     <label class="vink"><input type="checkbox" id="evalopen" ${w.eval_open ? "checked" : ""}> Spelers mogen deze wedstrijd evalueren</label>
     <button class="knop vol" onclick="A.opstellingBewaar('${w.id}')">Opstelling en uitslag opslaan</button>
   </div>`;
-  toonBeschikbaarheid(w.datum);
-}
-async function toonBeschikbaarheid(datum) {
-  try {
-    const prof = await q(sb.from("cs_speler_profiel").select("speler_id,data").eq("ploeg_id", P.id));
-    const weg = prof.filter(p => ((p.data && p.data.afwezig) || []).includes(datum)).map(p => P.spelerMap[p.speler_id]).filter(Boolean);
-    const el = $("#beschikbaar"); if (!el) return;
-    el.innerHTML = weg.length ? "⚠️ Niet beschikbaar op deze dag: <b>" + weg.map(s => esc(kortNaam(s))).join(", ") + "</b>" : "";
-    weg.forEach(s => document.querySelectorAll(`#opst [data-s="${s.id}"]`).forEach(b => b.classList.add("weg")));
-  } catch (e) { console.warn(e); }
 }
 
 /* ---------- evaluaties (coach) ---------- */
+const EVAL_LABELS = {
+  eigen_mentaliteit: "Mentaliteit", eigen_bplus: "Balbezit (B+)", eigen_bmin: "Balverlies (B−)", eigen_t1: "Omschakelen B+ → B−", eigen_t2: "Omschakelen B− → B+",
+  k_doellijn: "Doellijn en reflexen", k_1v1: "1 tegen 1 en uitkomen", k_communicatie: "Coachen en communiceren", k_opbouw: "Opbouw en uittrap",
+  team_mentaliteit: "Mentaliteit van de ploeg", team_samenspel: "Samenspel"
+};
 async function cEvaluaties(kop, wid) {
   const w = P.wedstrijden.find(x => x.id === wid);
   if (!w) { app().innerHTML = kop + '<div class="blok leeg">Wedstrijd niet gevonden.</div>'; return; }
   app().innerHTML = kop + '<div class="laden">Laden…</div>';
   const evals = await q(sb.from("cs_evaluaties").select("*").eq("wedstrijd_id", wid));
-  const opgesteld = [...new Set(Object.values(w.opstelling || {}).flat())];
+  const ids = opgesteld(w);
   const perSpeler = Object.fromEntries(evals.map(e => [e.speler_id, e]));
   const ontv = {}, motm = {}, wl = {};
   evals.forEach(e => {
@@ -873,7 +884,7 @@ async function cEvaluaties(kop, wid) {
     if (e.weak_link) wl[e.weak_link] = (wl[e.weak_link] || 0) + 1;
   });
   const sorteer = id => ontv[id] && ontv[id].length ? Number(gemiddelde(ontv[id])) : -1;
-  const rijen = opgesteld.map(id => P.spelerMap[id]).filter(Boolean)
+  const rijen = ids.map(id => P.spelerMap[id]).filter(Boolean)
     .sort((a, b) => sorteer(b.id) - sorteer(a.id))
     .map(s => {
       const e = perSpeler[s.id], a = (e && e.antwoorden) || {};
@@ -881,21 +892,21 @@ async function cEvaluaties(kop, wid) {
         <td><b>${esc(naamVan(s))}</b></td>
         <td>${e ? (e.ingediend ? '<span class="label groen">ingediend</span>' : '<span class="label geel">concept</span>') : '<span class="label">nog niet</span>'}</td>
         <td><b>${gemiddelde(ontv[s.id])}</b> <span class="klein">(${(ontv[s.id] || []).length})</span></td>
-        <td>${motm[s.id] || ""}</td>
+        <td>${motm[s.id] ? "⭐ " + motm[s.id] : ""}</td>
         ${P.ploeg.weak_link_aan ? `<td>${wl[s.id] || ""}</td>` : ""}
         <td>${a.eigen_mentaliteit || "–"}</td>
         <td>${e ? `<button class="knop klein" onclick="A.toonEval('${s.id}')">Bekijk</button>` : ""}</td></tr>`;
     }).join("");
   const tel = k => gemiddelde(evals.map(e => e.antwoorden && Number(e.antwoorden[k])).filter(Boolean));
   const systemen = {}; evals.forEach(e => { const s = e.antwoorden && e.antwoorden.teg_systeem; if (s) systemen[s] = (systemen[s] || 0) + 1; });
-  const besten = evals.map(e => e.antwoorden && e.antwoorden.teg_beste).filter(Boolean);
+  const tegTekst = evals.map(e => [e.speler_id, e.antwoorden || {}]).filter(([, a]) => a.teg_beste || a.teg_extra);
   const waarom = evals.map(e => [e.speler_id, e.antwoorden && e.antwoorden.team_waarom]).filter(x => x[1]);
   window._evals = { evals, w };
   app().innerHTML = kop + `
   <a class="terug" href="#/p/${P.id}/wedstrijden/${w.id}">← ${esc(w.tegenstander)}</a>
   <div class="blok" style="margin-top:10px">
     <div class="rij tussen"><h2 style="margin:0">Evaluaties · ${esc(w.tegenstander)}</h2>
-    <span class="klein">${evals.filter(e => e.ingediend).length} van ${opgesteld.length} ingediend</span></div>
+    <span class="klein">${evals.filter(e => e.ingediend).length} van ${ids.length} ingediend</span></div>
     <div class="tabelwrap" style="margin-top:10px"><table>
       <tr><th>Speler</th><th>Status</th><th>Score ploegmaats</th><th>MOTM</th>${P.ploeg.weak_link_aan ? "<th>Weak link</th>" : ""}<th>Eigen ment.</th><th></th></tr>
       ${rijen || '<tr><td colspan="7" class="leeg">Nog niemand opgesteld.</td></tr>'}
@@ -908,31 +919,10 @@ async function cEvaluaties(kop, wid) {
     </div>
     <div class="blok"><h2>Tegenstander</h2>
       ${Object.keys(systemen).length ? `<p style="margin:0">Systeem: ${Object.entries(systemen).sort((a, b) => b[1] - a[1]).map(([s, n]) => `<b>${esc(s)}</b> (${n})`).join(", ")}</p>` : '<p class="sub" style="margin:0">Nog geen antwoorden.</p>'}
-      ${besten.length ? `<p style="margin:8px 0 0">Beste speler: ${besten.map(esc).join(", ")}</p>` : ""}
+      ${tegTekst.length ? "<hr>" + tegTekst.map(([id, a]) => `<p style="margin:0 0 8px"><span class="klein">${esc(kortNaam(P.spelerMap[id]))}:</span> ${a.teg_beste ? "beste speler: " + esc(a.teg_beste) : ""}${a.teg_beste && a.teg_extra ? " · " : ""}${esc(a.teg_extra || "")}</p>`).join("") : ""}
     </div>
   </div>
   <div id="evaldetail"></div>`;
-}
-
-/* ---------- berichten ---------- */
-function cBerichten(kop) {
-  app().innerHTML = kop + `
-  <div class="blok">
-    <h2>Bericht aan de ploeg</h2>
-    <p class="sub">Iedereen in de ploeg ziet dit op zijn startpagina. Spelers kunnen niet antwoorden.</p>
-    <form id="bf"><textarea name="t" maxlength="2000" required placeholder="bv. Zaterdag verzamelen om 9u15 aan de kantine. Vergeet je scheenbeschermers niet!" aria-label="Bericht"></textarea>
-    <div class="rij" style="margin-top:10px"><label class="vink" style="margin:0"><input type="checkbox" name="pin"> Bovenaan vastzetten</label><button class="knop vol" style="margin-left:auto">Plaatsen</button></div></form>
-  </div>
-  <div class="blok"><h2>Geplaatst</h2>
-    ${P.berichten.map(b => `<div class="bericht"><div class="rij tussen"><span class="wanneer">${b.vastgepind ? "📌 " : ""}${tijdstip(b.created_at)}</span>
-      <span class="rij"><button class="knop klein" onclick="A.pin('${b.id}',${!b.vastgepind})">${b.vastgepind ? "Losmaken" : "Vastzetten"}</button><button class="knop klein gevaar" onclick="A.berichtWeg('${b.id}')">Verwijder</button></span></div>
-      <p>${esc(b.tekst)}</p></div>`).join("") || '<div class="leeg">Nog geen berichten.</div>'}
-  </div>`;
-  $("#bf").onsubmit = async e => {
-    e.preventDefault();
-    try { await q(sb.from("cs_berichten").insert({ ploeg_id: P.id, tekst: e.target.t.value.trim(), vastgepind: e.target.pin.checked })); toast("Bericht geplaatst"); herlaad(); }
-    catch (err) { foutMelding(err); }
-  };
 }
 
 /* ---------- instellingen ---------- */
@@ -949,7 +939,7 @@ function cInstellingen(kop) {
     <div class="lijst">${leden.map(l => `<div class="item" style="flex-wrap:wrap"><div class="hoofd" style="min-width:160px"><b>${esc(l.naam || "")}</b><span class="klein">${esc(l.email || "")}${l.speler_id && P.spelerMap[l.speler_id] ? " · " + esc(naamVan(P.spelerMap[l.speler_id])) : ""}</span></div>
       ${l.user_id === P.ploeg.eigenaar ? '<span class="label oranje">Eigenaar</span>' : `<select onchange="A.rol('${l.id}',this.value)" style="width:auto" aria-label="Rol"><option value="speler" ${l.rol === "speler" ? "selected" : ""}>Speler</option><option value="coach" ${l.rol === "coach" ? "selected" : ""}>Coach</option></select>
       <button class="knop klein gevaar" onclick="A.lidWeg('${l.id}')">Verwijder</button>`}</div>`).join("")}</div></div>
-  ${eigenaar ? `<div class="blok"><h2>Ploeg verwijderen</h2><p class="sub">Verwijdert de ploeg met alle spelers, wedstrijden, evaluaties en berichten. Dit kan niet ongedaan gemaakt worden.</p><button class="knop gevaar" onclick="A.ploegWeg()">Ploeg definitief verwijderen</button></div>`
+  ${eigenaar ? `<div class="blok"><h2>Ploeg verwijderen</h2><p class="sub">Verwijdert de ploeg met alle spelers, wedstrijden en evaluaties. Dit kan niet ongedaan gemaakt worden.</p><button class="knop gevaar" onclick="A.ploegWeg()">Ploeg definitief verwijderen</button></div>`
     : `<div class="blok"><h2>Ploeg verlaten</h2><button class="knop gevaar" onclick="A.verlaten()">Ik verlaat deze ploeg</button></div>`}`;
   $("#pf").onsubmit = async e => {
     e.preventDefault();
@@ -959,57 +949,143 @@ function cInstellingen(kop) {
 }
 
 /* =====================================================================
-   SPELER
+   SPELER  (Home · Profiel · Voetbal · Wedstrijden · Kalender)
    ===================================================================== */
 function mijnSpeler() { return P && P.lid && P.lid.speler_id && P.spelerMap ? P.spelerMap[P.lid.speler_id] : null; }
 function mijnGroep(w, sid) { return (P.ploeg.groepen || []).find(g => ((w.opstelling || {})[g.id] || []).includes(sid)); }
+async function laadFiche() {
+  const ik = mijnSpeler();
+  const prof = await q(sb.from("cs_speler_profiel").select("data").eq("speler_id", ik.id).maybeSingle());
+  fiche = Object.assign({ sterk: {}, werk: {}, pos_fav: [], pos_meest: [], afwezig: [], gegevens: {} }, (prof && prof.data) || {});
+  return fiche;
+}
 
 function vSpeler(tab, sub) {
   const ik = mijnSpeler();
-  const tabs = [["home", "Home"], ["wedstrijden", "Wedstrijden"], ["profiel", "Mijn profiel"]];
-  const kop = ploegKop(ik ? tabs : [["home", "Home"]], ik ? tab : "home");
   if (!ik) {
-    app().innerHTML = kop + `<div class="melding geel">Je bent goedgekeurd, maar de coach heeft je account nog niet aan een speler gekoppeld. Tot dan zie je enkel de berichten.</div>
-    <div class="blok" style="margin-top:14px"><h2>Berichten</h2>${berichtenHtml()}</div>
-    <div class="rij" style="margin-top:14px"><button class="knop gevaar klein" onclick="A.verlaten()">Ploeg verlaten</button></div>`;
+    app().innerHTML = ploegKop([["home", "Home"]], "home") + `<div class="melding geel">Je bent goedgekeurd, maar de coach heeft je account nog niet aan een speler gekoppeld. Vraag het even aan je coach.</div>
+    <div class="rij" style="margin-top:14px"><button class="knop" onclick="herlaad()">Opnieuw kijken</button><button class="knop gevaar klein" onclick="A.verlaten()">Ploeg verlaten</button></div>`;
     return;
   }
-  const views = { home: sHome, wedstrijden: sWedstrijden, profiel: sProfiel };
+  const tabs = [["home", "Home"], ["profiel", "Profiel"], ["voetbal", "Voetbal"], ["wedstrijden", "Wedstrijden"], ["kalender", "Kalender"]];
+  const kop = ploegKop(tabs, tab);
+  const views = { home: sHome, profiel: sProfiel, voetbal: sVoetbal, wedstrijden: sWedstrijden, kalender: sKalender };
   return (views[tab] || sHome)(kop, sub);
-}
-function berichtenHtml() {
-  return P.berichten.map(b => `<div class="bericht"><span class="wanneer">${b.vastgepind ? "📌 " : ""}${tijdstip(b.created_at)}</span><p>${esc(b.tekst)}</p></div>`).join("") || '<div class="leeg">Nog geen berichten van de coach.</div>';
 }
 
 async function sHome(kop) {
   const ik = mijnSpeler();
   app().innerHTML = kop + '<div class="laden">Laden…</div>';
-  const [profiel, mijnEvals] = await Promise.all([
-    q(sb.from("cs_speler_profiel").select("coach_boodschap").eq("speler_id", ik.id).maybeSingle()),
-    q(sb.from("cs_evaluaties").select("wedstrijd_id,ingediend").eq("speler_id", ik.id))
-  ]);
+  const [mijnEvals] = await Promise.all([q(sb.from("cs_evaluaties").select("wedstrijd_id,ingediend").eq("speler_id", ik.id)), laadFiche()]);
   const nu = vandaag();
-  const komend = P.wedstrijden.filter(w => w.datum >= nu).sort((a, b) => a.datum.localeCompare(b.datum))[0];
   const ingediend = new Set(mijnEvals.filter(e => e.ingediend).map(e => e.wedstrijd_id));
-  const teDoen = P.wedstrijden.filter(w => w.datum <= nu && w.eval_open && mijnGroep(w, ik.id) && !ingediend.has(w.id));
+  const mijnMatchen = P.wedstrijden.filter(w => w.datum <= nu && mijnGroep(w, ik.id));
+  const teDoen = mijnMatchen.filter(w => w.eval_open && !ingediend.has(w.id));
+  const komend = P.wedstrijden.filter(w => w.datum >= nu).sort((a, b) => a.datum.localeCompare(b.datum))[0];
+  const laatste = P.wedstrijden.filter(w => w.datum <= nu)[0];
   const g = komend && mijnGroep(komend, ik.id);
+  const klaar = mijnMatchen.filter(w => ingediend.has(w.id)).length;
   app().innerHTML = kop + `
-  ${teDoen.length ? `<div class="melding" style="margin-bottom:14px"><b>Evaluatie klaar om in te vullen:</b> ${teDoen.slice(0, 3).map(w => `<a href="#/p/${P.id}/wedstrijden/${w.id}">${esc(w.tegenstander)} (${datumMooi(w.datum, true)})</a>`).join(", ")}</div>` : ""}
+  <h1 class="titel" style="margin-top:0">Hallo <em>${esc(ik.voornaam)}</em>!</h1>
+  ${teDoen.length ? `<div class="melding" style="margin:10px 0 14px"><b>⚠️ ${teDoen.length === 1 ? "1 evaluatie" : teDoen.length + " evaluaties"} in te vullen:</b><br>${teDoen.map(w => `<a href="#/p/${P.id}/wedstrijden/${w.id}">${esc(w.tegenstander)} (${datumMooi(w.datum, true)})</a>`).join(" · ")}</div>`
+    : mijnMatchen.length ? '<div class="melding" style="margin:10px 0 14px;border-left-color:var(--live)"><b>Alle wedstrijdevaluaties ingevuld.</b> Goed bezig!</div>' : ""}
+  ${!ficheIngevuld(fiche) ? `<div class="melding geel" style="margin-bottom:14px">Vul je <a href="#/p/${P.id}/voetbal">voetbalfiche</a> in, zodat je coach weet wat jij wil leren.</div>` : ""}
   <div class="raster twee">
+    <div class="blok"><h2>📋 Mijn evaluaties</h2>
+      <div class="cijfers"><div><b>${klaar}/${mijnMatchen.length}</b><span class="klein">ingevuld</span></div></div>
+      <a class="knop klein" style="margin-top:12px" href="#/p/${P.id}/wedstrijden">Naar wedstrijden</a>
+    </div>
     <div class="blok"><h2>Volgende wedstrijd</h2>
       ${komend ? `<p style="margin:0 0 4px;font-size:18px"><b>${esc(komend.tegenstander)}</b> <span class="label">${komend.thuis_uit}</span></p>
-      <p class="sub" style="margin-bottom:8px">${datumMooi(komend.datum)}${komend.aanvang ? " · " + uur(komend.aanvang) : ""}${komend.locatie ? " · " + esc(komend.locatie) : ""}</p>
-      ${g ? `<p style="margin:0"><span class="stip" style="background:${esc(g.kleur)}"></span> Je speelt bij <b>${esc(g.naam)}</b></p>` : '<p class="klein" style="margin:0">De opstelling is nog niet bekend.</p>'}
-      ${komend.notities ? `<p style="white-space:pre-wrap;margin:10px 0 0" class="klein">${esc(komend.notities)}</p>` : ""}`
+      <p class="sub" style="margin-bottom:6px">${datumMooi(komend.datum)}</p>
+      ${g ? `<p style="margin:0"><span class="stip" style="background:${esc(g.kleur)}"></span> Je speelt bij <b>${esc(g.naam)}</b></p>` : '<p class="klein" style="margin:0">De opstelling is nog niet bekend.</p>'}`
       : '<p class="sub" style="margin:0">Nog geen wedstrijd gepland.</p>'}
     </div>
-    <div class="blok"><h2>Van je coach</h2>
-      ${profiel && profiel.coach_boodschap ? `<p style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere">${esc(profiel.coach_boodschap)}</p>` : '<p class="sub" style="margin:0">Nog geen persoonlijke boodschap.</p>'}
-    </div>
   </div>
-  <div class="blok" style="margin-top:14px"><h2>Berichten aan de ploeg</h2>${berichtenHtml()}</div>`;
+  ${laatste && Object.keys(laatste.scores || {}).length ? `<div class="blok" style="margin-top:14px"><h2>Laatste uitslag</h2><p style="margin:0"><b>${esc(laatste.tegenstander)}</b> · ${datumMooi(laatste.datum, true)} ${scoreLabels(laatste)}</p></div>` : ""}`;
 }
 
+/* Profiel: persoonlijke gegevens */
+async function sProfiel(kop) {
+  const ik = mijnSpeler();
+  app().innerHTML = kop + '<div class="laden">Laden…</div>';
+  await laadFiche();
+  app().innerHTML = kop + `
+  <div class="blok">
+    <h2>👤 Persoonlijke gegevens</h2>
+    <div class="velden">
+      <div><label>Voornaam</label><input value="${esc(ik.voornaam)}" disabled></div>
+      <div><label>Naam</label><input value="${esc(ik.naam)}" disabled></div>
+    </div>
+    ${veldenHtml(GEGEVENS_SPELER, fiche.gegevens)}
+    <p class="klein">Enkel jij en je coach zien deze gegevens. Klopt je naam niet? Vraag het aan je coach.</p>
+    <button class="knop vol" onclick="A.profielBewaar()">💾 Opslaan</button>
+  </div>`;
+}
+
+/* Voetbal: fiche + zelfbeoordeling (zoals in het KSK-platform) */
+async function sVoetbal(kop) {
+  const ik = mijnSpeler();
+  app().innerHTML = kop + '<div class="laden">Laden…</div>';
+  await laadFiche();
+  const pos = POSITIES[P.ploeg.formaat] || [];
+  const cats = ik.is_keeper ? CATS_KEEPER : CATS;
+  const posKnoppen = key => `<div class="pills" data-multi="${key}">${pos.map(p => `<button type="button" class="pill ${(fiche[key] || []).includes(p) ? "aan" : ""}" onclick="this.classList.toggle('aan')">${esc(p)}</button>`).join("")}</div>`;
+  const veld = (k, area) => area
+    ? `<label for="v-${k}" style="text-transform:none;letter-spacing:0;font-size:14px;color:var(--licht)">${VOETBAL_TEKST[k]}</label><textarea id="v-${k}" data-vb="${k}" maxlength="600" style="min-height:64px">${esc(fiche[k] || "")}</textarea>`
+    : `<label for="v-${k}" style="text-transform:none;letter-spacing:0;font-size:14px;color:var(--licht)">${VOETBAL_TEKST[k]}</label><input id="v-${k}" data-vb="${k}" maxlength="120" value="${esc(fiche[k] || "")}">`;
+  const pillBlok = soort => Object.entries(cats).map(([c, arr]) => `<h3 style="margin-top:12px">${CAT_NAAM[c]}</h3><div class="pills" data-cat="${soort}:${c}">${arr.map(x =>
+    `<button type="button" class="pill ${((fiche[soort] || {})[c] || []).includes(x) ? "aan" : ""}" onclick="this.classList.toggle('aan')">${esc(x)}</button>`).join("")}</div>`).join("");
+  app().innerHTML = kop + `
+  <div class="raster twee">
+    <div class="blok"><h2>ℹ️ Basisinfo</h2>
+      ${pos.length ? `<label>Favoriete positie <span class="klein" style="text-transform:none;letter-spacing:0">(kies 1 of meerdere)</span></label>${posKnoppen("pos_fav")}
+      <label>Meest gespeelde positie</label>${posKnoppen("pos_meest")}` : ""}
+      <label>Voorkeurspoot</label><div class="pills" data-keuze-vb="voet">${["Links","Rechts","Beide"].map(v => `<button type="button" class="pill ${fiche.voet === v ? "aan" : ""}" onclick="A.keuze(this)">${v}</button>`).join("")}</div>
+      <h2 style="margin-top:22px">📅 Achtergrond</h2>${veld("vorige_clubs")}
+    </div>
+    <div class="blok"><h2>⭐ Motivatie & identiteit</h2>
+      ${veld("fav_ploeg")}${veld("fav_speler")}${veld("leuk", true)}${veld("droom", true)}${veld("herinnering", true)}
+    </div>
+    <div class="blok"><h2>🎯 Mijn doelen</h2>${veld("goed", true)}${veld("beter", true)}${veld("verwacht", true)}</div>
+    <div class="blok"><h2>🔍 Zelfbeoordeling</h2><p class="sub">Geef jezelf een eerlijk cijfer van 1 tot 10.</p>
+      ${ZELF.map(([k, t]) => `<div class="evalvraag"><div class="vraag">${t}</div><div class="scores" data-zb="${k}">${tienKnoppen(fiche[k], false)}</div></div>`).join("")}
+    </div>
+    <div class="blok"><h2>🌟 Sterke punten</h2>${pillBlok("sterk")}</div>
+    <div class="blok"><h2>📈 Werkpunten</h2>${pillBlok("werk")}</div>
+  </div>
+  <div class="rij" style="margin-top:14px"><button class="knop vol" onclick="A.voetbalBewaar()">💾 Opslaan</button></div>`;
+}
+
+/* Kalender: vakantie / niet beschikbaar */
+async function sKalender(kop) {
+  app().innerHTML = kop + '<div class="laden">Laden…</div>';
+  await laadFiche();
+  if (!kalMaand) { const d = new Date(); kalMaand = [d.getFullYear(), d.getMonth()]; }
+  app().innerHTML = kop + `
+  <div class="blok" style="max-width:520px">
+    <h2>📅 Vakantiekalender</h2>
+    <p class="sub">Tik op een dag om door te geven dat je niet kan. Nog eens tikken om te verwijderen.</p>
+    <div id="kal"></div>
+    <button class="knop vol" style="margin-top:14px" onclick="A.kalenderBewaar()">💾 Opslaan</button>
+  </div>`;
+  tekenKalender();
+}
+function tekenKalender() {
+  const [j, m] = kalMaand, eerste = new Date(j, m, 1), dagen = new Date(j, m + 1, 0).getDate();
+  const start = (eerste.getDay() + 6) % 7, nu = vandaag();
+  let h = `<div class="rij tussen" style="margin-bottom:8px"><button type="button" class="knop klein" onclick="A.kalMaand(-1)" aria-label="Vorige maand">‹</button><b>${MAANDEN[m]} ${j}</b><button type="button" class="knop klein" onclick="A.kalMaand(1)" aria-label="Volgende maand">›</button></div><div class="kal">`;
+  h += ["ma","di","wo","do","vr","za","zo"].map(d => `<div class="kop7">${d}</div>`).join("");
+  for (let i = 0; i < start; i++) h += "<div></div>";
+  for (let d = 1; d <= dagen; d++) {
+    const iso = j + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+    const voorbij = iso < nu;
+    h += `<div class="dag ${fiche.afwezig.includes(iso) ? "weg" : ""} ${voorbij ? "voorbij" : ""}" ${voorbij ? "" : `onclick="A.kalDag('${iso}',this)"`}>${d}</div>`;
+  }
+  $("#kal").innerHTML = h + "</div>";
+}
+
+/* Wedstrijden + evaluatie */
 async function sWedstrijden(kop, sub) {
   const ik = mijnSpeler();
   if (sub) return sWedstrijd(kop, sub);
@@ -1019,15 +1095,16 @@ async function sWedstrijden(kop, sub) {
   const rij = w => {
     const g = mijnGroep(w, ik.id);
     let lab = "";
-    if (w.datum <= nu && g && w.eval_open) lab = st[w.id] ? '<span class="label groen">geëvalueerd</span>' : '<span class="label geel">evaluatie open</span>';
+    if (w.datum <= nu && g && w.eval_open) lab = st[w.id] ? '<span class="label groen">ingevuld</span>' : '<span class="label geel">✏️ invullen</span>';
+    else if (w.datum <= nu && !g) lab = '<span class="label">niet opgesteld</span>';
     return `<a class="item" href="#/p/${P.id}/wedstrijden/${w.id}">${datumBlok(w.datum)}
-      <div class="hoofd"><b>${esc(w.tegenstander)}</b><span class="klein">${w.thuis_uit}${w.aanvang ? " · " + uur(w.aanvang) : ""}${g ? " · " + esc(g.naam) : ""}</span></div>${lab || scoreLabels(w)}</a>`;
+      <div class="hoofd"><b>${esc(w.tegenstander)}</b><span class="klein">${w.thuis_uit}${g ? " · " + esc(g.naam) : ""} ${scoreLabels(w)}</span></div>${lab}</a>`;
   };
-  const komend = P.wedstrijden.filter(w => w.datum >= nu).sort((a, b) => a.datum.localeCompare(b.datum));
-  const voorbij = P.wedstrijden.filter(w => w.datum < nu);
+  const komend = P.wedstrijden.filter(w => w.datum > nu).sort((a, b) => a.datum.localeCompare(b.datum));
+  const voorbij = P.wedstrijden.filter(w => w.datum <= nu);
   app().innerHTML = kop + `
-  <div class="blok"><h2>Komend</h2><div class="lijst">${komend.map(rij).join("") || '<div class="leeg">Geen komende wedstrijden.</div>'}</div></div>
-  <div class="blok"><h2>Gespeeld</h2><div class="lijst">${voorbij.map(rij).join("") || '<div class="leeg">Nog niets gespeeld.</div>'}</div></div>`;
+  <div class="blok"><h2>Gespeeld</h2><div class="lijst">${voorbij.map(rij).join("") || '<div class="leeg">Nog niets gespeeld.</div>'}</div></div>
+  <div class="blok"><h2>Komend</h2><div class="lijst">${komend.map(rij).join("") || '<div class="leeg">Geen komende wedstrijden.</div>'}</div></div>`;
 }
 
 async function sWedstrijd(kop, wid) {
@@ -1046,12 +1123,11 @@ async function sWedstrijd(kop, wid) {
   <a class="terug" href="#/p/${P.id}/wedstrijden">← Alle wedstrijden</a>
   <div class="blok" style="margin-top:10px">
     <h2 style="margin:0">${esc(w.tegenstander)} <span class="label">${w.thuis_uit}</span></h2>
-    <div class="klein">${datumMooi(w.datum)}${w.aanvang ? " · " + uur(w.aanvang) : ""}${w.locatie ? " · " + esc(w.locatie) : ""}</div>
-    ${w.notities ? `<p style="white-space:pre-wrap;margin:12px 0 0">${esc(w.notities)}</p>` : ""}
+    <div class="klein">${datumMooi(w.datum)}</div>
   </div>
   <div class="blok"><h2>Opstelling</h2>${opstHtml ? `<div class="groepen">${opstHtml}</div>` : '<p class="sub" style="margin:0">Nog niet bekend.</p>'}</div>
   <div id="evalzone"></div>`;
-  if (!g) return;
+  if (!g) { if (w.datum <= vandaag() && opstHtml) $("#evalzone").innerHTML = '<div class="blok"><p class="sub" style="margin:0">Je stond niet opgesteld in deze wedstrijd.</p></div>'; return; }
   if (w.datum > vandaag()) { $("#evalzone").innerHTML = '<div class="blok"><h2>Evaluatie</h2><p class="sub" style="margin:0">Na de wedstrijd kan je hier je evaluatie invullen.</p></div>'; return; }
   const ev = await q(sb.from("cs_evaluaties").select("*").eq("wedstrijd_id", w.id).eq("speler_id", ik.id).maybeSingle());
   $("#evalzone").innerHTML = evalFormulier(w, ik, g, ev, !w.eval_open);
@@ -1068,88 +1144,51 @@ function evalFormulier(w, ik, g, ev, gesloten) {
   const a = (ev && ev.antwoorden) || {};
   const uit = gesloten || (ev && ev.ingediend && !window._bewerk);
   const ploegmaats = ((w.opstelling || {})[g.id] || []).filter(id => id !== ik.id).map(id => P.spelerMap[id]).filter(Boolean);
-  const iedereen = [...new Set(Object.values(w.opstelling || {}).flat())].filter(id => id !== ik.id).map(id => P.spelerMap[id]).filter(Boolean);
+  const iedereen = opgesteld(w).filter(id => id !== ik.id).map(id => P.spelerMap[id]).filter(Boolean);
   const r = (ev && ev.ratings) || {};
   const sys = SYSTEMEN[P.ploeg.formaat] || [];
   const opties = sel => '<option value="">— kies —</option>' + iedereen.map(s => `<option value="${s.id}" ${sel === s.id ? "selected" : ""}>${esc(naamVan(s))}</option>`).join("");
   const status = gesloten ? '<span class="label">gesloten</span>' : ev && ev.ingediend ? '<span class="label groen">ingediend</span>' : ev ? '<span class="label geel">concept</span>' : "";
   return `<form class="blok" id="evalform" data-w="${w.id}" onsubmit="return false">
     <div class="rij tussen"><h2 style="margin:0">Mijn evaluatie</h2>${status}</div>
-    ${uit && !gesloten ? `<p class="sub" style="margin:8px 0 0">Bedankt, je evaluatie is ingediend. <button type="button" class="knop klein" onclick="window._bewerk=true;route()">Aanpassen</button></p>` : ""}
+    ${uit && !gesloten ? `<p class="sub" style="margin:8px 0 0">✅ Evaluatie ingediend. <button type="button" class="knop klein" onclick="window._bewerk=true;route()">✏️ Bewerken</button></p>` : ""}
     ${gesloten ? '<p class="sub" style="margin:8px 0 0">De coach heeft de evaluaties voor deze wedstrijd gesloten.</p>' : ""}
-    <div class="evalsectie"><h3>Mijn eigen wedstrijd</h3>
+    <div class="evalsectie"><h3>Eigen prestatie</h3>
       ${vraag("Mentaliteit", "eigen_mentaliteit", a, uit, "inzet, doorzetten, positief blijven")}
       ${ik.is_keeper
         ? vraag("Doellijn en reflexen", "k_doellijn", a, uit) + vraag("1 tegen 1 en uitkomen", "k_1v1", a, uit) + vraag("Coachen en communiceren", "k_communicatie", a, uit) + vraag("Opbouw en uittrap", "k_opbouw", a, uit)
         : vraag("Balbezit (B+)", "eigen_bplus", a, uit, "als wij de bal hebben") + vraag("Balverlies (B−)", "eigen_bmin", a, uit, "als zij de bal hebben") + vraag("Omschakelen B+ → B−", "eigen_t1", a, uit, "bal kwijt: meteen druk zetten?") + vraag("Omschakelen B− → B+", "eigen_t2", a, uit, "bal veroverd: snel vooruit?")}
     </div>
-    <div class="evalsectie"><h3>De ploeg</h3>
+    <div class="evalsectie"><h3>Tegenstander</h3>
+      ${sys.length ? `<div class="evalvraag"><div class="vraag">Systeem tegenstander</div><div class="pills" data-keuze="teg_systeem">${sys.concat(["Weet ik niet"]).map(s => `<button type="button" class="pill ${a.teg_systeem === s ? "aan" : ""}" ${uit ? "disabled" : ""} onclick="A.keuze(this)">${s}</button>`).join("")}</div>
+      <textarea data-veld="teg_extra" maxlength="500" placeholder="Wat viel je op aan hun manier van spelen?" ${uit ? "disabled" : ""} aria-label="Opmerking tegenstander" style="margin-top:8px;min-height:52px">${esc(a.teg_extra || "")}</textarea></div>` : ""}
+      <div class="evalvraag"><div class="vraag">Beste speler tegenstander</div><input data-veld="teg_beste" maxlength="80" placeholder="Rugnummer of beschrijving" value="${esc(a.teg_beste || "")}" ${uit ? "disabled" : ""} aria-label="Beste speler tegenstander"></div>
+    </div>
+    <div class="evalsectie"><h3>Team beoordelen</h3>
       ${vraag("Mentaliteit van de ploeg", "team_mentaliteit", a, uit, "", false)}
       ${vraag("Samenspel", "team_samenspel", a, uit, "", false)}
-      <div class="evalvraag"><div class="vraag">Wat ging goed of minder goed als ploeg?</div><textarea data-veld="team_waarom" maxlength="800" ${uit ? "disabled" : ""} aria-label="Wat ging goed of minder goed">${esc(a.team_waarom || "")}</textarea></div>
+      <div class="evalvraag"><div class="vraag">Waarom?</div><textarea data-veld="team_waarom" maxlength="800" ${uit ? "disabled" : ""} aria-label="Waarom" placeholder="Wat ging goed of minder goed als ploeg?">${esc(a.team_waarom || "")}</textarea></div>
     </div>
-    ${ploegmaats.length ? `<div class="evalsectie"><h3>Mijn ploegmaats${(P.ploeg.groepen || []).length > 1 ? " (" + esc(g.naam) + ")" : ""}</h3>
+    ${ploegmaats.length ? `<div class="evalsectie"><h3>Teamgenoten beoordelen${(P.ploeg.groepen || []).length > 1 ? " (" + esc(g.naam) + ")" : ""}</h3>
       <p class="klein" style="margin:0 0 6px">Eerlijk en respectvol. Enkel de coach ziet je scores.</p>
       ${ploegmaats.map(s => `<div class="evalvraag"><div class="vraag">${esc(naamVan(s))}</div><div class="scores" data-rating="${s.id}">${tienKnoppen(r[s.id], uit)}</div></div>`).join("")}
     </div>` : ""}
-    <div class="evalsectie"><h3>Tegenstander</h3>
-      ${sys.length ? `<div class="evalvraag"><div class="vraag">In welk systeem speelden ze?</div><div class="pills" data-keuze="teg_systeem">${sys.concat(["Weet ik niet"]).map(s => `<button type="button" class="pill ${a.teg_systeem === s ? "aan" : ""}" ${uit ? "disabled" : ""} onclick="A.keuze(this)">${s}</button>`).join("")}</div></div>` : ""}
-      <div class="evalvraag"><div class="vraag">Beste speler van de tegenstander</div><input data-veld="teg_beste" maxlength="80" placeholder="Rugnummer of beschrijving" value="${esc(a.teg_beste || "")}" ${uit ? "disabled" : ""} aria-label="Beste speler tegenstander"></div>
-    </div>
-    ${iedereen.length ? `<div class="evalsectie"><h3>Man van de match</h3>
-      <select id="motm" ${uit ? "disabled" : ""} aria-label="Man van de match">${opties(ev && ev.motm)}</select>
-      ${P.ploeg.weak_link_aan ? `<label for="wl">Weak link <span class="klein" style="text-transform:none;letter-spacing:0">(enkel de coach ziet dit)</span></label><select id="wl" ${uit ? "disabled" : ""}>${opties(ev && ev.weak_link)}</select>` : ""}
+    ${iedereen.length ? `<div class="evalsectie"><h3>Man of the Match${P.ploeg.weak_link_aan ? " & Weak Link" : ""}</h3>
+      <label for="motm">⭐ Man of the Match</label><select id="motm" ${uit ? "disabled" : ""}>${opties(ev && ev.motm)}</select>
+      ${P.ploeg.weak_link_aan ? `<label for="wl">🔴 Weak Link <span class="klein" style="text-transform:none;letter-spacing:0">(enkel de coach ziet dit)</span></label><select id="wl" ${uit ? "disabled" : ""}>${opties(ev && ev.weak_link)}</select>` : ""}
     </div>` : ""}
-    ${uit ? "" : `<div class="rij" style="margin-top:16px"><button type="button" class="knop" onclick="A.evalBewaar(false)">Bewaren als concept</button><button type="button" class="knop vol" onclick="A.evalBewaar(true)">Indienen</button></div>`}
+    ${uit ? "" : `<div class="rij" style="margin-top:16px"><button type="button" class="knop" onclick="A.evalBewaar(false)">Bewaren als concept</button><button type="button" class="knop vol" onclick="A.evalBewaar(true)">💾 Indienen</button></div>`}
   </form>`;
-}
-
-/* ---------- profiel (speler) ---------- */
-let profielData = null, kalMaand = null;
-async function sProfiel(kop) {
-  const ik = mijnSpeler();
-  app().innerHTML = kop + '<div class="laden">Laden…</div>';
-  const prof = await q(sb.from("cs_speler_profiel").select("data").eq("speler_id", ik.id).maybeSingle());
-  profielData = Object.assign({ sterk: {}, werk: {}, posities: [], doel: "", afwezig: [] }, (prof && prof.data) || {});
-  const cats = ik.is_keeper ? CATS_KEEPER : CATS;
-  const pillBlok = soort => Object.entries(cats).map(([c, arr]) => `<h3 style="margin-top:12px">${CAT_NAAM[c]}</h3><div class="pills">${arr.map(x =>
-    `<button type="button" class="pill ${((profielData[soort] || {})[c] || []).includes(x) ? "aan" : ""}" onclick="A.profPill(this,'${soort}','${c}')">${esc(x)}</button>`).join("")}</div>`).join("");
-  const pos = POSITIES[P.ploeg.formaat] || [];
-  if (!kalMaand) { const d = new Date(); kalMaand = [d.getFullYear(), d.getMonth()]; }
-  app().innerHTML = kop + `
-  <div class="raster twee">
-    <div class="blok"><h2>Mijn sterke punten</h2><p class="sub">Waar ben je goed in? Kies er gerust een paar per blok.</p>${pillBlok("sterk")}</div>
-    <div class="blok"><h2>Mijn werkpunten</h2><p class="sub">Waar wil je dit seizoen beter in worden?</p>${pillBlok("werk")}</div>
-  </div>
-  <div class="raster twee" style="margin-top:14px">
-    <div class="blok">
-      ${pos.length ? `<h2>Favoriete posities</h2><div class="pills">${pos.map(p => `<button type="button" class="pill ${profielData.posities.includes(p) ? "aan" : ""}" onclick="A.profPos(this)">${esc(p)}</button>`).join("")}</div><hr>` : ""}
-      <h2>Mijn doel dit seizoen</h2>
-      <textarea id="doel" maxlength="300" placeholder="bv. Meer scoren met mijn linker" aria-label="Mijn doel">${esc(profielData.doel || "")}</textarea>
-    </div>
-    <div class="blok"><h2>Wanneer ben ik er niet?</h2><p class="sub">Tik op de dagen dat je niet kan spelen. De coach ziet dit bij de opstelling.</p><div id="kal"></div></div>
-  </div>
-  <div class="blok" style="margin-top:14px"><h2>Mijn gegevens</h2><p class="sub">Enkel jij en je coach zien dit.</p>${gegevensVelden(profielData.gegevens)}</div>
-  <div class="rij" style="margin-top:14px"><button class="knop vol" onclick="A.profielBewaar()">Profiel opslaan</button></div>`;
-  tekenKalender();
-}
-function tekenKalender() {
-  const [j, m] = kalMaand, eerste = new Date(j, m, 1), dagen = new Date(j, m + 1, 0).getDate();
-  const start = (eerste.getDay() + 6) % 7, nu = vandaag();
-  let h = `<div class="rij tussen" style="margin-bottom:8px"><button type="button" class="knop klein" onclick="A.kalMaand(-1)" aria-label="Vorige maand">‹</button><b>${MAANDEN[m]} ${j}</b><button type="button" class="knop klein" onclick="A.kalMaand(1)" aria-label="Volgende maand">›</button></div><div class="kal">`;
-  h += ["ma","di","wo","do","vr","za","zo"].map(d => `<div class="kop7">${d}</div>`).join("");
-  for (let i = 0; i < start; i++) h += "<div></div>";
-  for (let d = 1; d <= dagen; d++) {
-    const iso = j + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
-    const voorbij = iso < nu;
-    h += `<div class="dag ${profielData.afwezig.includes(iso) ? "weg" : ""} ${voorbij ? "voorbij" : ""}" ${voorbij ? "" : `onclick="A.kalDag('${iso}',this)"`}>${d}</div>`;
-  }
-  $("#kal").innerHTML = h + "</div>";
 }
 
 /* =====================================================================
    ACTIES
    ===================================================================== */
+async function bewaarFiche(melding) {
+  const ik = mijnSpeler();
+  await q(sb.from("cs_speler_profiel").upsert({ speler_id: ik.id, ploeg_id: P.id, data: fiche }, { onConflict: "speler_id" }));
+  toast(melding || "Opgeslagen");
+}
 const A = window.A = {
   async uitloggen() { await sb.auth.signOut(); sessie = null; P = null; mijnLeden = []; sessionStorage.removeItem("cs_lijst"); ga("#/"); },
   kopieer(t) { navigator.clipboard.writeText(t).then(() => toast("Link gekopieerd"), () => prompt("Kopieer deze link:", t)); },
@@ -1178,25 +1217,19 @@ const A = window.A = {
     try { await q(sb.from("cs_leden").delete().eq("id", lidId)); toast("Aanvraag geweigerd"); herlaad(); } catch (e) { foutMelding(e); }
   },
   async ontkoppel(lidId) {
-    if (!confirm("Dit account ontkoppelen? De persoon blijft lid maar ziet geen spelersgegevens meer.")) return;
+    if (!confirm("Dit account ontkoppelen van de speler?")) return;
     try { await q(sb.from("cs_leden").update({ speler_id: null }).eq("id", lidId)); toast("Ontkoppeld"); herlaad(); } catch (e) { foutMelding(e); }
   },
   async spelerWeg(sid) {
-    if (!confirm("Speler verwijderen? Ook zijn evaluaties en profiel worden gewist. Zet hem liever op inactief als hij gewoon vertrokken is.")) return;
+    if (!confirm("Speler verwijderen? Ook zijn evaluaties en fiche worden gewist. Zet hem liever op inactief als hij gewoon vertrokken is.")) return;
     try { await q(sb.from("cs_spelers").delete().eq("id", sid)); toast("Speler verwijderd"); P._verouderd = true; ga("#/p/" + P.id + "/spelers"); } catch (e) { foutMelding(e); }
   },
-  async boodschap(sid) {
-    try {
-      await q(sb.from("cs_speler_profiel").upsert({ speler_id: sid, ploeg_id: P.id, coach_boodschap: $("#boodschap").value.trim() || null }, { onConflict: "speler_id" }));
-      toast("Boodschap opgeslagen");
-    } catch (e) { foutMelding(e); }
-  },
   async gegevensCoach(sid) {
-    const huidig = (window._profielCoach && window._profielCoach.sid === sid && window._profielCoach.data) || {};
-    const data = Object.assign({}, huidig, { gegevens: leesGegevens() });
+    const data = Object.assign({}, P.profielen[sid] || {});
+    data.gegevens = leesGegevens(data.gegevens);
     try {
       await q(sb.from("cs_speler_profiel").upsert({ speler_id: sid, ploeg_id: P.id, data }, { onConflict: "speler_id" }));
-      window._profielCoach.data = data; toast("Gegevens opgeslagen");
+      P.profielen[sid] = data; toast("Gegevens opgeslagen");
     } catch (e) { foutMelding(e); }
   },
   async wedstrijdWeg(wid) {
@@ -1224,19 +1257,16 @@ const A = window.A = {
   toonEval(sid) {
     const { evals } = window._evals; const e = evals.find(x => x.speler_id === sid); if (!e) return;
     const a = e.antwoorden || {}, s = P.spelerMap[sid];
-    const lbl = { eigen_mentaliteit: "Mentaliteit", eigen_bplus: "Balbezit (B+)", eigen_bmin: "Balverlies (B−)", eigen_t1: "Omschakelen B+ → B−", eigen_t2: "Omschakelen B− → B+", k_doellijn: "Doellijn en reflexen", k_1v1: "1 tegen 1", k_communicatie: "Coachen en communiceren", k_opbouw: "Opbouw en uittrap", team_mentaliteit: "Mentaliteit ploeg", team_samenspel: "Samenspel ploeg" };
-    const rijen = Object.entries(lbl).filter(([k]) => a[k] != null).map(([k, t]) => `<tr><td>${t}</td><td><b>${esc(a[k])}</b></td><td>${esc(a[k + "_opm"] || "")}</td></tr>`).join("");
+    const rijen = Object.entries(EVAL_LABELS).filter(([k]) => a[k] != null).map(([k, t]) => `<tr><td>${t}</td><td><b>${esc(a[k])}</b></td><td>${esc(a[k + "_opm"] || "")}</td></tr>`).join("");
     const gegeven = Object.entries(e.ratings || {}).map(([id, r]) => `${esc(kortNaam(P.spelerMap[id]))}: <b>${esc(r)}</b>`).join(" · ");
-    $("#evaldetail").innerHTML = `<div class="blok" style="margin-top:14px"><div class="rij tussen"><h2 style="margin:0">Antwoorden van ${esc(naamVan(s))}</h2><button class="knop klein" onclick="this.closest('.blok').remove()">Sluiten</button></div>
+    $("#evaldetail").innerHTML = `<div class="blok" style="margin-top:14px"><div class="rij tussen"><h2 style="margin:0">Evaluatie van ${esc(naamVan(s))}</h2><button class="knop klein" onclick="this.closest('.blok').remove()">Sluiten</button></div>
       <div class="tabelwrap"><table><tr><th>Vraag</th><th>Score</th><th>Toelichting</th></tr>${rijen || '<tr><td colspan="3">Geen scores.</td></tr>'}</table></div>
       ${a.team_waarom ? `<p><span class="klein">Over de ploeg:</span> ${esc(a.team_waarom)}</p>` : ""}
-      ${a.teg_systeem || a.teg_beste ? `<p><span class="klein">Tegenstander:</span> ${esc(a.teg_systeem || "")}${a.teg_beste ? " · beste speler: " + esc(a.teg_beste) : ""}</p>` : ""}
-      ${gegeven ? `<p><span class="klein">Scores aan ploegmaats:</span> ${gegeven}</p>` : ""}
-      <p class="klein">MOTM: ${e.motm ? esc(naamVan(P.spelerMap[e.motm])) : "–"}${P.ploeg.weak_link_aan ? " · Weak link: " + (e.weak_link ? esc(naamVan(P.spelerMap[e.weak_link])) : "–") : ""}</p></div>`;
+      ${a.teg_systeem || a.teg_beste || a.teg_extra ? `<p><span class="klein">Tegenstander:</span> ${esc(a.teg_systeem || "")}${a.teg_beste ? " · beste speler: " + esc(a.teg_beste) : ""}${a.teg_extra ? " · " + esc(a.teg_extra) : ""}</p>` : ""}
+      ${gegeven ? `<p><span class="klein">Scores aan teamgenoten:</span> ${gegeven}</p>` : ""}
+      <p class="klein">⭐ MOTM: ${e.motm ? esc(naamVan(P.spelerMap[e.motm])) : "–"}${P.ploeg.weak_link_aan ? " · 🔴 Weak link: " + (e.weak_link ? esc(naamVan(P.spelerMap[e.weak_link])) : "–") : ""}</p></div>`;
     $("#evaldetail").scrollIntoView({ behavior: "smooth" });
   },
-  async pin(id, aan) { try { await q(sb.from("cs_berichten").update({ vastgepind: aan }).eq("id", id)); herlaad(); } catch (e) { foutMelding(e); } },
-  async berichtWeg(id) { if (!confirm("Bericht verwijderen?")) return; try { await q(sb.from("cs_berichten").delete().eq("id", id)); toast("Verwijderd"); herlaad(); } catch (e) { foutMelding(e); } },
   async nieuweCode() {
     if (!confirm("Nieuwe teamcode maken? De oude werkt dan niet meer.")) return;
     try { const c = await q(sb.rpc("cs_code_vernieuwen", { p_ploeg: P.id })); toast("Nieuwe code: " + c); herlaad(); } catch (e) { foutMelding(e); }
@@ -1273,23 +1303,24 @@ const A = window.A = {
       route();
     } catch (e) { foutMelding(e); }
   },
-  profPill(btn, soort, cat) {
-    const lijst = (profielData[soort][cat] = profielData[soort][cat] || []), x = btn.textContent;
-    const i = lijst.indexOf(x); if (i >= 0) lijst.splice(i, 1); else lijst.push(x);
-    btn.classList.toggle("aan", i < 0);
-  },
-  profPos(btn) { const x = btn.textContent, l = profielData.posities, i = l.indexOf(x); if (i >= 0) l.splice(i, 1); else l.push(x); btn.classList.toggle("aan", i < 0); },
-  kalMaand(d) { let [j, m] = kalMaand; m += d; if (m < 0) { m = 11; j--; } if (m > 11) { m = 0; j++; } kalMaand = [j, m]; tekenKalender(); },
-  kalDag(iso, el) { const l = profielData.afwezig, i = l.indexOf(iso); if (i >= 0) l.splice(i, 1); else l.push(iso); el.classList.toggle("weg", i < 0); },
   async profielBewaar() {
-    const ik = mijnSpeler();
-    profielData.doel = ($("#doel").value || "").trim();
-    profielData.gegevens = leesGegevens();
-    profielData.afwezig = profielData.afwezig.filter(x => x >= vandaag()).sort();
-    try {
-      await q(sb.from("cs_speler_profiel").upsert({ speler_id: ik.id, ploeg_id: P.id, data: profielData }, { onConflict: "speler_id" }));
-      toast("Profiel opgeslagen");
-    } catch (e) { foutMelding(e); }
+    fiche.gegevens = leesGegevens(fiche.gegevens);
+    try { await bewaarFiche("Profiel opgeslagen"); } catch (e) { foutMelding(e); }
+  },
+  async voetbalBewaar() {
+    document.querySelectorAll("[data-multi]").forEach(el => fiche[el.dataset.multi] = [...el.querySelectorAll(".pill.aan")].map(b => b.textContent));
+    const voet = document.querySelector('[data-keuze-vb="voet"] .pill.aan'); fiche.voet = voet ? voet.textContent : "";
+    document.querySelectorAll("[data-vb]").forEach(el => { const v = el.value.trim(); if (v) fiche[el.dataset.vb] = v; else delete fiche[el.dataset.vb]; });
+    document.querySelectorAll("[data-zb]").forEach(el => { const b = el.querySelector(".aan"); if (b) fiche[el.dataset.zb] = Number(b.textContent); else delete fiche[el.dataset.zb]; });
+    fiche.sterk = {}; fiche.werk = {};
+    document.querySelectorAll("[data-cat]").forEach(el => { const [soort, cat] = el.dataset.cat.split(":"); const k = [...el.querySelectorAll(".pill.aan")].map(b => b.textContent); if (k.length) fiche[soort][cat] = k; });
+    try { await bewaarFiche("Voetbalfiche opgeslagen"); } catch (e) { foutMelding(e); }
+  },
+  kalMaand(d) { let [j, m] = kalMaand; m += d; if (m < 0) { m = 11; j--; } if (m > 11) { m = 0; j++; } kalMaand = [j, m]; tekenKalender(); },
+  kalDag(iso, el) { const l = fiche.afwezig, i = l.indexOf(iso); if (i >= 0) l.splice(i, 1); else l.push(iso); el.classList.toggle("weg", i < 0); },
+  async kalenderBewaar() {
+    fiche.afwezig = fiche.afwezig.filter(x => x >= vandaag()).sort();
+    try { await bewaarFiche("Kalender opgeslagen"); } catch (e) { foutMelding(e); }
   }
 };
 Object.assign(window, { ga, herlaad, route, deelLink });
