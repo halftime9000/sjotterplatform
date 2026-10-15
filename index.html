@@ -14,70 +14,69 @@
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sjotter</title>
-<meta name="description" content="Sjotter — gratis tools voor jeugdvoetbalcoaches: oefenwedstrijden en tornooien, spelersopvolging, trainingsoefeningen en ThePlayerNation.">
+<meta name="description" content="Sjotter — gratis tools voor jeugdvoetbalcoaches: oefenmatchen en tornooien, coach &amp; speler, Training Hub en ThePlayerNation.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjE2IiBmaWxsPSIjMEQzQjIwIi8+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEwLjUiIGZpbGw9IiNmZmZmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSIxNiw5LjUgMjEuNCwxMy40IDE5LjQsMTkuNyAxMi42LDE5LjcgMTAuNiwxMy40IiBmaWxsPSIjMEQzQjIwIi8+Cjwvc3ZnPg==">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="shared/sjotter.css">
 <script src="shared/config.js"></script>
 <style>
 html,body{overflow-x:clip}
-body{font-family:Archivo,system-ui,sans-serif}
 
 /* kop */
-.kop{max-width:1200px;margin:0 auto;padding:22px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.merk{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--inkt);font-weight:900;font-size:24px;letter-spacing:-.02em;font-stretch:88%}
-.wie{font-family:Caveat,cursive;font-size:21px;color:var(--gras-d)}
+.kop{max-width:1240px;margin:0 auto;padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.merk{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--inkt);font-weight:900;font-size:25px;letter-spacing:-.02em;font-stretch:88%}
+.kop .tag{font-family:Caveat,cursive;font-size:22px;color:var(--gras-d)}
 
-/* opening: slogan links, vier onderdelen rechts */
-.opening{max-width:1200px;margin:0 auto;padding:40px 20px 56px;display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:48px;align-items:start}
-.slogan{position:sticky;top:32px;padding-top:12px}
-.slogan h1{font-weight:900;font-stretch:72%;text-transform:uppercase;font-size:clamp(40px,4.7vw,74px);line-height:.9;letter-spacing:-.01em;margin:0 0 20px;color:var(--inkt);hyphens:none}
-.slogan h1 .mark{background:linear-gradient(transparent 58%,var(--geel) 58%,var(--geel) 90%,transparent 90%);padding:0 .04em}
-.slogan p{font-size:18px;line-height:1.55;margin:0 0 18px;color:var(--zacht);max-width:28em}
-.pijltje{display:flex;align-items:center;gap:10px;font-family:Caveat,cursive;font-size:25px;color:var(--gras-d);margin-top:6px}
-.pijltje svg{flex:none}
+/* vier gelijke vakken */
+.vakken{max-width:1240px;margin:0 auto;padding:22px 20px 48px;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:18px}
+.vak{position:relative;display:flex;flex-direction:column;gap:12px;padding:22px 24px 22px;background:var(--papier-l);border:2px solid var(--inkt);border-radius:8px;color:var(--inkt);text-decoration:none;min-width:0}
+a.vak{transition:transform .12s,box-shadow .12s}
+a.vak:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--inkt)}
+.vak-kop{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.vak-kop h2{margin:0;font-weight:900;font-stretch:78%;text-transform:uppercase;font-size:24px;letter-spacing:.01em;line-height:1}
+.vak-kop .nr{font-weight:800;font-stretch:70%;font-size:15px;letter-spacing:.08em;color:#9C937F}
+.vak p{margin:0;color:var(--zacht);line-height:1.5;font-size:16px}
+.beeld{display:block;width:100%;aspect-ratio:414/240;object-fit:cover;border-radius:6px;background:#282e32}
+.vak > .beeld{flex:none;height:clamp(170px,19vw,240px);object-fit:contain}
+.punten{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.punten li{position:relative;padding-left:24px;font-size:15px;font-weight:600}
+.punten li::before{content:'';position:absolute;left:2px;top:4px;width:12px;height:7px;border-left:2.6px solid var(--gras-d);border-bottom:2.6px solid var(--gras-d);transform:rotate(-45deg)}
+.status{font-family:Caveat,cursive;font-size:24px;color:var(--gras-d);transform:rotate(-3deg);transform-origin:left;align-self:flex-start;margin-top:auto}
 
-.tools{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.tool{position:relative;display:flex;flex-direction:column;gap:10px;padding:22px 22px 20px;background:var(--papier-l);border:2px solid var(--inkt);border-radius:8px;color:var(--inkt);text-decoration:none;min-height:262px;transition:transform .12s,box-shadow .12s}
-a.tool:hover,.tool.live:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 0 var(--inkt)}
-.tool .bovenaan{display:flex;justify-content:space-between;align-items:flex-start}
-.tool .nr{font-weight:800;font-stretch:70%;font-size:14px;letter-spacing:.08em;color:#9C937F}
-.tool h2{margin:2px 0 0;font-weight:900;font-stretch:80%;text-transform:uppercase;font-size:27px;line-height:.98;letter-spacing:0}
-.tool p{margin:0;color:var(--zacht);line-height:1.5;font-size:15.5px;flex:1}
-.tool .status{font-family:Caveat,cursive;font-size:22px;color:var(--gras-d);transform:rotate(-3deg);transform-origin:left;align-self:flex-start}
-.tool .open{font-weight:700;font-size:15px}
-.tool.live{background:#fff;border-color:var(--gras-d);box-shadow:0 0 0 0 var(--inkt)}
-.tool.live .nr{margin-top:18px}
-.tool.live .lint{position:absolute;top:-2px;right:18px;background:var(--geel);color:var(--inkt);font-weight:800;font-stretch:80%;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px 4px;border-radius:0 0 4px 4px}
-.snel{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
-.snel a{font-weight:700;font-size:14px;text-decoration:none;color:var(--inkt);border:1.5px solid var(--inkt);border-radius:5px;padding:7px 10px;background:var(--papier-l)}
-.snel a:hover{background:var(--geel)}
-.snel a.vol{background:var(--gras-d);border-color:var(--gras-d);color:#fff}
-.snel a.vol:hover{background:var(--inkt)}
+/* vak 1: slogan + oefenmatch + tornooi */
+.vak.een{background:#fff;border-color:var(--gras-d)}
+.vak.een .lint{position:absolute;top:-12px;right:18px;transform:rotate(2deg);box-shadow:0 2px 0 var(--inkt);border:1.5px solid var(--inkt);background:var(--geel);font-weight:800;font-stretch:80%;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px 4px;border-radius:4px}
+.vak.een h1{margin:2px 0 0;font-weight:900;font-stretch:72%;text-transform:uppercase;font-size:clamp(34px,3.6vw,50px);line-height:.92;letter-spacing:-.005em}
+.vak.een h1 .mark{background:linear-gradient(transparent 58%,var(--geel) 58%,var(--geel) 90%,transparent 90%);padding:0 .04em}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:auto}
+.duo .deel{display:flex;flex-direction:column;gap:8px;min-width:0}
+.duo .deel > a:first-child{display:block;border-radius:6px;transition:transform .12s,box-shadow .12s}
+.duo .deel > a:first-child:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--inkt)}
+.duo h3{margin:2px 0 0;font-size:17px;font-weight:800}
+.knoppen{display:flex;flex-wrap:wrap;gap:6px}
+.knoppen a{font-weight:700;font-size:14px;text-decoration:none;color:var(--inkt);border:1.5px solid var(--inkt);border-radius:5px;padding:6px 9px;background:var(--papier-l);white-space:nowrap}
+.knoppen a:hover{background:var(--geel)}
+.knoppen a.vol{background:var(--gras-d);border-color:var(--gras-d);color:#fff}
+.knoppen a.vol:hover{background:var(--inkt);border-color:var(--inkt)}
 
-/* hoe het werkt */
-.sectie{max-width:1200px;margin:0 auto;padding:8px 20px 56px}
-.sectie-kop{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;border-top:3px solid var(--inkt);padding-top:14px;margin-bottom:24px}
-.sectie-kop h2{margin:0;font-weight:900;font-stretch:75%;text-transform:uppercase;font-size:30px}
-.waarom{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+/* onderaan */
+.sectie{max-width:1240px;margin:0 auto;padding:8px 20px 48px}
+.waarom{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;border-top:3px solid var(--inkt);padding-top:20px}
 .waarom h3{margin:0 0 6px;font-size:18px;font-weight:800}
 .waarom p{margin:0;color:var(--zacht);line-height:1.55}
-
-.voet{max-width:1200px;margin:0 auto;padding:24px 20px 44px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;color:var(--zacht);font-size:15px;border-top:1px solid var(--lijn)}
+.voet{max-width:1240px;margin:0 auto;padding:22px 20px 44px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;color:var(--zacht);font-size:15px;border-top:1px solid var(--lijn)}
 .voet a{color:var(--zacht)}
-.voet .hand{font-family:Caveat,cursive;font-size:22px;color:var(--inkt)}
+.voet .hand{font-family:Caveat,cursive;font-size:23px;color:var(--inkt)}
 
-@media (max-width:980px){
-  .opening{grid-template-columns:1fr;gap:28px;padding-top:28px}
-  .slogan{position:static;padding-top:0}
-  .pijltje svg{transform:rotate(60deg)}
+@media (max-width:900px){
+  .vakken{grid-template-columns:1fr;grid-auto-rows:auto}
+  .waarom{grid-template-columns:1fr;gap:20px}
+  .kop .tag{display:none}
 }
-@media (max-width:600px){
-  .tools{grid-template-columns:1fr;gap:14px}
-  .tool{min-height:0}
-  .waarom{grid-template-columns:1fr;gap:22px}
+@media (max-width:440px){
+  .vak{padding:18px 16px}
+  .duo{gap:10px}
+  .knoppen a{font-size:13px;padding:6px 8px}
 }
 </style>
 </head>
@@ -88,73 +87,59 @@ a.tool:hover,.tool.live:hover{transform:translate(-3px,-3px);box-shadow:5px 5px 
     <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#1F4D2B"/><circle cx="16" cy="16" r="10" fill="#F4EFE4"/><polygon points="16,9.5 21.4,13.4 19.4,19.7 12.6,19.7 10.6,13.4" fill="#1F4D2B"/></svg>
     Sjotter
   </a>
-  <span id="wie" class="wie"></span>
+  <span id="wie" class="tag">gratis voor elke jeugdcoach</span>
 </header>
 
-<main class="opening">
-  <div class="slogan">
+<main class="vakken">
+
+  <!-- 01 Oefenmatch & Tornooi -->
+  <section class="vak een">
+    <span class="lint">Nu open</span>
+    <div class="vak-kop"><h2>Oefenmatch &amp; Tornooi</h2><span class="nr">01</span></div>
     <h1>Nog geen <span class="mark">tegenstander</span> voor zaterdag?</h1>
-    <p>Sjotter is een gratis gereedschapskist voor jeugdcoaches. Van een oefenmatch zoeken tot je spelers opvolgen: alles zit hier, zonder gedoe met Excel en WhatsApp-groepen.</p>
-    <div class="pijltje">
-      <svg width="64" height="30" viewBox="0 0 64 30" aria-hidden="true"><path d="M3 22 C 18 6, 38 4, 56 14" fill="none" stroke="#1F4D2B" stroke-width="2.4" stroke-linecap="round"/><path d="M48 8 L57 14 L48 19" fill="none" stroke="#1F4D2B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      kies waar je mee start
-    </div>
-  </div>
-
-  <div class="tools">
-    <!-- 01 Oefenmatch & Tornooi -->
-    <div class="tool live">
-      <span class="lint">Nu open</span>
-      <div class="bovenaan">
-        <svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#fff" stroke="#1C2620" stroke-width="2.4"/><polygon points="24,15 31.6,20.5 28.7,29.4 19.3,29.4 16.4,20.5" fill="#1C2620"/><path d="M24 15 V6.5 M31.6 20.5 L40 17.5 M28.7 29.4 L34 37 M19.3 29.4 L14 37 M16.4 20.5 L8 17.5" stroke="#1C2620" stroke-width="2.2" stroke-linecap="round"/></svg>
-        <span class="nr">01</span>
+    <p>Vind of plaats een oefenmatch zonder account. Of organiseer je eigen tornooi met loting, speelschema en live standen.</p>
+    <div class="duo">
+      <div class="deel">
+        <a href="tornooi/#/wedstrijden"><img class="beeld" src="assets/oefenmatch.png" alt="Club Friendlies: oefenmatchen tussen clubs" width="414" height="240"></a>
+        <h3>Oefenmatchen</h3>
+        <div class="knoppen"><a class="vol" href="tornooi/#/wedstrijden">Zoek</a><a href="tornooi/#/wedstrijden/plaatsen">Plaats</a></div>
       </div>
-      <h2>Oefenmatch &amp; Tornooi</h2>
-      <p>Vind of plaats een oefenmatch, zonder account. Of organiseer je eigen tornooi met loting, speelschema en live standen.</p>
-      <div class="snel">
-        <a class="vol" href="tornooi/#/wedstrijden">Zoek een match</a>
-        <a href="tornooi/#/wedstrijden/plaatsen">Plaats een match</a>
-        <a href="tornooi/">Tornooien</a>
+      <div class="deel">
+        <a href="tornooi/"><img class="beeld" src="assets/tornooi.png" alt="Club Tornooien" width="414" height="240"></a>
+        <h3>Tornooien</h3>
+        <div class="knoppen"><a class="vol" href="tornooi/">Bekijk</a><a href="tornooi/#/dashboard">Organiseer</a></div>
       </div>
     </div>
+  </section>
 
-    <!-- 02 Coach & Speler -->
-    <a class="tool" href="coach/">
-      <div class="bovenaan">
-        <svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="8" width="28" height="34" rx="3" fill="#fff" stroke="#1C2620" stroke-width="2.4"/><rect x="18" y="4.5" width="12" height="7" rx="2" fill="#F2C230" stroke="#1C2620" stroke-width="2.2"/><path d="M15.5 21 l2.5 2.5 l4.5-5 M15.5 31 l2.5 2.5 l4.5-5" fill="none" stroke="#1F4D2B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M26 21.5 H33 M26 31.5 H33" stroke="#1C2620" stroke-width="2.2" stroke-linecap="round"/></svg>
-        <span class="nr">02</span>
-      </div>
-      <h2>Coach &amp; Speler</h2>
-      <p>Je spelerslijst, wedstrijden en evaluaties bij elkaar. Jij kiest categorie, formaat en hoe je je groep indeelt.</p>
-      <span class="status">binnenkort</span>
-    </a>
+  <!-- 02 Coach & Speler -->
+  <a class="vak" href="coach/">
+    <div class="vak-kop"><h2>Coach &amp; Speler</h2><span class="nr">02</span></div>
+    <img class="beeld" src="assets/coach.png" alt="" width="414" height="240">
+    <p>Je spelerslijst, wedstrijden en evaluaties bij elkaar. Jij kiest de categorie, het formaat en hoe je je groep indeelt.</p>
+    <ul class="punten"><li>Spelers en ouders uitnodigen met een code</li><li>Evaluaties en man van de match na elke wedstrijd</li><li>Voor 5v5, 8v8 en 11v11</li></ul>
+    <span class="status">binnenkort</span>
+  </a>
 
-    <!-- 03 Training Hub -->
-    <a class="tool" href="training/">
-      <div class="bovenaan">
-        <svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true"><path d="M19 8 H29 L36 38 H12 Z" fill="#fff" stroke="#1C2620" stroke-width="2.4" stroke-linejoin="round"/><path d="M16.6 18 H31.4 L33.2 26 H14.8 Z" fill="#F2C230"/><path d="M16.6 18 H31.4 M14.8 26 H33.2" stroke="#1C2620" stroke-width="2"/><rect x="6" y="38" width="36" height="5" rx="1.5" fill="#1C2620"/></svg>
-        <span class="nr">03</span>
-      </div>
-      <h2>Training Hub</h2>
-      <p>Je favoriete oefenvideo's netjes per thema bewaard. Plus een gedeelde bibliotheek met wat andere coaches aanraden.</p>
-      <span class="status">binnenkort</span>
-    </a>
+  <!-- 03 Training Hub -->
+  <a class="vak" href="training/">
+    <div class="vak-kop"><h2>Training Hub</h2><span class="nr">03</span></div>
+    <img class="beeld" src="assets/training.png" alt="" width="414" height="240">
+    <p>Je favoriete oefenvideo's netjes per thema bewaard, plus een gedeelde bibliotheek met wat andere coaches aanraden.</p>
+    <ul class="punten"><li>Links van YouTube, Instagram of TikTok</li><li>Per thema: opwarming, techniek, eindspel, keeper…</li><li>Zelf kiezen wat je deelt</li></ul>
+    <span class="status">binnenkort</span>
+  </a>
 
-    <!-- 04 ThePlayerNation -->
-    <a class="tool" href="playernation/">
-      <div class="bovenaan">
-        <svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true"><path d="M17 6 L8 11 L4 21 L11 24 L12 42 H36 L37 24 L44 21 L40 11 L31 6 C 29 10, 19 10, 17 6 Z" fill="#fff" stroke="#1C2620" stroke-width="2.4" stroke-linejoin="round"/><text x="24" y="35" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="900" font-size="15" fill="#1F4D2B">10</text></svg>
-        <span class="nr">04</span>
-      </div>
-      <h2>ThePlayerNation</h2>
-      <p>Iets nieuws, speciaal voor spelers. Hoe het werkt vertellen we je binnenkort.</p>
-      <span class="status">wordt vervolgd</span>
-    </a>
-  </div>
+  <!-- 04 ThePlayerNation -->
+  <a class="vak" href="playernation/">
+    <div class="vak-kop"><h2>ThePlayerNation</h2><span class="nr">04</span></div>
+    <img class="beeld" src="assets/playernation.png" alt="" width="414" height="240">
+    <p>Iets nieuws, speciaal voor spelers. Hoe het werkt vertellen we je binnenkort.</p>
+    <span class="status">wordt vervolgd</span>
+  </a>
 </main>
 
 <section class="sectie" id="contact">
-  <div class="sectie-kop"><h2>Hoe het werkt</h2></div>
   <div class="waarom">
     <div><h3>Gratis, gewoon</h3><p>Geen abonnement, geen proefperiode. Sjotter is gemaakt door jeugdcoaches, voor jeugdcoaches.</p></div>
     <div><h3>Eén account voor alles</h3><p>Rondkijken kan zonder login. Pas als je iets wil beheren vragen we een e-mailadres en wachtwoord, en daarmee kan je overal in Sjotter terecht.</p></div>
