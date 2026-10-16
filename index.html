@@ -21,18 +21,19 @@
 @font-face{font-family:'Exo 2';src:url('assets/fonts/exo2-italic.woff2') format('woff2');font-weight:100 900;font-style:italic;font-display:swap}
 @font-face{font-family:Caveat;src:url('assets/fonts/caveat.woff2') format('woff2');font-weight:400 700;font-display:swap}
 
-/* Sjotter · donker "kleedkamer bij avond": één geel signaal op diep petrol, platte kaarten met haarlijn */
+/* Sjotter · diepzee-navy met één cyaan signaal, platte kaarten met haarlijn, blauwe horizon-gloed */
 :root{
-  --canvas:#0F1E22;      /* pagina */
-  --kaart:#172B30;       /* kaarten, één stap lichter */
-  --kaart2:#1D353B;      /* geneste vlakken */
+  --canvas:#111733;      /* pagina: diepzee-navy */
+  --kaart:#202A3E;       /* kaarten, één stap lichter */
+  --kaart2:#283350;      /* geneste vlakken */
   --lijn:#000;           /* haarlijn */
   --lijn2:rgba(255,255,255,.07);
   --wit:#FFFFFF;
-  --mist:#C9D3D4;        /* secundaire tekst */
-  --mist2:#8FA5A8;
-  --geel:#F4C95D;        /* het enige accent */
-  --live:#79D6A5;
+  --mist:#CDD0D6;        /* secundaire tekst */
+  --mist2:#8D95A8;
+  --geel:#6AE4FF;        /* het enige accent: spectraal cyaan */
+  --verloop:linear-gradient(73.6deg,#34EDB3 2%,#00D1FF);
+  --live:#34EDB3;
   --r-kaart:15px;--r-paneel:24px;--r-pil:80px;
   --max:1200px;
 }
@@ -45,14 +46,16 @@ h1,h2,h3{margin:0;font-weight:800;font-style:italic;letter-spacing:-.03em;line-h
 .geel{color:var(--geel)}
 
 /* gloed achter de hero */
-.gloed{position:absolute;inset:0 0 auto 0;height:900px;pointer-events:none;z-index:0;
+.gloed{position:absolute;inset:0 0 auto 0;height:1000px;pointer-events:none;z-index:0;overflow:hidden;
   background:
-   radial-gradient(60% 55% at 18% 8%, rgba(47,138,132,.55) 0%, rgba(31,90,99,.28) 38%, rgba(15,30,34,0) 72%),
-   radial-gradient(40% 40% at 85% 20%, rgba(244,201,93,.08) 0%, rgba(15,30,34,0) 70%)}
+   radial-gradient(55% 50% at 8% 0%, rgba(41,138,203,.85) 0%, rgba(8,33,143,.55) 40%, rgba(17,23,51,0) 75%),
+   radial-gradient(45% 45% at 100% 55%, rgba(41,138,203,.35) 0%, rgba(8,33,143,.2) 45%, rgba(17,23,51,0) 75%)}
+.gloed::before{content:'';position:absolute;left:-380px;top:-420px;width:1100px;height:1100px;border-radius:50%;
+  background:repeating-radial-gradient(circle,transparent 0 149px,rgba(255,255,255,.08) 149px 150px);mask:radial-gradient(circle,#000 30%,transparent 72%);-webkit-mask:radial-gradient(circle,#000 30%,transparent 72%)}
 
 /* aankondiging */
-.balk{position:relative;z-index:2;background:#13262A;color:var(--mist);font-size:14px;text-align:center;padding:9px 16px;border-bottom:1px solid var(--lijn)}
-.balk a{color:var(--geel);text-decoration:none}.balk a:hover{text-decoration:underline}
+.balk{position:relative;z-index:2;background:linear-gradient(90deg,#08218F,#298ACB);color:#fff;color:var(--mist);font-size:14px;text-align:center;padding:9px 16px;border-bottom:1px solid var(--lijn)}
+.balk a{color:#fff;text-decoration:underline}.balk a:hover{text-decoration:underline}
 
 /* kop */
 header{position:relative;z-index:2}
@@ -65,12 +68,12 @@ header{position:relative;z-index:2}
 /* knoppen */
 .pil{display:inline-flex;align-items:center;gap:8px;border-radius:var(--r-pil);padding:12px 22px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap;border:0;cursor:pointer;font-family:inherit}
 .pil.wit{background:var(--wit);color:#000}
-.pil.wit:hover{background:var(--geel)}
+.pil.wit:hover{background:var(--geel);color:#000}
 .spook{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--geel);color:var(--geel);border-radius:8px;padding:10px 14px;font-size:14px;text-decoration:none;white-space:nowrap}
 .spook:hover{background:rgba(244,201,93,.08)}
 .spook::after{content:'→'}
 .chip{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r-pil);padding:4px 11px;font-size:12px;font-weight:600;background:var(--kaart2);color:var(--mist);white-space:nowrap}
-.chip.live{color:var(--live)}.chip.live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--live)}
+.chip.live{color:#0B2B26;background:var(--verloop)}.chip.live::before{content:'';width:7px;height:7px;border-radius:50%;background:#0B2B26}
 
 /* hero */
 .hero{position:relative;z-index:1;text-align:center;padding:64px 0 40px}
@@ -131,7 +134,7 @@ section{position:relative;z-index:1}
 .cijfers span{display:block;color:var(--mist);font-size:14px;margin-top:10px}
 
 /* voet */
-footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0C191C}
+footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 .voet{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:26px 24px;flex-wrap:wrap;color:var(--mist);font-size:14px}
 .voet .hand{font-family:Caveat,cursive;font-size:24px;color:var(--geel)}
 .voet a{color:var(--mist)}.voet a:hover{color:var(--geel)}
@@ -158,6 +161,36 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0C191C}
   .paneel h3{font-size:24px}
   .sectie{padding-top:60px}
 }
+
+/* typende woorden in de hero (verloop teal → cyaan) */
+.typ{display:inline-block;min-height:1em;background:var(--verloop);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.08em}
+.cursor{display:inline-block;width:.06em;height:.82em;margin-left:.04em;vertical-align:-.04em;background:#00D1FF;animation:knip 1s steps(1) infinite}
+@keyframes knip{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cursor{animation:none}}
+.hero h1{max-width:none}
+/* kaarten als in de referentie: witte ronde pijl, naam boven, groot cijfer/woord */
+.mod .pijl{background:#fff;color:#000;border:0;width:34px;height:34px;font-weight:700}
+.mod:hover .pijl{background:var(--geel)}
+.mod .groot{font-style:normal;font-weight:700;letter-spacing:-.036em}
+.mod .groot em{font-style:normal;color:var(--mist2);font-weight:600}
+.mod .kop img{border-radius:12px;height:62px;width:auto}
+.mod .groot{font-size:28px!important}
+.typ{white-space:nowrap}
+/* carrousel-knoppen onder de kaarten */
+.schuif{display:none;justify-content:center;gap:14px;margin-top:22px}
+.schuif button{width:52px;height:52px;border-radius:50%;border:0;font-size:20px;cursor:pointer;background:#fff;color:#000}
+.schuif button:first-child{background:#5B6378;color:#fff}
+/* vertrouwensstrook */
+.vertrouw{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:44px;text-align:left;color:var(--mist);font-size:14px}
+.vertrouw b{display:block;color:#fff;font-size:22px;font-weight:700;margin-top:4px}
+.vertrouw .tags{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;color:#fff;opacity:.55;font-weight:600;font-style:italic}
+@media (max-width:960px){
+  .modules{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
+  .modules::-webkit-scrollbar{display:none}
+  .mod{flex:0 0 78%;scroll-snap-align:center}
+  .schuif{display:flex}
+}
+@media (max-width:560px){ .mod .kop{flex-direction:row;align-items:center}.mod .groot{font-size:28px}.mod{padding:20px;gap:16px} }
 </style>
 </head>
 <body>
@@ -183,41 +216,47 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0C191C}
 <section class="hero">
   <div class="w">
     <span class="boven">Gemaakt door jeugdcoaches, voor jeugdcoaches</span>
-    <h1>Nog geen <span class="geel">tegenstander</span> voor zaterdag?</h1>
-    <p>Zoek een oefenmatch, vul je tornooi in de paasvakantie of zet je ploeg online. Gratis, voor elke jeugdcoach in Vlaanderen.</p>
+    <h1>Eén plek voor je<br><span class="typ" aria-live="polite"><span id="typ">oefenmatchen</span><i class="cursor" aria-hidden="true"></i></span></h1>
+    <p>Oefenmatch zoeken, tornooi organiseren, je ploeg online laten meedenken en je oefeningen bewaren. Gratis, voor elke jeugdcoach in Vlaanderen.</p>
     <div class="rij">
       <a class="pil wit" href="tornooi/#/wedstrijden">Zoek een oefenmatch</a>
       <a class="spook" href="tornooi/#/toernooien">Bekijk tornooien</a>
     </div>
 
-    <div class="modules">
+    <div class="modules" id="modules">
       <a class="mod" href="tornooi/#/wedstrijden">
         <div class="kop"><img src="assets/oefenmatch-b.png" alt=""><div><b>Oefenmatch</b><small>Club Friendlies</small></div></div>
-        <div class="groot"><small>Vrije speelweek?</small>Zoek &amp; plaats</div>
+        <div class="groot"><small>Vrije speelweek?</small>Zoek <em>een match</em></div>
         <div class="onder"><span class="chip live">Nu open</span><span class="pijl">→</span></div>
       </a>
       <a class="mod" href="tornooi/#/toernooien">
         <div class="kop"><img src="assets/tornooi-b.png" alt=""><div><b>Tornooi</b><small>Club Tornooien</small></div></div>
-        <div class="groot"><small>Paasvakantie?</small>Bekijk &amp; organiseer</div>
+        <div class="groot"><small>Paasvakantie?</small>Organiseer <em>live</em></div>
         <div class="onder"><span class="chip live">Nu open</span><span class="pijl">→</span></div>
       </a>
       <a class="mod" href="#tools" data-tab="cs">
         <div class="kop"><img src="assets/platform-b.png" alt=""><div><b>Coach &amp; Speler</b><small>Player Platform</small></div></div>
-        <div class="groot"><small>Na elke match</small>Je ploeg online</div>
+        <div class="groot"><small>Na elke match</small>Evalueer <em>samen</em></div>
         <div class="onder"><span class="chip">Binnenkort</span><span class="pijl">→</span></div>
       </a>
       <a class="mod" href="#tools" data-tab="th">
         <div class="kop"><img src="assets/training-b.png" alt=""><div><b>Training Hub</b><small>Oefenvideo's</small></div></div>
-        <div class="groot"><small>Per thema</small>Je oefeningen bewaard</div>
+        <div class="groot"><small>Per thema</small>Bewaar <em>oefeningen</em></div>
         <div class="onder"><span class="chip">Binnenkort</span><span class="pijl">→</span></div>
       </a>
+    </div>
+    <div class="schuif"><button type="button" aria-label="Vorige" onclick="document.getElementById('modules').scrollBy({left:-280,behavior:'smooth'})">‹</button><button type="button" aria-label="Volgende" onclick="document.getElementById('modules').scrollBy({left:280,behavior:'smooth'})">›</button></div>
+    <div class="vertrouw">
+      <div>Voor<div class="tags"><span>Jeugdcoaches</span><span>Clubs</span><span>Organisatoren</span><span>Spelers</span></div></div>
+      <div>Kost<b>€0</b></div>
+      <div>Eén account voor<b>4 tools</b></div>
     </div>
   </div>
 </section>
 
 <section class="sectie" id="tools">
   <div class="w">
-    <h2>Eén plek voor je <span class="geel">ploeg</span></h2>
+    <h2>Kies je <span class="geel">tool</span></h2>
     <p class="sub">Kies wat je nodig hebt. Rondkijken kan zonder login, beheren met één account.</p>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="om" aria-selected="true">Oefenmatch</button>
@@ -327,6 +366,21 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0C191C}
   }
   document.querySelectorAll(".tab").forEach(function (t) { t.addEventListener("click", function () { kies(t.dataset.tab); }); });
   document.querySelectorAll("a[data-tab]").forEach(function (a) { a.addEventListener("click", function () { kies(a.dataset.tab); }); });
+
+  // typende woorden: het hele systeem in één kopregel
+  (function () {
+    var el = document.getElementById("typ"); if (!el) return;
+    var woorden = ["oefenmatchen", "tornooien", "evaluaties", "spelersprofielen", "trainingen", "ploeg"];
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = "ploeg"; return; }
+    var w = 0, n = woorden[0].length, weg = false;
+    (function stap() {
+      var woord = woorden[w];
+      if (!weg) { n++; if (n > woord.length) { weg = true; return setTimeout(stap, 1600); } }
+      else { n--; if (n === 0) { weg = false; w = (w + 1) % woorden.length; return setTimeout(stap, 250); } }
+      el.textContent = woord.slice(0, n);
+      setTimeout(stap, weg ? 45 : 85);
+    })();
+  })();
 })();
 </script>
 </body>
