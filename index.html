@@ -284,6 +284,12 @@ body{background:var(--canvas)}
 .mod:hover .pijl{background:var(--geel)!important}
 footer{background:#0B2124!important;border-top-color:#0A1F22!important}
 .hd{color:var(--geel)!important}
+
+/* kaarten: rustige Exo 2 zoals de rest van de site */
+.mod .kop b{font-style:normal!important;font-weight:600!important;font-size:18px!important;letter-spacing:-.01em!important}
+.mod .groot{font-style:normal!important;font-weight:500!important;font-size:17px!important;line-height:1.35!important;letter-spacing:0!important;color:#E6EEEE}
+.mod .groot small{font-size:12.5px!important;color:var(--mist2)!important;margin-bottom:4px!important}
+@media (max-width:560px){.mod .groot{font-size:16px!important}}
 </style>
 </head>
 <body>
@@ -314,22 +320,22 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
     <div class="modules" id="modules">
       <div class="mod duo-mod" role="link" tabindex="0" data-tab="om" onclick="if(!event.target.closest('a')){kiesTab('om');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><img src="assets/tornooi-b.png" alt="Club Tornooien"></span><div><b>Oefenmatch &amp; <br>Tornooi</b></div></div>
-        <div class="groot"><small>Vrij weekend of tornooi voor de paasvakantie?</small>Zoek &amp; plaats <em>· Organiseer</em></div>
+        <div class="groot"><small>Vrij weekend of tornooi voor de paasvakantie?</small>Zoek een match of organiseer een tornooi</div>
         <div class="onder"><span class="duoknop"><a href="tornooi/#/wedstrijden">Match</a><a href="tornooi/#/toernooien">Tornooi</a></span></div>
       </div>
       <div class="mod duo-mod cs-mod" role="link" tabindex="0" data-tab="cs" onclick="if(!event.target.closest('a')){kiesTab('cs');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><img src="assets/platform-b.png" alt=""><div><b>Coach <svg class="hd" viewBox="0 0 24 24" aria-label="en" role="img" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg> Speler</b><small>Player Platform</small></div></div>
-        <div class="groot"><small>Na elke match</small>Evalueer <em>samen</em></div>
+        <div class="groot"><small>Na elke match</small>Spelers evalueren zichzelf en hun ploeg</div>
         <div class="onder"><span class="duoknop"><a href="coach/#/login">Aanmelden</a><a href="coach/">Aansluiten</a></span></div>
       </div>
       <a class="mod" href="#tools" data-tab="th">
         <div class="kop"><img src="assets/training-b.png" alt=""><div><b>Training Hub</b><small>Oefenvideo's</small></div></div>
-        <div class="groot"><small>Per thema</small>Bewaar <em>oefeningen</em></div>
+        <div class="groot"><small>Per thema</small>Al je oefenvideo's samen</div>
         <div class="onder"><span class="chip">Binnenkort</span><span class="pijl">→</span></div>
       </a>
       <a class="mod" href="#tools" data-tab="pn">
         <div class="kop"><img src="assets/playernation-b.png" alt=""><div><b>ThePlayerNation</b><small>Voor spelers</small></div></div>
-        <div class="groot"><small>Iets nieuws</small>Speciaal <em>voor spelers</em></div>
+        <div class="groot"><small>Iets nieuws</small>Een eigen plek voor spelers</div>
         <div class="onder"><span class="chip">Wordt vervolgd</span><span class="pijl">→</span></div>
       </a>
     </div>
