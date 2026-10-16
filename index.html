@@ -265,12 +265,14 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 .paneel-duo .hk b{font-size:20px;font-style:italic;font-weight:800}
 .duo-mod{cursor:pointer}
 @media (max-width:960px){.paneel-duo.aan{grid-template-columns:1fr}}
+.hd{width:1.05em;height:1.05em;vertical-align:-.15em;color:var(--geel);display:inline-block}
+.cs-mod .kop small{display:none}
 </style>
 </head>
 <body>
 <div class="gloed" aria-hidden="true"></div>
 
-<div class="balk">Nieuw: <b>Coach &amp; Speler</b> komt eraan, je ploeg online. <a href="#tools" data-tab="cs">Lees meer</a></div>
+<div class="balk">Nieuw: <b>Coach <svg class="hd" viewBox="0 0 24 24" aria-label="en" role="img" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg> Speler</b>, je ploeg online. Spelers denken mee na elke match. <a href="#tools" data-tab="cs">Lees meer</a></div>
 
 <header class="w">
   <div class="nav">
@@ -298,11 +300,11 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
         <div class="groot"><small>Vrij weekend of tornooi voor de paasvakantie?</small>Zoek &amp; plaats <em>· Organiseer</em></div>
         <div class="onder"><span class="duoknop"><a href="tornooi/#/wedstrijden">Match</a><a href="tornooi/#/toernooien">Tornooi</a></span></div>
       </div>
-      <a class="mod" href="#tools" data-tab="cs">
-        <div class="kop"><img src="assets/platform-b.png" alt=""><div><b>Coach &amp; Speler</b><small>Player Platform</small></div></div>
+      <div class="mod duo-mod cs-mod" role="link" tabindex="0" data-tab="cs" onclick="if(!event.target.closest('a')){kiesTab('cs');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
+        <div class="kop"><img src="assets/platform-b.png" alt=""><div><b>Coach <svg class="hd" viewBox="0 0 24 24" aria-label="en" role="img" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg> Speler</b><small>Player Platform</small></div></div>
         <div class="groot"><small>Na elke match</small>Evalueer <em>samen</em></div>
-        <div class="onder"><span class="chip">Binnenkort</span><span class="pijl">→</span></div>
-      </a>
+        <div class="onder"><span class="duoknop"><a href="coach/#/login">Aanmelden</a><a href="coach/">Aansluiten</a></span></div>
+      </div>
       <a class="mod" href="#tools" data-tab="th">
         <div class="kop"><img src="assets/training-b.png" alt=""><div><b>Training Hub</b><small>Oefenvideo's</small></div></div>
         <div class="groot"><small>Per thema</small>Bewaar <em>oefeningen</em></div>
@@ -315,11 +317,6 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
       </a>
     </div>
     <div class="schuif"><button type="button" aria-label="Vorige" onclick="document.getElementById('modules').scrollBy({left:-280,behavior:'smooth'})">‹</button><button type="button" aria-label="Volgende" onclick="document.getElementById('modules').scrollBy({left:280,behavior:'smooth'})">›</button></div>
-    <div class="vertrouw">
-      <div>Voor<div class="tags"><span>Jeugdcoaches</span><span>Clubs</span><span>Organisatoren</span><span>Spelers</span></div></div>
-      <div>Kost<b>€0</b></div>
-      <div>Eén account voor<b>4 tools</b></div>
-    </div>
   </div>
 </section>
 
@@ -329,7 +326,7 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
     <p class="sub">Kies wat je nodig hebt. Rondkijken kan zonder login, beheren met één account.</p>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="om" aria-selected="true">Oefenmatch &amp; Tornooi</button>
-      <button class="tab" role="tab" data-tab="cs" aria-selected="false">Coach &amp; Speler</button>
+      <button class="tab" role="tab" data-tab="cs" aria-selected="false">Coach <svg class="hd" viewBox="0 0 24 24" aria-label="en" role="img" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg> Speler</button>
       <button class="tab" role="tab" data-tab="th" aria-selected="false">Training Hub</button>
       <button class="tab" role="tab" data-tab="pn" aria-selected="false">ThePlayerNation</button>
     </div>
@@ -352,7 +349,7 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
       <div><h3>Je <span class="geel">ploeg</span> online!</h3>
         <p>Na elke match denken je spelers zelf na over wat er gebeurde.</p>
         <ul><li>Ze begrijpen het verhaal van de match en leren meedenken</li><li>Verantwoordelijkheid: zichzelf en hun ploegmaats eerlijk beoordelen</li><li>De tegenstander leren kennen en lezen</li></ul>
-        <div class="rij"><a class="pil wit" href="coach/#/nieuw">Maak je ploeg</a>
+        <div class="rij"><a class="pil wit" href="coach/#/nieuw">Maak je ploeg</a><a class="spook" href="coach/#/login">Aanmelden</a>
           <form class="code" onsubmit="event.preventDefault();var c=this.c.value.trim().toUpperCase();if(c)location.href='coach/#/code/'+encodeURIComponent(c)"><input name="c" maxlength="6" placeholder="Teamcode speler" aria-label="Teamcode" autocomplete="off" required><button class="pil wit" style="padding:11px 16px">Aansluiten</button></form></div></div>
       <div class="beeld"><img src="assets/platform-b.png" alt="Player Platform"></div>
     </div>
