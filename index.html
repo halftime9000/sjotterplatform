@@ -193,7 +193,10 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 @media (max-width:560px){ .mod .kop{flex-direction:row;align-items:center}.mod .groot{font-size:28px}.mod{padding:20px;gap:16px} }
 
 .duo-mod .ikonen{display:flex;gap:4px}
-.duo-mod .ikonen img{height:50px;width:auto;border-radius:10px}
+.duo-mod .ikonen img{height:96px;width:auto;border-radius:12px}
+.duo-mod .ikonen{gap:8px}
+.duo-mod .naam{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-top:-4px}
+.duo-mod .groot{font-size:22px!important}
 .duo-mod .kop b{font-size:17px}
 .mod .groot{font-size:25px!important}
 .duoknop{display:flex;gap:6px}
@@ -201,6 +204,12 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 .duoknop a:hover{background:var(--geel)}
 .links a{display:inline-flex;align-items:center;gap:5px}
 .links .hd{width:16px;height:16px;color:var(--geel)}
+
+/* alle kaarten zelfde opbouw: groot icoon boven, naam eronder */
+.mod .kop{flex-direction:column;align-items:flex-start;gap:12px}
+.mod .kop img{height:96px!important;width:auto;border-radius:12px}
+.mod .kop b{font-size:19px}
+@media (max-width:560px){.mod .kop{flex-direction:column!important;align-items:flex-start!important}}
 </style>
 </head>
 <body>
@@ -234,9 +243,10 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 
     <div class="modules" id="modules">
       <div class="mod duo-mod">
-        <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt=""><img src="assets/tornooi-b.png" alt=""></span><div><b>Oefenmatch &amp; Tornooi</b><small>Friendlies · Tornooien</small></div></div>
-        <div class="groot"><small>Vrije week of paasvakantie?</small>Zoek <em>&amp; organiseer</em></div>
-        <div class="onder"><span class="chip live">Nu open</span><span class="duoknop"><a href="tornooi/#/wedstrijden">Match</a><a href="tornooi/#/toernooien">Tornooi</a></span></div>
+        <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><img src="assets/tornooi-b.png" alt="Club Tornooien"></span></div>
+        <b class="naam">Oefenmatch &amp; Tornooi</b>
+        <div class="groot"><small>Vrij weekend of tornooi voor de paasvakantie?</small>Zoek &amp; plaats <em>· Organiseer</em></div>
+        <div class="onder"><span class="duoknop"><a href="tornooi/#/wedstrijden">Zoek &amp; plaats</a><a href="tornooi/#/toernooien">Organiseer</a></span></div>
       </div>
       <a class="mod" href="#tools" data-tab="cs">
         <div class="kop"><img src="assets/platform-b.png" alt=""><div><b>Coach &amp; Speler</b><small>Player Platform</small></div></div>
