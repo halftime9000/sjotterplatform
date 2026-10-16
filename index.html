@@ -191,6 +191,14 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
   .schuif{display:flex}
 }
 @media (max-width:560px){ .mod .kop{flex-direction:row;align-items:center}.mod .groot{font-size:28px}.mod{padding:20px;gap:16px} }
+
+.duo-mod .ikonen{display:flex;gap:4px}
+.duo-mod .ikonen img{height:50px;width:auto;border-radius:10px}
+.duo-mod .kop b{font-size:17px}
+.mod .groot{font-size:25px!important}
+.duoknop{display:flex;gap:6px}
+.duoknop a{background:#fff;color:#000;border-radius:80px;padding:6px 12px;font-size:13px;font-weight:700;text-decoration:none}
+.duoknop a:hover{background:var(--geel)}
 </style>
 </head>
 <body>
@@ -216,7 +224,7 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 <section class="hero">
   <div class="w">
     <span class="boven">Gemaakt door jeugdcoaches, voor jeugdcoaches</span>
-    <h1>Eén plek voor je<br><span class="typ" aria-live="polite"><span id="typ">oefenmatchen</span><i class="cursor" aria-hidden="true"></i></span></h1>
+    <h1>Eén plek voor<br><span class="typ" aria-live="polite"><span id="typ">coaches</span><i class="cursor" aria-hidden="true"></i></span></h1>
     <p>Oefenmatch zoeken, tornooi organiseren, je ploeg online laten meedenken en je oefeningen bewaren. Gratis, voor elke jeugdcoach in Vlaanderen.</p>
     <div class="rij">
       <a class="pil wit" href="tornooi/#/wedstrijden">Zoek een oefenmatch</a>
@@ -224,16 +232,11 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
     </div>
 
     <div class="modules" id="modules">
-      <a class="mod" href="tornooi/#/wedstrijden">
-        <div class="kop"><img src="assets/oefenmatch-b.png" alt=""><div><b>Oefenmatch</b><small>Club Friendlies</small></div></div>
-        <div class="groot"><small>Vrije speelweek?</small>Zoek <em>een match</em></div>
-        <div class="onder"><span class="chip live">Nu open</span><span class="pijl">→</span></div>
-      </a>
-      <a class="mod" href="tornooi/#/toernooien">
-        <div class="kop"><img src="assets/tornooi-b.png" alt=""><div><b>Tornooi</b><small>Club Tornooien</small></div></div>
-        <div class="groot"><small>Paasvakantie?</small>Organiseer <em>live</em></div>
-        <div class="onder"><span class="chip live">Nu open</span><span class="pijl">→</span></div>
-      </a>
+      <div class="mod duo-mod">
+        <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt=""><img src="assets/tornooi-b.png" alt=""></span><div><b>Oefenmatch &amp; Tornooi</b><small>Friendlies · Tornooien</small></div></div>
+        <div class="groot"><small>Vrije week of paasvakantie?</small>Zoek <em>&amp; organiseer</em></div>
+        <div class="onder"><span class="chip live">Nu open</span><span class="duoknop"><a href="tornooi/#/wedstrijden">Match</a><a href="tornooi/#/toernooien">Tornooi</a></span></div>
+      </div>
       <a class="mod" href="#tools" data-tab="cs">
         <div class="kop"><img src="assets/platform-b.png" alt=""><div><b>Coach &amp; Speler</b><small>Player Platform</small></div></div>
         <div class="groot"><small>Na elke match</small>Evalueer <em>samen</em></div>
@@ -243,6 +246,11 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
         <div class="kop"><img src="assets/training-b.png" alt=""><div><b>Training Hub</b><small>Oefenvideo's</small></div></div>
         <div class="groot"><small>Per thema</small>Bewaar <em>oefeningen</em></div>
         <div class="onder"><span class="chip">Binnenkort</span><span class="pijl">→</span></div>
+      </a>
+      <a class="mod" href="#tools" data-tab="pn">
+        <div class="kop"><img src="assets/playernation-b.png" alt=""><div><b>ThePlayerNation</b><small>Voor spelers</small></div></div>
+        <div class="groot"><small>Iets nieuws</small>Speciaal <em>voor spelers</em></div>
+        <div class="onder"><span class="chip">Wordt vervolgd</span><span class="pijl">→</span></div>
       </a>
     </div>
     <div class="schuif"><button type="button" aria-label="Vorige" onclick="document.getElementById('modules').scrollBy({left:-280,behavior:'smooth'})">‹</button><button type="button" aria-label="Volgende" onclick="document.getElementById('modules').scrollBy({left:280,behavior:'smooth'})">›</button></div>
@@ -370,8 +378,8 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
   // typende woorden: het hele systeem in één kopregel
   (function () {
     var el = document.getElementById("typ"); if (!el) return;
-    var woorden = ["oefenmatchen", "tornooien", "evaluaties", "spelersprofielen", "trainingen", "ploeg"];
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = "ploeg"; return; }
+    var woorden = ["coaches", "spelers", "oefenwedstrijden", "tornooien", "trainingen", "analyses"];
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = "coaches"; return; }
     var w = 0, n = woorden[0].length, weg = false;
     (function stap() {
       var woord = woorden[w];
