@@ -199,6 +199,8 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 .duoknop{display:flex;gap:6px}
 .duoknop a{background:#fff;color:#000;border-radius:80px;padding:6px 12px;font-size:13px;font-weight:700;text-decoration:none}
 .duoknop a:hover{background:var(--geel)}
+.links a{display:inline-flex;align-items:center;gap:5px}
+.links .hd{width:16px;height:16px;color:var(--geel)}
 </style>
 </head>
 <body>
@@ -210,11 +212,10 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
   <div class="nav">
     <a class="merk" href="./" aria-label="Sjotter"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle class="o1" cx="16" cy="16" r="15"/><circle class="o2" cx="16" cy="16" r="10"/><polygon class="o1" points="16,9.5 21.4,13.4 19.4,19.7 12.6,19.7 10.6,13.4"/></svg>Sjotter</a>
     <nav class="links" aria-label="Hoofdmenu">
-      <a href="#tools" data-tab="om">Oefenmatch</a>
-      <a href="#tools" data-tab="tn">Tornooien</a>
-      <a href="#tools" data-tab="cs">Coach &amp; Speler</a>
+      <a href="#tools" data-tab="om">Oefenmatch &amp; Tornooi</a>
+      <a href="#tools" data-tab="cs">Coach <svg class="hd" viewBox="0 0 24 24" aria-label="en" role="img" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg> Speler</a>
       <a href="#tools" data-tab="th">Training Hub</a>
-      <a href="#contact">Contact</a>
+      <a href="#tools" data-tab="pn">ThePlayerNation</a>
     </nav>
     <a class="pil wit" href="tornooi/#/login">Aanmelden</a>
   </div>
@@ -225,10 +226,10 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
   <div class="w">
     <span class="boven">Gemaakt door jeugdcoaches, voor jeugdcoaches</span>
     <h1>Eén plek voor<br><span class="typ" aria-live="polite"><span id="typ">coaches</span><i class="cursor" aria-hidden="true"></i></span></h1>
-    <p>Oefenmatch zoeken, tornooi organiseren, je ploeg online laten meedenken en je oefeningen bewaren. Gratis, voor elke jeugdcoach in Vlaanderen.</p>
+    <p>Alles wat een jeugdploeg nodig heeft, samen op één plek: tegenstanders en tornooien vinden, spelers laten meedenken na elke match en trainingen voorbereiden. Gratis, voor elke coach en speler in Vlaanderen.</p>
     <div class="rij">
-      <a class="pil wit" href="tornooi/#/wedstrijden">Zoek een oefenmatch</a>
-      <a class="spook" href="tornooi/#/toernooien">Bekijk tornooien</a>
+      <a class="pil wit" href="#tools">Ontdek alle tools</a>
+      <a class="spook" href="coach/#/nieuw">Maak je ploeg</a>
     </div>
 
     <div class="modules" id="modules">
