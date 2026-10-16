@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="nl-BE">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sjotter · Alles voor je jeugdploeg</title>
+<meta name="description" content="Oefenmatch zoeken, tornooi organiseren, je ploeg online. Gemaakt door jeugdcoaches, voor jeugdcoaches.">
+<script src="shared/config.js"></script>
+<style>
+@font-face{font-family:Jost;src:url('assets/fonts/jost.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:Inter;src:url('assets/fonts/inter.woff2') format('woff2');font-weight:100 900;font-display:swap}
+
+/* Sjotter · monochrome galerij: wit, zwart, drie grijzen. Kleur komt enkel uit de beelden. */
+:root{
+  --zwart:#111111; --wit:#FFFFFF; --beton:#E5E5E5; --mist:#F5F5F5; --staal:#707072; --vaag:#9E9EA0;
+  --donker:#282E32;   /* = achtergrond van de Sjotter-iconen, zodat ze naadloos "zweven" */
+  --pil:30px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--wit);color:var(--zwart);font:400 16px/1.75 Inter,'Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{display:block}
+.disp{font-family:Jost,'Futura PT',Futura,sans-serif;font-weight:500;text-transform:uppercase;line-height:1;letter-spacing:0}
+.w{max-width:1440px;margin:0 auto;padding:0 48px}
+
+/* knoppen: één vorm, twee varianten */
+.pil{display:inline-flex;align-items:center;justify-content:center;border-radius:var(--pil);padding:8px 20px;font:500 16px/1.5 Inter,sans-serif;border:0;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.pil:hover{opacity:.7}
+.pil.zw{background:var(--zwart);color:var(--wit)}
+.pil.wt{background:var(--wit);color:var(--zwart)}
+
+/* nutsbalk + hoofdnavigatie */
+.nuts{background:var(--mist);font-size:12px;line-height:1.5}
+.nuts .w{display:flex;justify-content:space-between;align-items:center;height:36px}
+.nuts nav{display:flex;gap:6px;align-items:center}
+.nuts nav a{padding:0 6px}.nuts nav a:hover{color:var(--staal)}
+.nuts nav span{color:var(--vaag)}
+.nav .w{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:60px;gap:24px}
+.merk{display:flex;align-items:center;gap:8px;font-family:Jost,sans-serif;font-weight:600;font-size:24px;letter-spacing:-.01em}
+.merk svg .o1{fill:var(--zwart)}.merk svg .o2{fill:var(--wit)}
+.menu{display:flex;gap:24px;font-weight:500}
+.menu a:hover{color:var(--staal)}
+.zoek{justify-self:end;display:flex;align-items:center;gap:8px;background:var(--mist);border-radius:24px;padding:6px 8px 6px 14px}
+.zoek svg{width:18px;height:18px;stroke:var(--staal);fill:none;stroke-width:2}
+.zoek input{border:0;background:transparent;font:400 16px Inter,sans-serif;width:150px;outline:none;color:var(--zwart);text-transform:uppercase;letter-spacing:.08em}
+.zoek input::placeholder{text-transform:none;letter-spacing:0;color:var(--staal)}
+.zoek button{border:0;background:var(--zwart);color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px}
+
+/* editoriale hero */
+.hero{position:relative;background:var(--donker);color:var(--wit);min-height:calc(100vh - 96px);display:flex;align-items:flex-end;overflow:hidden}
+.hero .beeld{position:absolute;right:6%;top:50%;transform:translateY(-55%);display:flex;gap:2vw}
+.hero .beeld img{height:min(58vh,520px);width:auto}
+.hero .beeld img:last-child{transform:translateY(8%)}
+.hero .tekst{position:relative;z-index:1;padding:0 48px 64px;max-width:900px}
+.hero .boven{font-size:16px;margin-bottom:12px;color:#D8DADC}
+.hero h1{font-size:clamp(44px,6.4vw,96px);margin:0}
+.hero h1 .typ{display:inline-block;border-bottom:4px solid var(--wit);min-width:1ch}
+.hero p{font-size:16px;max-width:520px;margin:18px 0 22px;color:#E4E5E6}
+
+/* 2x2 categorie-tegels, volledige breedte, geen tussenruimte */
+.tegels{display:grid;grid-template-columns:1fr 1fr}
+.tegel{position:relative;min-height:62vh;background:var(--donker);color:var(--wit);overflow:hidden;display:flex;align-items:flex-end}
+.tegel:nth-child(2),.tegel:nth-child(3){background:#1F2427}
+.tegel .ico{position:absolute;right:8%;top:50%;transform:translateY(-58%);height:58%;width:auto;transition:transform .35s}
+.tegel:hover .ico{transform:translateY(-58%) scale(1.04)}
+.tegel .tekst{position:relative;z-index:1;padding:0 48px 48px}
+.tegel small{font-size:16px;color:#D8DADC}
+.tegel h2{font-family:Inter,sans-serif;font-weight:500;font-size:24px;line-height:1.2;margin:4px 0 16px;max-width:360px}
+.tegel .rij{display:flex;gap:8px;flex-wrap:wrap}
+
+/* snel naar: horizontale kaartenrij */
+.blok{padding:48px 0}
+.blokkop{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.blokkop h2{font-weight:500;font-size:24px;line-height:1.2;margin:0}
+.pijlen{display:flex;gap:12px}
+.pijlen button{width:48px;height:48px;border-radius:50%;border:0;background:var(--mist);font-size:20px;cursor:pointer;color:var(--zwart)}
+.pijlen button:hover{background:var(--beton)}
+.rij-kaarten{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 24px)/3);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.rij-kaarten::-webkit-scrollbar{display:none}
+.kaart{scroll-snap-align:start;display:block}
+.kaart .vlak{position:relative;aspect-ratio:1/1;background:var(--mist);display:grid;place-items:center}
+.kaart .vlak img{height:62%;width:auto}
+.kaart .lab{position:absolute;left:16px;bottom:16px;background:var(--zwart);color:#fff;border-radius:var(--pil);padding:4px 12px;font-weight:500;font-size:14px;line-height:1.5}
+.kaart b{display:block;font-weight:500;margin-top:12px}
+.kaart span{color:var(--staal)}
+
+/* kernzinnen */
+.kern{border-top:1px solid var(--beton);border-bottom:1px solid var(--beton)}
+.kern .w{display:grid;grid-template-columns:repeat(4,1fr)}
+.kern div.c{padding:36px 24px;border-left:1px solid var(--beton)}
+.kern div.c:first-child{border-left:0;padding-left:0}
+.kern .disp{font-size:48px}
+.kern span{display:block;color:var(--staal);margin-top:8px}
+
+/* voet */
+footer{padding:48px 0 36px}
+.kols{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:24px}
+.kols h3{font-weight:500;font-size:16px;margin:0 0 12px}
+.kols a,.kols p{display:block;color:var(--staal);margin:0 0 6px}
+.kols a:hover{color:var(--zwart)}
+.kols .regio{color:var(--zwart);font-weight:500}
+.onder{display:flex;justify-content:space-between;color:var(--staal);font-size:12px;margin-top:36px;flex-wrap:wrap;gap:12px}
+
+@media (max-width:960px){
+  .w{padding:0 24px}
+  .menu{display:none}.nav .w{grid-template-columns:auto 1fr}
+  .tegel .tekst,.hero .tekst{padding-left:24px;padding-right:24px}
+  .rij-kaarten{grid-auto-columns:calc((100% - 12px)/2)}
+  .kern .w{grid-template-columns:1fr 1fr}.kern div.c:nth-child(3){border-left:0;padding-left:0}
+  .kols{grid-template-columns:1fr 1fr}
+}
+@media (max-width:600px){
+  .nuts nav a:not(:last-child),.nuts nav span{display:none}
+  .zoek input{width:96px}
+  .hero{min-height:calc(100svh - 96px)}
+  .hero .beeld{left:50%;right:auto;top:34%;transform:translate(-50%,-50%);gap:10px}
+  .hero .beeld img{height:30svh}
+  .hero .tekst{padding-bottom:36px}
+  .tegels{grid-template-columns:1fr 1fr}
+  .tegel{min-height:0;aspect-ratio:1/1.25;align-items:flex-end}
+  .tegel .ico{left:50%;right:auto;top:8%;transform:translateX(-50%);height:46%}
+  .tegel:hover .ico{transform:translateX(-50%) scale(1.04)}
+  .tegel .tekst{padding:0 14px 16px}
+  .tegel small{font-size:12px}
+  .tegel h2{font-size:15px;margin:2px 0 10px}
+  .tegel .rij .pil{padding:5px 12px;font-size:13px}
+  .tegel .rij .pil:nth-child(2){display:none}
+  .rij-kaarten{grid-auto-columns:72%}
+  .kern .disp{font-size:36px}
+}
+
+/* correcties: tekst en beeld naast elkaar, geen overlap */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:end}
+.hero .beeld{position:static;transform:none;grid-column:2;grid-row:1;align-self:center;justify-content:center;padding:48px 48px 48px 0}
+.hero .beeld img{height:min(46vh,440px)}
+.hero .tekst{grid-column:1;grid-row:1}
+.tegel,.tegel:nth-child(2),.tegel:nth-child(3){background:var(--donker)}
+.tegels{gap:1px;background:#1A1E21}
+.tegel .ico{top:12%;transform:none;height:50%}
+.tegel:hover .ico{transform:scale(1.04)}
+.tegel .tekst{max-width:58%}
+@media (max-width:960px){
+  .hero{grid-template-columns:1fr}
+  .hero .beeld{grid-column:1;grid-row:1;padding:32px 24px 0;align-self:start}
+  .hero .tekst{grid-row:2}
+}
+@media (max-width:600px){
+  .hero{min-height:calc(100svh - 96px);align-content:space-between}
+  .hero .beeld img{height:26svh}
+  .tegel{aspect-ratio:auto;min-height:250px;flex-direction:column;align-items:stretch;justify-content:flex-end}
+  .tegel .ico{position:static;transform:none;height:110px;margin:16px auto auto}
+  .tegel:hover .ico{transform:none}
+  .tegel .tekst{max-width:none}
+}
+.hero h1{font-size:clamp(38px,5vw,80px)!important;white-space:nowrap}
+.tegel .rij{flex-wrap:nowrap}
+@media (max-width:600px){.hero h1{font-size:clamp(32px,10vw,44px)!important}.tegel .rij{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<div class="nuts"><div class="w">
+  <span>Gemaakt door jeugdcoaches, voor jeugdcoaches</span>
+  <nav><a href="tornooi/#/help">Help</a><span>|</span><a href="#contact">Contact</a><span>|</span><a href="tornooi/#/login">Aanmelden</a></nav>
+</div></div>
+
+<header class="nav"><div class="w">
+  <a class="merk" href="./" aria-label="Sjotter"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><circle class="o1" cx="16" cy="16" r="15"/><circle class="o2" cx="16" cy="16" r="10"/><polygon class="o1" points="16,9.5 21.4,13.4 19.4,19.7 12.6,19.7 10.6,13.4"/></svg>Sjotter</a>
+  <nav class="menu" aria-label="Hoofdmenu">
+    <a href="tornooi/#/wedstrijden">Oefenmatch</a>
+    <a href="tornooi/#/toernooien">Tornooien</a>
+    <a href="coach/">Coach &amp; Speler</a>
+    <a href="training/">Training Hub</a>
+    <a href="playernation/">Spelers</a>
+  </nav>
+  <form class="zoek" onsubmit="event.preventDefault();var c=this.c.value.trim().toUpperCase();if(c)location.href='coach/#/code/'+encodeURIComponent(c)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+    <input name="c" maxlength="6" placeholder="Teamcode" aria-label="Teamcode van je ploeg" autocomplete="off">
+    <button aria-label="Aansluiten">→</button>
+  </form>
+</div></header>
+
+<main>
+<section class="hero">
+  <div class="beeld" aria-hidden="true"><img src="assets/oefenmatch-b.png" alt=""><img src="assets/tornooi-b.png" alt=""></div>
+  <div class="tekst">
+    <div class="boven">Gratis voor elke jeugdcoach</div>
+    <h1 class="disp">Alles voor je<br><span class="typ" id="typ">oefenmatch</span></h1>
+    <p>Oefenmatch zoeken, tornooi organiseren, je spelers laten meedenken en je oefeningen bewaren. Eén plek, één account.</p>
+    <a class="pil wt" href="tornooi/#/wedstrijden">Zoek een oefenmatch</a>
+  </div>
+</section>
+
+<section class="tegels">
+  <a class="tegel" href="tornooi/#/wedstrijden">
+    <img class="ico" src="assets/oefenmatch-b.png" alt="">
+    <div class="tekst"><small>Oefenmatch</small><h2>Nog geen tegenstander voor zaterdag?</h2>
+      <div class="rij"><span class="pil wt">Zoek</span><span class="pil wt" onclick="event.preventDefault();location.href='tornooi/#/wedstrijden/plaatsen'">Plaats je match</span></div></div>
+  </a>
+  <a class="tegel" href="tornooi/#/toernooien">
+    <img class="ico" src="assets/tornooi-b.png" alt="">
+    <div class="tekst"><small>Tornooi</small><h2>Van inschrijving tot finale, live op de dag zelf</h2>
+      <div class="rij"><span class="pil wt">Bekijk</span><span class="pil wt" id="organiseer" onclick="event.preventDefault();location.href=this.dataset.href||'tornooi/#/registreren'">Organiseer</span></div></div>
+  </a>
+  <a class="tegel" href="coach/">
+    <img class="ico" src="assets/platform-b.png" alt="">
+    <div class="tekst"><small>Coach &amp; Speler</small><h2>Je ploeg online. Na elke match denken je spelers mee</h2>
+      <div class="rij"><span class="pil wt" onclick="event.preventDefault();location.href='coach/#/nieuw'">Maak je ploeg</span><span class="pil wt">Aanmelden</span></div></div>
+  </a>
+  <a class="tegel" href="training/">
+    <img class="ico" src="assets/training-b.png" alt="">
+    <div class="tekst"><small>Training Hub</small><h2>Je oefenvideo's per thema bewaard</h2>
+      <div class="rij"><span class="pil wt">Binnenkort</span></div></div>
+  </a>
+</section>
+
+<section class="blok"><div class="w">
+  <div class="blokkop"><h2>Snel naar</h2><div class="pijlen"><button type="button" aria-label="Vorige" data-r="-1">‹</button><button type="button" aria-label="Volgende" data-r="1">›</button></div></div>
+  <div class="rij-kaarten" id="rij">
+    <a class="kaart" href="tornooi/#/wedstrijden"><div class="vlak"><img src="assets/oefenmatch-b.png" alt=""><span class="lab">Zoek een match</span></div><b>Oefenmatch zoeken</b><span>Op categorie, niveau en provincie</span></a>
+    <a class="kaart" href="tornooi/#/wedstrijden/plaatsen"><div class="vlak"><img src="assets/oefenmatch-b.png" alt=""><span class="lab">Plaats</span></div><b>Zoekertje plaatsen</b><span>Ook zonder account</span></a>
+    <a class="kaart" href="tornooi/#/toernooien"><div class="vlak"><img src="assets/tornooi-b.png" alt=""><span class="lab">Kalender</span></div><b>Tornooien bekijken</b><span>In heel Vlaanderen</span></a>
+    <a class="kaart" href="tornooi/#/registreren"><div class="vlak"><img src="assets/tornooi-b.png" alt=""><span class="lab">Organiseer</span></div><b>Tornooi organiseren</b><span>Inschrijving, loting, live uitslagen</span></a>
+    <a class="kaart" href="coach/#/nieuw"><div class="vlak"><img src="assets/platform-b.png" alt=""><span class="lab">Coach</span></div><b>Maak je ploeg</b><span>Evaluaties na elke match</span></a>
+    <a class="kaart" href="coach/"><div class="vlak"><img src="assets/platform-b.png" alt=""><span class="lab">Speler</span></div><b>Aansluiten met teamcode</b><span>Je eigen voetbalfiche</span></a>
+    <a class="kaart" href="training/"><div class="vlak"><img src="assets/training-b.png" alt=""><span class="lab">Binnenkort</span></div><b>Training Hub</b><span>Oefenvideo's per thema</span></a>
+    <a class="kaart" href="playernation/"><div class="vlak"><img src="assets/playernation-b.png" alt=""><span class="lab">Wordt vervolgd</span></div><b>ThePlayerNation</b><span>Iets nieuws voor spelers</span></a>
+  </div>
+</div></section>
+
+<section class="kern"><div class="w">
+  <div class="c"><div class="disp">€0</div><span>Altijd gratis</span></div>
+  <div class="c"><div class="disp">1</div><span>Account voor alles</span></div>
+  <div class="c"><div class="disp">4</div><span>Tools voor je ploeg</span></div>
+  <div class="c"><div class="disp">U6–U21</div><span>Alle jeugdcategorieën</span></div>
+</div></section>
+</main>
+
+<footer id="contact"><div class="w">
+  <div class="kols">
+    <div><h3>Tools</h3><a href="tornooi/#/wedstrijden">Oefenmatch</a><a href="tornooi/#/toernooien">Tornooien</a><a href="coach/">Coach &amp; Speler</a><a href="training/">Training Hub</a></div>
+    <div><h3>Help</h3><a href="tornooi/#/help">Veelgestelde vragen</a><a href="tornooi/#/login">Aanmelden</a><a href="coach/">Teamcode gebruiken</a></div>
+    <div><h3>Sjotter</h3><p>Gemaakt door jeugdcoaches, voor jeugdcoaches.</p><p>Tot op het veld!</p></div>
+    <div><h3>Contact</h3><p>Vraag of idee?</p><a id="mail" href="#"></a></div>
+    <div class="regio">Vlaanderen</div>
+  </div>
+  <div class="onder"><span>© <span id="jaar"></span> Sjotter</span><span><a href="tornooi/#/privacy">Privacy</a> · <a href="tornooi/#/help">Help</a></span></div>
+</div></footer>
+
+<script>
+(function () {
+  var C = window.SJOTTER || {};
+  var m = document.getElementById("mail");
+  m.textContent = C.CONTACT_EMAIL || "sjotter.be@gmail.com"; m.href = "mailto:" + m.textContent;
+  document.getElementById("jaar").textContent = new Date().getFullYear();
+  var u = C.huidigeGebruiker && C.huidigeGebruiker();
+  if (u && u.email) document.getElementById("organiseer").dataset.href = "tornooi/#/dashboard";
+
+  var rij = document.getElementById("rij");
+  document.querySelectorAll(".pijlen button").forEach(function (b) {
+    b.addEventListener("click", function () { rij.scrollBy({ left: rij.clientWidth * 0.66 * Number(b.dataset.r), behavior: "smooth" }); });
+  });
+
+  // het hele systeem in één kopregel
+  var el = document.getElementById("typ");
+  var woorden = ["oefenmatch", "tornooi", "ploeg", "evaluatie", "training"];
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = "ploeg"; return; }
+  var w = 0, n = woorden[0].length, weg = false;
+  (function stap() {
+    var woord = woorden[w];
+    if (!weg) { n++; if (n > woord.length) { weg = true; return setTimeout(stap, 1700); } }
+    else { n--; if (n === 0) { weg = false; w = (w + 1) % woorden.length; return setTimeout(stap, 250); } }
+    el.textContent = woord.slice(0, n) || " ";
+    setTimeout(stap, weg ? 45 : 90);
+  })();
+})();
+</script>
+</body>
+</html>
