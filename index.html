@@ -206,10 +206,15 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 .links .hd{width:16px;height:16px;color:var(--geel)}
 .duo-mod .kop{flex-direction:row!important;align-items:center!important}
 .duo-mod .kop b{font-size:17px!important;line-height:1.25;white-space:nowrap}
-/* proef: kaart 1 iconen boven, tekst eronder */
-.duo-mod .kop{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+/* proef: alle kaarten gecentreerd, naam boven, icoon eronder */
+.mod{text-align:center;align-items:center}
+.mod .kop,.duo-mod .kop{flex-direction:column-reverse!important;align-items:center!important;gap:12px!important}
+.mod .kop img{height:92px!important;width:auto}
 .duo-mod .ikonen img{height:92px!important}
 .duo-mod .kop b br{display:none}
+.mod .kop b{font-size:19px!important}
+.mod .onder{justify-content:center;gap:10px;width:100%}
+.mod .kop small{display:none}
 </style>
 </head>
 <body>
