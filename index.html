@@ -294,6 +294,31 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
 /* kaart 1: tekst en knoppen samen onderaan, op dezelfde hoogte als de andere kaarten */
 .duo-mod .groot{margin-top:auto!important;font-size:18px!important;font-weight:600!important}
 .duo-mod .onder{margin-top:10px!important}
+
+/* PROEF knoppen */
+.duoknop a.sp{background:transparent;color:var(--geel);border:1px solid var(--geel)}
+.duoknop a.sp:hover{background:rgba(244,201,93,.12)}
+.duoknop{flex-wrap:wrap;justify-content:center}
+.inlog{position:relative}
+.inlog summary{list-style:none;cursor:pointer}
+.inlog summary::-webkit-details-marker{display:none}
+.inlog-menu{position:absolute;right:0;top:calc(100% + 10px);z-index:20;width:270px;background:var(--kaart);border:1px solid #000;border-radius:15px;padding:14px;display:grid;gap:8px;box-shadow:0 20px 40px rgba(0,0,0,.35)}
+.inlog-menu span{font-size:13px;color:var(--mist2)}
+.inlog-menu a{display:flex;align-items:center;gap:12px;padding:8px;border-radius:12px;text-decoration:none;color:#fff;font-weight:600;background:var(--kaart2)}
+.inlog-menu a:hover{outline:1px solid var(--geel)}
+.inlog-menu img{height:44px;border-radius:8px}
+.inlog-menu small{font-size:12px;color:var(--mist2);text-align:center}
+.tweekeus{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.keus{background:var(--kaart2);border:1px solid #0A1F22;border-radius:15px;padding:16px}
+.keus b{font-style:italic;font-weight:800;font-size:17px}
+.keus p{margin:6px 0 12px!important;font-size:14px}
+.keus .code{flex-wrap:wrap}
+.keus .code input{width:130px}
+.klein-link{display:inline-block;margin-top:10px;font-size:13px;color:var(--mist2)}
+.code.flits input{outline:2px solid var(--geel);outline-offset:2px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,.mod:focus-visible{outline:2px solid var(--geel);outline-offset:3px;border-radius:12px}
+@media (max-width:960px){.tweekeus{grid-template-columns:1fr}}
+@media (max-width:560px){.duoknop a,.pil,.spook,.tab{min-height:44px;display:inline-flex;align-items:center}.duoknop a{padding:10px 14px!important;font-size:14px!important}}
 </style>
 </head>
 <body>
@@ -310,7 +335,11 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
       <a href="#tools" data-tab="th">Training Hub</a>
       <a href="#tools" data-tab="pn">ThePlayerNation</a>
     </nav>
-    <a class="pil wit" href="tornooi/#/login">Aanmelden</a>
+    <details class="inlog"><summary class="pil wit">Aanmelden</summary>
+      <div class="inlog-menu"><span>Waar wil je naartoe?</span>
+        <a href="tornooi/#/login"><img src="assets/oefenmatch-b.png" alt="">Oefenmatch &amp; Tornooi</a>
+        <a href="coach/#/login"><img src="assets/platform-b.png" alt="">Coach &amp; Speler</a>
+        <small>Eén account voor allebei.</small></div></details>
   </div>
 </header>
 
@@ -325,23 +354,23 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
       <div class="mod duo-mod" role="link" tabindex="0" data-tab="om" onclick="if(!event.target.closest('a')){kiesTab('om');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><img src="assets/tournament-b.png" alt="Club Tournament"></span><div><b>Oefenmatch &amp; <br>Tornooi</b></div></div>
         <div class="groot">Zoek &amp; plaats of organiseer</div>
-        <div class="onder"><span class="duoknop"><a href="tornooi/#/wedstrijden">Match</a><a href="tornooi/#/toernooien">Tornooi</a></span></div>
+        <div class="onder"><span class="duoknop"><a href="tornooi/#/wedstrijden">Zoek een match</a><a class="sp" href="tornooi/#/toernooien">Tornooien</a></span></div>
       </div>
       <div class="mod duo-mod cs-mod" role="link" tabindex="0" data-tab="cs" onclick="if(!event.target.closest('a')){kiesTab('cs');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><img src="assets/platform-b.png" alt=""><div><b>Coach <svg class="hd" viewBox="0 0 24 24" aria-label="en" role="img" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></svg> Speler</b><small>Player Platform</small></div></div>
         <div class="groot"><small>Na elke match</small>Spelers evalueren zichzelf en hun ploeg</div>
-        <div class="onder"><span class="duoknop"><a href="coach/#/login">Aanmelden</a><a href="coach/">Aansluiten</a></span></div>
+        <div class="onder"><span class="duoknop"><a href="coach/#/nieuw">Maak je ploeg</a><a class="sp" href="#speler" onclick="event.preventDefault();naarCode()">Aansluiten</a></span></div>
       </div>
-      <a class="mod" href="#tools" data-tab="th">
+      <div class="mod" role="link" tabindex="0" data-tab="th" onclick="if(!event.target.closest('a,button,input,form')){kiesTab('th');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><img src="assets/training-b.png" alt=""><div><b>Training Hub</b><small>Oefenvideo's</small></div></div>
         <div class="groot"><small>Per thema</small>Al je oefenvideo's samen</div>
-        <div class="onder"><span class="chip">Binnenkort</span><span class="pijl">→</span></div>
-      </a>
-      <a class="mod" href="#tools" data-tab="pn">
+        <div class="onder"><span class="duoknop"><a href="#tools" onclick="event.preventDefault();kiesTab('th');document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Meer info</a><a class="sp" href="mailto:sjotter.be@gmail.com?subject=Hou%20me%20op%20de%20hoogte:%20Training%20Hub">Hou me op de hoogte</a></span></div>
+      </div>
+      <div class="mod" role="link" tabindex="0" data-tab="pn" onclick="if(!event.target.closest('a,button,input,form')){kiesTab('pn');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><img src="assets/playernation-b.png" alt=""><div><b>ThePlayerNation</b><small>Voor spelers</small></div></div>
         <div class="groot"><small>Iets nieuws</small>Een eigen plek voor spelers</div>
-        <div class="onder"><span class="chip">Wordt vervolgd</span><span class="pijl">→</span></div>
-      </a>
+        <div class="onder"><span class="duoknop"><a href="#tools" onclick="event.preventDefault();kiesTab('pn');document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Meer info</a><a class="sp" href="mailto:sjotter.be@gmail.com?subject=Hou%20me%20op%20de%20hoogte:%20ThePlayerNation">Hou me op de hoogte</a></span></div>
+      </div>
     </div>
     <div class="schuif"><button type="button" aria-label="Vorige" onclick="document.getElementById('modules').scrollBy({left:-280,behavior:'smooth'})">‹</button><button type="button" aria-label="Volgende" onclick="document.getElementById('modules').scrollBy({left:280,behavior:'smooth'})">›</button></div>
   </div>
@@ -376,8 +405,13 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
       <div><h3>Je <span class="geel">ploeg</span> online!</h3>
         <p>Na elke match denken je spelers zelf na over wat er gebeurde.</p>
         <ul><li>Ze begrijpen het verhaal van de match en leren meedenken</li><li>Verantwoordelijkheid: zichzelf en hun ploegmaats eerlijk beoordelen</li><li>De tegenstander leren kennen en lezen</li></ul>
-        <div class="rij"><a class="pil wit" href="coach/#/nieuw">Maak je ploeg</a><a class="spook" href="coach/#/login">Aanmelden</a>
-          <form class="code" onsubmit="event.preventDefault();var c=this.c.value.trim().toUpperCase();if(c)location.href='coach/#/code/'+encodeURIComponent(c)"><input name="c" maxlength="6" placeholder="Teamcode speler" aria-label="Teamcode" autocomplete="off" required><button class="pil wit" style="padding:11px 16px">Aansluiten</button></form></div></div>
+        <div class="tweekeus">
+          <div class="keus"><b>Ik ben coach</b><p>Maak je ploeg aan en deel de teamcode met je spelers.</p>
+            <div class="rij"><a class="pil wit" href="coach/#/nieuw">Maak je ploeg</a><a class="spook" href="coach/#/login">Aanmelden</a></div></div>
+          <div class="keus" id="speler"><b>Ik ben speler</b><p>Vul de code van je coach in en sluit aan bij je ploeg.</p>
+            <form class="code" onsubmit="event.preventDefault();var c=this.c.value.trim().toUpperCase();if(c)location.href='coach/#/code/'+encodeURIComponent(c)"><input id="codeveld" name="c" maxlength="6" placeholder="Teamcode" aria-label="Teamcode" autocomplete="off" required><button class="pil wit">Aansluiten</button></form>
+            <a class="klein-link" href="coach/#/login">Al een account? Aanmelden</a></div>
+        </div></div>
       <div class="beeld"><img src="assets/platform-b.png" alt="Player Platform"></div>
     </div>
     <div class="paneel" data-paneel="th" role="tabpanel">
@@ -452,6 +486,14 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
   if (u && u.email) document.getElementById("organiseer").href = "tornooi/#/dashboard";
 
   // tabs
+
+  window.naarCode = function () {
+    kies("cs");
+    document.getElementById("speler").scrollIntoView({ behavior: "smooth", block: "center" });
+    var f = document.querySelector("#speler .code");
+    setTimeout(function () { var i = document.getElementById("codeveld"); if (i) i.focus({ preventScroll: true }); f.classList.add("flits"); setTimeout(function(){ f.classList.remove("flits"); }, 1600); }, 500);
+  };
+  document.addEventListener("click", function (e) { var d = document.querySelector(".inlog"); if (d && d.open && !d.contains(e.target)) d.open = false; });
   window.kiesTab = kies;
   function kies(id) {
     document.querySelectorAll(".tab").forEach(function (t) { t.setAttribute("aria-selected", t.dataset.tab === id ? "true" : "false"); });
