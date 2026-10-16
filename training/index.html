@@ -1,8 +1,31 @@
 <!DOCTYPE html>
 <html lang="nl-BE"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Training Hub · Sjotter</title>
-<link rel="stylesheet" href="../shared/sjotter.css"></head>
+<style>
+@font-face{font-family:'Exo 2';src:url('../assets/fonts/exo2.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'Exo 2';src:url('../assets/fonts/exo2-italic.woff2') format('woff2');font-weight:100 900;font-style:italic;font-display:swap}
+@font-face{font-family:Caveat;src:url('../assets/fonts/caveat.woff2') format('woff2');font-weight:400 700;font-display:swap}
+:root{--acc:#6FD6B0;--canvas:#111733;--kaart:#202A3E;--mist:#A9B0C0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--canvas);color:#fff;font:400 16px/1.55 'Exo 2',system-ui,sans-serif;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-gradient(55% 45% at 6% 0%,rgba(41,138,203,.42),rgba(8,33,143,.24) 40%,transparent 75%),radial-gradient(45% 45% at 95% 35%,rgba(111,214,176,.14) 0%,transparent 70%)}
+header{max-width:1000px;width:100%;margin:0 auto;padding:16px 20px;display:flex;align-items:center;gap:12px}
+.merk{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;font-weight:900;font-style:italic;font-size:22px}
+.merk .o1{fill:#fff}.merk .o2{fill:var(--canvas)}
+.module{font-weight:800;font-style:italic;text-transform:uppercase;letter-spacing:.06em;font-size:13px;color:var(--acc);border-left:1px solid rgba(255,255,255,.12);padding-left:12px}
+main{flex:1;display:grid;place-items:center;padding:20px}
+.kaart{max-width:560px;width:100%;text-align:center;background:var(--kaart);border:1px solid #000;border-radius:24px;padding:40px 28px}
+.kaart img{height:150px;border-radius:16px;background:#282e32;margin:0 auto 18px;display:block}
+.hand{font-family:Caveat,cursive;font-size:26px;color:var(--acc)}
+h1{margin:4px 0 10px;font-size:40px;font-style:italic;font-weight:800;letter-spacing:-.03em}
+p{color:var(--mist);margin:0 auto 24px;max-width:420px}
+.rij{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pil{display:inline-flex;align-items:center;border-radius:80px;padding:12px 22px;font-weight:700;font-size:14px;text-decoration:none;background:#fff;color:#000}
+.pil:hover{background:var(--acc)}
+.spook{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--acc);color:var(--acc);border-radius:8px;padding:11px 14px;font-size:14px;text-decoration:none}
+</style></head>
 <body>
-<header class="sj-top"><div class="sj-top-in"><a href="../" class="sj-logo"><span class="sj-bal"></span>Sjotter</a></div></header>
-<main class="sj-leeg"><span class="hand">nog even geduld…</span><h1>Training Hub</h1><p>Hier bewaar je straks je oefenvideo's per thema en zie je wat andere coaches delen.</p><a class="sj-knop" href="../">← Terug naar Sjotter</a></main>
+<header><a href="../" class="merk" aria-label="Sjotter"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle class="o1" cx="16" cy="16" r="15"/><circle class="o2" cx="16" cy="16" r="10"/><polygon class="o1" points="16,9.5 21.4,13.4 19.4,19.7 12.6,19.7 10.6,13.4"/></svg>Sjotter</a><span class="module">Training Hub</span></header>
+<main><div class="kaart"><img src="../assets/training-b.png" alt=""><span class="hand">nog even geduld…</span><h1>Training Hub</h1><p>Hier bewaar je straks je oefenvideo's per thema en zie je wat andere coaches delen.</p>
+<div class="rij"><a class="pil" href="../">Terug naar Sjotter</a><a class="spook" href="mailto:sjotter.be@gmail.com">Idee? Mail ons →</a></div></div></main>
 </body></html>

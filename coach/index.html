@@ -332,6 +332,79 @@ h1.titel,.ploegkop .naam,.ploegkop .club,.ploegtegel .naam,h2,.evalsectie > h3,.
 .scorevak{display:flex;flex-direction:column;gap:3px;margin:0}
 .scorevak input{width:84px}
 .scorevak .klein{max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ===== Sjotter-familie · donker (zoals de hub) · accent Coach & Speler = koraal ===== */
+:root{
+  --bg:#111733;--kaart:#202A3E;--kaart2:#283350;--rand:rgba(255,255,255,.10);--tekst:#FFFFFF;--zacht:#A9B0C0;--licht:#E2E5EC;
+  --accent:#FF8A6B;--accent-d:#FF7350;--op-accent:#1A0F0B;--geel:#F4C95D;--live:#4ADE80;--fout:#F87171;--knoprand:rgba(255,255,255,.22);
+  --goed:#4ADE80;--goed2:#86EFAC;--matig:#FBBF24;--acc-l:rgba(255,138,107,.12);
+}
+body{background:var(--bg);color:#fff;position:relative}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(55% 45% at 6% 0%,rgba(41,138,203,.42) 0%,rgba(8,33,143,.26) 40%,transparent 75%),
+             radial-gradient(40% 40% at 100% 25%,rgba(255,138,107,.12) 0%,transparent 70%)}
+a{color:var(--accent)}
+.merk .o1{fill:#fff}.merk .o2{fill:var(--bg)}
+.module{color:var(--accent);border-left-color:var(--rand)}
+.blok{background:var(--kaart);border:1px solid #000;border-radius:15px;box-shadow:none}
+.knop{border-radius:80px;border-color:var(--knoprand);color:#fff}
+.knop:hover{border-color:var(--accent);color:var(--accent)}
+.knop.vol,.knop.vol:hover{background:#fff;border-color:#fff;color:#000}
+.knop.vol:hover{background:var(--accent);border-color:var(--accent)}
+.knop.gevaar{border-color:rgba(248,113,113,.5);color:#FCA5A5}
+.knop.gevaar:hover{border-color:var(--fout);color:var(--fout)}
+input,select,textarea{background:var(--kaart2);border-color:var(--rand);color:#fff}
+input::placeholder,textarea::placeholder{color:#7D869B}
+select option{background:#202A3E;color:#fff}
+.tabs a{color:var(--zacht)}
+.tabs a:hover{color:#fff}
+.tabs a.aan{background:#fff;color:#000}
+.tabs .teller{background:var(--accent);color:#1A0F0B}
+.label{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:var(--zacht)}
+.label.groen{color:#4ADE80;border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.10)}
+.label.geel{color:#F4C95D;border-color:rgba(244,201,93,.35);background:rgba(244,201,93,.10)}
+.label.oranje{color:var(--accent);border-color:rgba(255,138,107,.4);background:var(--acc-l)}
+.code{color:var(--accent);border-color:rgba(255,138,107,.45);background:var(--acc-l)}
+.melding{background:var(--kaart2)}
+.kal .dag{background:var(--kaart2)}
+.kal .dag.weg{background:rgba(248,113,113,.16);border-color:rgba(248,113,113,.5);color:#FCA5A5}
+.ploegtegel{background:var(--kaart);border:1px solid #000;border-left:6px solid var(--accent);box-shadow:none}
+.ploegtegel:hover{border-color:#000;border-left-color:var(--accent);background:var(--kaart2);box-shadow:none}
+.ploegtegel .embleem{background:var(--accent);color:#1A0F0B;box-shadow:none}
+.ploegtegel.wacht .embleem{background:var(--kaart2);color:var(--geel)}
+.ploegkop .club{color:var(--accent)!important}
+.ploegkop .naam,.ploegtegel .naam{color:#fff!important}
+.ploegtegel .meta{color:var(--zacht)!important}
+.ploeglogo,.ploegtegel .embleem.met-logo img{mix-blend-mode:normal!important;background:#fff!important;border-radius:12px!important;padding:5px!important}
+.logovak{background:#fff}
+.uitleg{background:#0B1029;color:#fff}
+.uitleg .klein{color:var(--zacht)}
+.uitleg a{color:var(--accent)}
+.uitleg .stappen > div{border-top-color:var(--rand)}
+.uitleg .blok{box-shadow:none}
+.stappen b{background:var(--accent);color:#1A0F0B}
+.bijzaak{border-color:var(--rand)}
+.pill{background:var(--kaart2);border-color:var(--rand);color:var(--licht)}
+.pill.aan{background:var(--accent);border-color:var(--accent);color:#1A0F0B}
+.scores button{background:var(--kaart2);border-color:var(--rand);color:#fff}
+.scores button.aan{background:var(--accent);border-color:var(--accent);color:#1A0F0B}
+.wie{color:var(--accent)}
+#toast{background:#fff;color:#000}
+/* evaluatieformulier blijft licht en rustig, maar in de koraal-familie */
+.licht{--kaart:#FFFFFF;--kaart2:#FBF7F5;--rand:#EADFD9;--tekst:#1E2433;--zacht:#5F6577;--licht:#2E3446;--accent:#E8714F;--accent-d:#D65F3D;--op-accent:#FFFFFF;--live:#1E7A45;--geel:#8A5F00;--goed:#1E7A45;--goed2:#3FA36B;--matig:#C76A1B;--fout:#C0392B;color:var(--tekst)}
+.licht.blok,.licht .blok{border-color:var(--rand)}
+.licht .scores button,.licht .pill{background:#fff;border-color:#E2D5CE;color:#2E3446}
+.licht .scores button.aan,.licht .pill.aan{background:var(--accent);border-color:var(--accent);color:#fff}
+.licht input,.licht select,.licht textarea{background:#FFFCFA;border-color:#E2D5CE;color:var(--tekst)}
+.licht .knop{border-color:#D8CAC2;color:var(--tekst)}
+.licht .knop.vol{background:var(--tekst);border-color:var(--tekst);color:#fff}
+.licht .knop.vol:hover{background:var(--accent);border-color:var(--accent)}
+.licht .evalsectie > h3,.licht a{color:var(--accent-d)}
+.licht .label{background:#F6F0EC;border-color:#E6DAD3;color:#5F6577}
+.licht .label.groen{color:#1E7A45;border-color:#BFDCC8;background:#EEF7F1}
+.licht .label.geel{color:#8A5F00;border-color:#E8D5A6;background:#FBF5E4}
+.licht .label.oranje{color:#B5482A;border-color:#EDC3B4;background:#FCEFEA}
+.licht th,.licht td{border-bottom-color:#EFE5DF}
 </style>
 </head>
 <body>
@@ -917,8 +990,8 @@ async function cHome(kop) {
 }
 
 /* ---------- overzicht: alle spelers in één oogopslag (zoals het KSK-beheer) ---------- */
-const scoreKleur = v => v == null ? "var(--zacht)" : v >= 9 ? "#1E7A45" : v >= 7 ? "#3FA36B" : v >= 6 ? "#D9822B" : "var(--fout)";
-const pctKleur = p => p >= 100 ? "#1E7A45" : p >= 70 ? "#3FA36B" : p >= 40 ? "#D9822B" : "var(--fout)";
+const scoreKleur = v => v == null ? "var(--zacht)" : v >= 9 ? "var(--goed)" : v >= 7 ? "var(--goed2)" : v >= 6 ? "var(--matig)" : "var(--fout)";
+const pctKleur = p => p >= 100 ? "var(--goed)" : p >= 70 ? "var(--goed2)" : p >= 40 ? "var(--matig)" : "var(--fout)";
 const gem = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
 const getal = v => { const n = parseFloat(v); return isNaN(n) ? null : n; };
 async function cOverzicht(kop) {
@@ -948,10 +1021,10 @@ async function cOverzicht(kop) {
       <td>${r.gespeeld || '<span class="klein">—</span>'}</td>
       <td>${cijfer(r.eigen)}</td>
       <td>${cijfer(r.peer)}${r.peerN ? `<div class="klein">${r.peerN}×</div>` : ""}</td>
-      <td>${r.motm ? `<b style="color:#1E7A45">${r.motm}</b>` : '<span class="klein">—</span>'}</td>
+      <td>${r.motm ? `<b style="color:var(--goed)">${r.motm}</b>` : '<span class="klein">—</span>'}</td>
       ${wl ? `<td>${r.weak ? `<b style="color:var(--fout)">${r.weak}</b>` : '<span class="klein">—</span>'}</td>` : ""}
     </tr>`).join("")}</tbody></table></div>
-    <div class="legende"><span>Ø score:</span><span style="color:var(--fout)">● 1-5</span><span style="color:#D9822B">● 6</span><span style="color:#3FA36B">● 7-8</span><span style="color:#1E7A45">● 9-10</span></div>`;
+    <div class="legende"><span>Ø score:</span><span style="color:var(--fout)">● 1-5</span><span style="color:var(--matig)">● 6</span><span style="color:var(--goed2)">● 7-8</span><span style="color:var(--goed)">● 9-10</span></div>`;
 
   // invulgraad evaluaties (ranglijst)
   const rang = rij.filter(r => r.gespeeld).sort((a, b) => (b.pct - a.pct) || naamVan(a.s).localeCompare(naamVan(b.s)));
@@ -987,7 +1060,7 @@ async function cOverzicht(kop) {
       <p class="sub" style="margin:12px 0 0">${fiches.filter(ficheIngevuld).length} van ${spelers.length} spelers hebben hun voetbalfiche ingevuld.</p></div>
   </div>
   <div class="raster twee" style="margin-top:14px">
-    ${puntenBlok("sterk", "🌟 Meest genoemde sterke punten", "#1E7A45")}
+    ${puntenBlok("sterk", "🌟 Meest genoemde sterke punten", "var(--goed)")}
     ${puntenBlok("werk", "📈 Meest genoemde werkpunten", "var(--fout)")}
   </div>`;
 }
@@ -1229,7 +1302,7 @@ async function cEvaluaties(kop, wid) {
     .map(s => {
       const e = perSpeler[s.id], a = (e && e.antwoorden) || {};
       return `<tr>
-        <td><b style="color:${e && e.ingediend ? "#1E7A45" : "var(--fout)"}" title="${e && e.ingediend ? "Ingediend" : e ? "Nog niet ingediend (concept)" : "Nog niet ingevuld"}">${esc(naamVan(s))}</b>${e && !e.ingediend ? ' <span class="klein">concept</span>' : ""}</td>
+        <td><b style="color:${e && e.ingediend ? "var(--goed)" : "var(--fout)"}" title="${e && e.ingediend ? "Ingediend" : e ? "Nog niet ingediend (concept)" : "Nog niet ingevuld"}">${esc(naamVan(s))}</b>${e && !e.ingediend ? ' <span class="klein">concept</span>' : ""}</td>
         <td><b>${gemiddelde(ontv[s.id])}</b> <span class="klein">(${(ontv[s.id] || []).length})</span></td>
         <td><b>${eigenGem(e)}</b></td>
         <td>${motm[s.id] ? "⭐ " + motm[s.id] : ""}</td>
