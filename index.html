@@ -206,6 +206,10 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 .links .hd{width:16px;height:16px;color:var(--geel)}
 .duo-mod .kop{flex-direction:row!important;align-items:center!important}
 .duo-mod .kop b{font-size:17px!important;line-height:1.25;white-space:nowrap}
+/* proef: kaart 1 iconen boven, tekst eronder */
+.duo-mod .kop{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+.duo-mod .ikonen img{height:92px!important}
+.duo-mod .kop b br{display:none}
 </style>
 </head>
 <body>
@@ -239,7 +243,7 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
 
     <div class="modules" id="modules">
       <div class="mod duo-mod">
-        <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><img src="assets/tornooi-b.png" alt="Club Tornooien"></span><div><b>Oefenmatch &amp;<br>Tornooi</b></div></div>
+        <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><img src="assets/tornooi-b.png" alt="Club Tornooien"></span><div><b>Oefenmatch &amp; <br>Tornooi</b></div></div>
         <div class="groot"><small>Vrij weekend of tornooi voor de paasvakantie?</small>Zoek &amp; plaats <em>· Organiseer</em></div>
         <div class="onder"><span class="duoknop"><a href="tornooi/#/wedstrijden">Match</a><a href="tornooi/#/toernooien">Tornooi</a></span></div>
       </div>
