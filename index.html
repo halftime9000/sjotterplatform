@@ -255,6 +255,16 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
   .hero p{margin:20px auto 0!important;color:#AEB4C2}
   .modules{margin-top:30px!important}
 }
+
+.paneel-duo.aan{grid-template-columns:1fr 1fr;gap:20px 34px;align-items:start}
+.paneel-duo .koppen{grid-column:1/-1}
+.paneel-duo .koppen p{margin-bottom:0}
+.paneel-duo .helft{background:var(--kaart2);border:1px solid var(--lijn);border-radius:var(--r-kaart);padding:20px}
+.paneel-duo .hk{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.paneel-duo .hk img{height:72px;border-radius:12px;background:#282e32}
+.paneel-duo .hk b{font-size:20px;font-style:italic;font-weight:800}
+.duo-mod{cursor:pointer}
+@media (max-width:960px){.paneel-duo.aan{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -283,7 +293,7 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
     <p>Alles wat een jeugdploeg nodig heeft, samen op één plek: tegenstanders en tornooien vinden, spelers laten meedenken na elke match en trainingen voorbereiden. Gratis, voor elke coach en speler in Vlaanderen.</p>
 
     <div class="modules" id="modules">
-      <div class="mod duo-mod">
+      <div class="mod duo-mod" role="link" tabindex="0" data-tab="om" onclick="if(!event.target.closest('a')){kiesTab('om');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><img src="assets/tornooi-b.png" alt="Club Tornooien"></span><div><b>Oefenmatch &amp; <br>Tornooi</b></div></div>
         <div class="groot"><small>Vrij weekend of tornooi voor de paasvakantie?</small>Zoek &amp; plaats <em>· Organiseer</em></div>
         <div class="onder"><span class="duoknop"><a href="tornooi/#/wedstrijden">Match</a><a href="tornooi/#/toernooien">Tornooi</a></span></div>
@@ -318,26 +328,25 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
     <h2>Kies je <span class="geel">tool</span></h2>
     <p class="sub">Kies wat je nodig hebt. Rondkijken kan zonder login, beheren met één account.</p>
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" data-tab="om" aria-selected="true">Oefenmatch</button>
-      <button class="tab" role="tab" data-tab="tn" aria-selected="false">Tornooi</button>
+      <button class="tab" role="tab" data-tab="om" aria-selected="true">Oefenmatch &amp; Tornooi</button>
       <button class="tab" role="tab" data-tab="cs" aria-selected="false">Coach &amp; Speler</button>
       <button class="tab" role="tab" data-tab="th" aria-selected="false">Training Hub</button>
       <button class="tab" role="tab" data-tab="pn" aria-selected="false">ThePlayerNation</button>
     </div>
 
-    <div class="paneel aan" data-paneel="om" role="tabpanel">
-      <div><h3>Nooit meer een <span class="geel">vrije speelweek</span></h3>
-        <p>Zoek een tegenstander op jouw niveau of plaats zelf een zoekertje, ook zonder account.</p>
-        <ul><li>Zoek op categorie, niveau en provincie</li><li>Plaats een zoekertje in een minuut</li><li>Rechtstreeks contact met de andere club</li></ul>
-        <div class="rij"><a class="pil wit" href="tornooi/#/wedstrijden">Zoek een oefenmatch</a><a class="spook" href="tornooi/#/wedstrijden/plaatsen">Plaats je match</a></div></div>
-      <div class="beeld"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"></div>
-    </div>
-    <div class="paneel" data-paneel="tn" role="tabpanel">
-      <div><h3>Je <span class="geel">tornooi</span>, van inschrijving tot finale</h3>
-        <p>Online inschrijvingen, automatische loting en live uitslagen op de dag zelf.</p>
-        <ul><li>Inschrijvingen per leeftijdscategorie</li><li>Loting en speelschema in een paar klikken</li><li>Live standen en finales voor ouders en spelers</li></ul>
-        <div class="rij"><a class="pil wit" href="tornooi/#/toernooien">Bekijk tornooien</a><a class="spook" id="organiseer" href="tornooi/#/registreren">Organiseer een tornooi</a></div></div>
-      <div class="beeld"><img src="assets/tornooi-b.png" alt="Club Tornooien"></div>
+    <div class="paneel aan paneel-duo" data-paneel="om" role="tabpanel">
+      <div class="koppen"><h3>Nooit meer een <span class="geel">vrije speelweek</span>, nooit meer een leeg tornooi</h3>
+        <p>Vind een tegenstander op jouw niveau of organiseer je eigen jeugdtornooi, van inschrijving tot finale.</p></div>
+      <div class="helft">
+        <div class="hk"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><b>Oefenmatch</b></div>
+        <ul><li>Zoek op categorie, niveau en provincie</li><li>Plaats een zoekertje in een minuut, ook zonder account</li><li>Rechtstreeks contact met de andere club</li></ul>
+        <div class="rij"><a class="pil wit" href="tornooi/#/wedstrijden">Zoek een oefenmatch</a><a class="spook" href="tornooi/#/wedstrijden/plaatsen">Plaats je match</a></div>
+      </div>
+      <div class="helft">
+        <div class="hk"><img src="assets/tornooi-b.png" alt="Club Tornooien"><b>Tornooi</b></div>
+        <ul><li>Online inschrijvingen per leeftijdscategorie</li><li>Loting en speelschema in een paar klikken</li><li>Live standen en finales voor ouders en spelers</li></ul>
+        <div class="rij"><a class="pil wit" href="tornooi/#/toernooien">Bekijk tornooien</a><a class="spook" id="organiseer" href="tornooi/#/registreren">Organiseer een tornooi</a></div>
+      </div>
     </div>
     <div class="paneel" data-paneel="cs" role="tabpanel">
       <div><h3>Je <span class="geel">ploeg</span> online!</h3>
@@ -377,7 +386,7 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
         <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 8h18v8a9 9 0 0 1-18 0V8z"/><path d="M15 11H9a6 6 0 0 0 6 7M33 11h6a6 6 0 0 1-6 7M24 25v7M17 40h14M20 32h8l1 8H19l1-8z"/></svg>
         <h3>Voor clubs en organisatoren</h3>
         <p>Organiseer je jeugdtornooi met online inschrijvingen, loting en live uitslagen.</p>
-        <div class="rij"><a class="pil wit" href="tornooi/#/registreren">Organiseer</a><a class="spook" href="#tools" data-tab="tn">Meer info</a></div>
+        <div class="rij"><a class="pil wit" href="tornooi/#/registreren">Organiseer</a><a class="spook" href="#tools" data-tab="om">Meer info</a></div>
       </div>
       <div>
         <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 7l-9 5 3 8 4-2v22h18V18l4 2 3-8-9-5c-1 3-4 5-7 5s-6-2-7-5z"/><path d="M22 26h4v8"/></svg>
@@ -419,6 +428,7 @@ footer{margin-top:96px;border-top:1px solid var(--lijn);background:#0B1029}
   if (u && u.email) document.getElementById("organiseer").href = "tornooi/#/dashboard";
 
   // tabs
+  window.kiesTab = kies;
   function kies(id) {
     document.querySelectorAll(".tab").forEach(function (t) { t.setAttribute("aria-selected", t.dataset.tab === id ? "true" : "false"); });
     document.querySelectorAll(".paneel").forEach(function (p) { p.classList.toggle("aan", p.dataset.paneel === id); });
