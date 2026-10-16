@@ -290,6 +290,10 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
 .mod .groot{font-style:normal!important;font-weight:500!important;font-size:17px!important;line-height:1.35!important;letter-spacing:0!important;color:#E6EEEE}
 .mod .groot small{font-size:12.5px!important;color:var(--mist2)!important;margin-bottom:4px!important}
 @media (max-width:560px){.mod .groot{font-size:16px!important}}
+
+/* kaart 1: tekst en knoppen samen onderaan, op dezelfde hoogte als de andere kaarten */
+.duo-mod .groot{margin-top:auto!important;font-size:18px!important;font-weight:600!important}
+.duo-mod .onder{margin-top:10px!important}
 </style>
 </head>
 <body>
@@ -319,7 +323,7 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
 
     <div class="modules" id="modules">
       <div class="mod duo-mod" role="link" tabindex="0" data-tab="om" onclick="if(!event.target.closest('a')){kiesTab('om');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
-        <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><img src="assets/tornooi-b.png" alt="Club Tornooien"></span><div><b>Oefenmatch &amp; <br>Tornooi</b></div></div>
+        <div class="kop"><span class="ikonen"><img src="assets/oefenmatch-b.png" alt="Club Friendlies"><img src="assets/tournament-b.png" alt="Club Tournament"></span><div><b>Oefenmatch &amp; <br>Tornooi</b></div></div>
         <div class="groot">Zoek &amp; plaats of organiseer</div>
         <div class="onder"><span class="duoknop"><a href="tornooi/#/wedstrijden">Match</a><a href="tornooi/#/toernooien">Tornooi</a></span></div>
       </div>
@@ -363,7 +367,7 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
         <div class="rij"><a class="pil wit" href="tornooi/#/wedstrijden">Zoek een oefenmatch</a><a class="spook" href="tornooi/#/wedstrijden/plaatsen">Plaats je match</a></div>
       </div>
       <div class="helft">
-        <div class="hk"><img src="assets/tornooi-b.png" alt="Club Tornooien"><b>Tornooi</b></div>
+        <div class="hk"><img src="assets/tournament-b.png" alt="Club Tournament"><b>Tornooi</b></div>
         <ul><li>Online inschrijvingen per leeftijdscategorie</li><li>Loting en speelschema in een paar klikken</li><li>Live standen en finales voor ouders en spelers</li></ul>
         <div class="rij"><a class="pil wit" href="tornooi/#/toernooien">Bekijk tornooien</a><a class="spook" id="organiseer" href="tornooi/#/registreren">Organiseer een tornooi</a></div>
       </div>
