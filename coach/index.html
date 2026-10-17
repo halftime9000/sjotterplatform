@@ -472,6 +472,17 @@ body::before{background:radial-gradient(55% 45% at 6% 0%,rgba(47,138,132,.6) 0%,
 .ev-meer{margin-top:10px}
 .ev-meer summary{cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accent-d)}
 @media (min-width:900px){.ev-lijst{display:grid!important;grid-template-columns:1fr 1fr;column-gap:28px}.ev-kolkop{display:none}.ev-rij:nth-last-child(2):nth-child(odd){border-bottom:0}}
+.ev-ok{color:#1E8A4C}.ev-niet{color:#C2412D}
+.ev-bekijk{grid-column:1!important;justify-self:start;margin-top:3px;background:#E4F0F2!important;color:#1F5A63!important;border:1px solid #BFD9DD!important;border-radius:6px!important;padding:2px 10px!important;font-size:12px!important;transform:skewX(-10deg);font-style:italic}
+.ev-bekijk:hover{background:#1F5A63!important;color:#fff!important}
+.ev-naam{display:flex!important;flex-direction:column;align-items:flex-start}
+.ev-concept{font-size:11px;color:#C2412D;opacity:.8}
+.ev-groepen{display:grid;gap:14px;margin-top:6px}
+.ev-groep{border:1px solid #F1E8E2;border-radius:12px;padding:8px 10px;border-top:4px solid var(--g,#ccc)}
+.ev-gkop{display:flex;align-items:center;gap:8px;padding:2px 2px 4px}
+.ev-gkop b{font-style:italic;font-size:15px}
+.ev-gkop .klein{margin-left:auto}
+@media (min-width:900px){.ev-groepen{grid-template-columns:1fr 1fr;align-items:start}.ev-lijst{display:flex!important;flex-direction:column}.ev-kolkop{display:flex!important}}
 </style>
 </head>
 <body>
@@ -1398,17 +1409,23 @@ async function cEvaluaties(kop, wid) {
   });
   const sorteer = id => ontv[id] && ontv[id].length ? Number(gemiddelde(ontv[id])) : -1;
   const ingediend = evals.filter(e => e.ingediend).length;
-  const spelers = ids.map(id => P.spelerMap[id]).filter(Boolean).sort((x, y) => sorteer(y.id) - sorteer(x.id) || kortNaam(x).localeCompare(kortNaam(y)));
-  const rijen = spelers.map(s => {
+  const volgorde = (x, y) => sorteer(y.id) - sorteer(x.id) || kortNaam(x).localeCompare(kortNaam(y));
+  const rij = s => {
     const e = perSpeler[s.id], st = e && e.ingediend ? "ok" : e ? "concept" : "nog";
     return `<div class="ev-rij">
-      <div class="ev-naam"><span class="ev-stip ${st}" title="${st === "ok" ? "Ingediend" : st === "concept" ? "Concept" : "Nog niet ingevuld"}"></span><b>${esc(kortNaam(s))}</b>
-        ${e ? `<button class="ev-bekijk" onclick="A.toonEval('${s.id}')">Bekijk ›</button>` : `<span class="ev-nog">${st === "nog" ? "nog niet ingevuld" : ""}</span>`}</div>
+      <div class="ev-naam"><b class="${st === "ok" ? "ev-ok" : "ev-niet"}" title="${st === "ok" ? "Ingediend" : st === "concept" ? "Concept, nog niet ingediend" : "Nog niet ingevuld"}">${esc(kortNaam(s))}</b>
+        ${e ? `<button class="ev-bekijk" onclick="A.toonEval('${s.id}')">Bekijk</button>` : ""}${st === "concept" ? '<span class="ev-concept">concept</span>' : ""}</div>
       <div class="ev-cijfers">
         <span class="ev-pil" title="Gemiddelde van ploegmaats (${(ontv[s.id] || []).length} scores)">${scorePil(ontv[s.id] && ontv[s.id].length ? Number(gemiddelde(ontv[s.id])) : null)}<i>${(ontv[s.id] || []).length || ""}</i></span>
         <span class="ev-pil" title="Gemiddelde van de eigen scores">${scorePil(eigenGemiddelde(e))}</span>
         <span class="ev-badges">${motm[s.id] ? `<span title="Man van de match">⭐${motm[s.id]}</span>` : ""}${P.ploeg.weak_link_aan && wl[s.id] ? `<span title="Weak link">🔴${wl[s.id]}</span>` : ""}</span>
       </div></div>`;
+  };
+  const groepen = (P.ploeg.groepen || []).map(g => ({ g, sp: ((w.opstelling || {})[g.id] || []).map(id => P.spelerMap[id]).filter(Boolean).sort(volgorde) })).filter(x => x.sp.length);
+  const kolkop = '<div class="ev-kolkop"><span></span><span><b>Ploeg</b><b>Zelf</b><b></b></span></div>';
+  const rijen = groepen.map(({ g, sp }) => {
+    const ok = sp.filter(s => perSpeler[s.id] && perSpeler[s.id].ingediend).length;
+    return `<section class="ev-groep" style="--g:${esc(g.kleur || "#ccc")}"><div class="ev-gkop"><span class="stip" style="background:${esc(g.kleur || "#ccc")}"></span><b>Ploeg ${esc(g.naam)}</b><span class="klein">${ok}/${sp.length} ingediend</span></div>${kolkop}<div class="ev-lijst">${sp.map(rij).join("")}</div></section>`;
   }).join("");
   const tel = k => { const v = evals.map(e => e.antwoorden && Number(e.antwoorden[k])).filter(Boolean); return v.length ? Number(gemiddelde(v)) : null; };
   const systemen = {}; evals.forEach(e => { const sy = e.antwoorden && e.antwoorden.teg_systeem; if (sy) (systemen[sy] = systemen[sy] || []).push(e.speler_id); });
@@ -1422,9 +1439,8 @@ async function cEvaluaties(kop, wid) {
   <div class="blok" style="margin-top:10px">
     <div class="rij tussen" style="align-items:baseline"><h2 style="margin:0">Evaluaties · ${esc(w.tegenstander)}</h2><span class="klein"><b>${ingediend}</b> van ${ids.length} ingediend</span></div>
     <div class="ev-voortgang"><i style="width:${pct}%"></i></div>
-    <div class="ev-legende"><span><span class="ev-stip ok"></span>ingediend</span><span><span class="ev-stip concept"></span>concept</span><span><span class="ev-stip nog"></span>nog niet</span><span class="ev-schaal"><b class="s-laag">1-5</b><b class="s-mid">6</b><b class="s-goed">7</b><b class="s-top">8-10</b></span></div>
-    ${rijen ? `<div class="ev-kolkop"><span>Speler</span><span><b>Ploeg</b><b>Zelf</b><b></b></span></div>` : ""}
-    <div class="ev-lijst">${rijen || '<p class="leeg">Nog niemand opgesteld.</p>'}</div>
+    <div class="ev-legende"><span><b class="ev-ok">Naam</b> ingediend</span><span><b class="ev-niet">Naam</b> nog niet</span><span class="ev-schaal"><b class="s-laag">1-5</b><b class="s-mid">6</b><b class="s-goed">7</b><b class="s-top">8-10</b></span></div>
+    <div class="ev-groepen">${rijen || '<p class="leeg">Nog niemand opgesteld.</p>'}</div>
   </div>
   <div class="raster twee" style="margin-top:12px">
     <div class="blok"><h2>De ploeg volgens de spelers</h2>
