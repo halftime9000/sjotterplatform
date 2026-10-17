@@ -319,6 +319,17 @@ footer{background:#0B2124!important;border-top-color:#0A1F22!important}
 a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,.mod:focus-visible{outline:2px solid var(--geel);outline-offset:3px;border-radius:12px}
 @media (max-width:960px){.tweekeus{grid-template-columns:1fr}}
 @media (max-width:560px){.duoknop a,.pil,.spook,.tab{min-height:44px;display:inline-flex;align-items:center}.duoknop a{padding:10px 14px!important;font-size:14px!important}}
+
+/* Knoppen: schuin, zoals de italic titels */
+.duoknop a{min-height:40px;display:inline-flex!important;align-items:center;padding:0 16px!important;font-size:14px!important}
+.pil,.code button{min-height:48px;padding:0 22px!important;display:inline-flex;align-items:center}
+.spook{min-height:48px;padding:0 18px!important;display:inline-flex;align-items:center}
+.code input{min-height:48px;border-radius:6px!important}
+.duoknop a,.pil,.spook,.code button,.schuif button{transform:skewX(-10deg);border-radius:6px!important;font-style:italic;font-weight:800!important}
+.schuif button{border-radius:8px!important}
+.tab{border-radius:6px!important;transform:skewX(-10deg)}
+
+@media (min-width:561px){.duoknop{flex-wrap:nowrap!important;gap:7px!important}.duoknop a{padding:0 13px!important;font-size:13px!important;white-space:nowrap}}
 </style>
 </head>
 <body>
@@ -364,12 +375,12 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,.
       <div class="mod" role="link" tabindex="0" data-tab="th" onclick="if(!event.target.closest('a,button,input,form')){kiesTab('th');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><img src="assets/training-b.png" alt=""><div><b>Training Hub</b><small>Oefenvideo's</small></div></div>
         <div class="groot"><small>Per thema</small>Al je oefenvideo's samen</div>
-        <div class="onder"><span class="duoknop"><a href="#tools" onclick="event.preventDefault();kiesTab('th');document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Meer info</a><a class="sp" href="mailto:sjotter.be@gmail.com?subject=Hou%20me%20op%20de%20hoogte:%20Training%20Hub">Hou me op de hoogte</a></span></div>
+        <div class="onder"><span class="duoknop"><a href="#tools" onclick="event.preventDefault();kiesTab('th');document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Meer info</a><a class="sp" href="mailto:sjotter.be@gmail.com?subject=Hou%20me%20op%20de%20hoogte:%20Training%20Hub">Verwittig me</a></span></div>
       </div>
       <div class="mod" role="link" tabindex="0" data-tab="pn" onclick="if(!event.target.closest('a,button,input,form')){kiesTab('pn');document.getElementById('tools').scrollIntoView({behavior:'smooth'})}">
         <div class="kop"><img src="assets/playernation-b.png" alt=""><div><b>ThePlayerNation</b><small>Voor spelers</small></div></div>
         <div class="groot"><small>Iets nieuws</small>Een eigen plek voor spelers</div>
-        <div class="onder"><span class="duoknop"><a href="#tools" onclick="event.preventDefault();kiesTab('pn');document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Meer info</a><a class="sp" href="mailto:sjotter.be@gmail.com?subject=Hou%20me%20op%20de%20hoogte:%20ThePlayerNation">Hou me op de hoogte</a></span></div>
+        <div class="onder"><span class="duoknop"><a href="#tools" onclick="event.preventDefault();kiesTab('pn');document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Meer info</a><a class="sp" href="mailto:sjotter.be@gmail.com?subject=Hou%20me%20op%20de%20hoogte:%20ThePlayerNation">Verwittig me</a></span></div>
       </div>
     </div>
     <div class="schuif"><button type="button" aria-label="Vorige" onclick="document.getElementById('modules').scrollBy({left:-280,behavior:'smooth'})">‹</button><button type="button" aria-label="Volgende" onclick="document.getElementById('modules').scrollBy({left:280,behavior:'smooth'})">›</button></div>
