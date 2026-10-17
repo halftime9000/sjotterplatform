@@ -163,14 +163,14 @@ export async function zetOm(ex) {
 
 // ---------- KSK lezen ----------
 async function kskTabel(tabel) {
-  const url = Deno.env.get("KSK_URL") || KSK_STANDAARD_URL, key = Deno.env.get("KSK_SERVICE_KEY");
+  const url = (Deno.env.get("KSK_URL") || KSK_STANDAARD_URL).trim(), key = (Deno.env.get("KSK_SERVICE_KEY") || "").replace(/\s+/g, "");
   if (!key) throw new Error("Geheim KSK_SERVICE_KEY ontbreekt bij de functie ksk-sync");
   const rijen = [];
   for (let van = 0; ; van += 1000) {
     const r = await fetch(`${url}/rest/v1/${tabel}?select=*&order=id`, {
       headers: { ...sleutelHeaders(key), Range: `${van}-${van + 999}`, "Range-Unit": "items" },
     });
-    if (!r.ok) throw new Error(`KSK ${tabel}: ${r.status} ${await r.text()}`);
+    if (!r.ok) throw new Error(r.status === 401 ? `KSK weigert de sleutel (401). Controleer KSK_SERVICE_KEY: het moet de secret- of service_role-key van het KSK-project (gfjq…) zijn.` : `KSK ${tabel}: ${r.status} ${(await r.text()).slice(0, 200)}`);
     const deel = await r.json();
     rijen.push(...deel);
     if (deel.length < 1000) return rijen;
@@ -223,6 +223,9 @@ if (typeof Deno !== "undefined" && Deno.serve) {
       const telling = await sjotter("/rest/v1/rpc/cs_ksk_sync_toepassen", { method: "POST", body: JSON.stringify({ p }) });
       return antwoord({ ok: true, bron, telling, ksk: { spelers: spelers.length, wedstrijden: wedstrijden.length, evaluaties: evaluaties.length } });
     } catch (e) {
+      const geheimen = [Deno.env.get("KSK_SERVICE_KEY"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")].filter(Boolean);
+      const veilig = (t) => geheimen.reduce((x, g) => x.split(g).join("•••").split(g.replace(/\s+/g, "")).join("•••"), String(t)).replace(/sb_secret_[A-Za-z0-9_\- ]+/g, "sb_secret_•••");
+      e = new Error(veilig(e && e.message || e));
       try { await sjotter("/rest/v1/rpc/cs_ksk_sync_fout", { method: "POST", body: JSON.stringify({ p_ploeg: PID, p_bron: bron, p_fout: String(e && e.message || e) }) }); } catch { /* log mislukt */ }
       return antwoord({ ok: false, fout: String(e && e.message || e) }, 500);
     }
