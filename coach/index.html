@@ -419,6 +419,59 @@ body::before{background:radial-gradient(55% 45% at 6% 0%,rgba(47,138,132,.6) 0%,
 .ksk-strook .stip{background:var(--live);width:8px;height:8px}
 .ksk-strook.fout .stip{background:var(--fout)}
 .ksk-strook:hover{color:#fff;border-color:var(--accent)}
+
+/* Evaluaties: compact, licht, mobielvriendelijk */
+.evv .blok{padding:14px}
+.ev-voortgang{height:6px;border-radius:9px;background:#EFE6E0;margin:10px 0 8px;overflow:hidden}
+.ev-voortgang i{display:block;height:100%;background:#2E9E5B;border-radius:9px}
+.ev-legende{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--zacht);margin-bottom:6px;align-items:center}
+.ev-legende > span{display:inline-flex;align-items:center;gap:5px}
+.ev-schaal{margin-left:auto;gap:3px!important}
+.ev-schaal b{font-size:11px;padding:1px 6px;border-radius:6px}
+.ev-stip{width:9px;height:9px;border-radius:50%;flex:none;display:inline-block}
+.ev-stip.ok{background:#2E9E5B}.ev-stip.concept{background:#E3A008}.ev-stip.nog{background:#D9CFC8}
+.ev-lijst{display:flex;flex-direction:column}
+.ev-rij{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 2px;border-bottom:1px solid #F1E8E2}
+.ev-rij:last-child{border-bottom:0}
+.ev-naam{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:center;min-width:0}
+.ev-naam b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-bekijk,.ev-nog{grid-column:2;justify-self:start;font-size:12.5px}
+.ev-bekijk{border:0;background:none;padding:2px 0;color:var(--accent-d);font-weight:700;cursor:pointer;font-family:inherit}
+.ev-nog{color:#A79C95}
+.ev-cijfers{display:flex;align-items:center;gap:8px;flex:none}
+.ev-pil{display:flex;flex-direction:column;align-items:center;gap:1px;position:relative}
+.ev-pil small{font-size:10px;color:var(--zacht);text-transform:uppercase;letter-spacing:.04em}
+.ev-pil i{position:absolute;top:12px;right:-7px;font-style:normal;font-size:9.5px;color:var(--zacht)}
+.ev-badges{display:flex;flex-direction:column;gap:1px;font-size:12px;min-width:28px}
+.sc{display:inline-block;min-width:38px;text-align:center;padding:3px 7px;border-radius:8px;font-weight:800;font-size:14px}
+.s-top{background:#DDF3E4;color:#17663A}.s-goed{background:#EAF6D9;color:#4C7A12}.s-mid{background:#FFF1D1;color:#94610A}.s-laag{background:#FDE2DE;color:#B4321F}.s-leeg{background:#F3EEEA;color:#A79C95}
+.ev-duo{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.ev-duo > span{display:inline-flex;align-items:center;gap:8px}
+.ev-quote{margin:10px 0 0;font-size:14px;line-height:1.45}
+.ev-quote b{color:var(--accent-d);margin-right:4px}
+.ev-systemen{display:flex;flex-direction:column;gap:8px}
+.ev-systemen > div{display:flex;gap:10px;align-items:baseline}
+.ev-sys{display:inline-block;font-weight:800;background:#FCEFEA;color:#B5482A;border-radius:7px;padding:2px 8px;white-space:nowrap}
+.ev-wie{font-size:14px}
+.ev-modal{position:fixed;inset:0;z-index:60;background:rgba(5,15,18,.55);display:flex;align-items:flex-end;justify-content:center}
+.ev-sheet{background:#fff;color:var(--tekst);width:min(640px,100%);max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px 24px}
+.ev-sheet h3{margin:16px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--zacht)}
+.ev-kop{position:sticky;top:-16px;background:#fff;padding:4px 0 8px;margin-top:-4px}
+.ev-vraag{padding:7px 0;border-bottom:1px solid #F1E8E2}
+.ev-vraag p{margin:4px 0 0;font-size:13.5px;color:var(--zacht)}
+.ev-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ev-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 4px 4px 10px;font-size:13px;font-weight:600}
+.ev-chip b{background:rgba(255,255,255,.75);border-radius:999px;min-width:24px;text-align:center;padding:1px 6px}
+@media (min-width:700px){.ev-modal{align-items:center}.ev-sheet{border-radius:18px}}
+.ev-rij{padding:6px 2px!important}
+.ev-pil i{top:6px!important}
+.ev-kolkop{display:flex;justify-content:space-between;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--zacht);padding:6px 2px 2px;border-bottom:1px solid #F1E8E2}
+.ev-kolkop > span:last-child{display:flex;gap:8px}
+.ev-kolkop b{font-weight:600;min-width:38px;text-align:center}
+.ev-kolkop b:last-child{min-width:28px}
+.ev-meer{margin-top:10px}
+.ev-meer summary{cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accent-d)}
+@media (min-width:900px){.ev-lijst{display:grid!important;grid-template-columns:1fr 1fr;column-gap:28px}.ev-kolkop{display:none}.ev-rij:nth-last-child(2):nth-child(odd){border-bottom:0}}
 </style>
 </head>
 <body>
@@ -1339,52 +1392,60 @@ async function cEvaluaties(kop, wid) {
   const perSpeler = Object.fromEntries(evals.map(e => [e.speler_id, e]));
   const ontv = {}, motm = {}, wl = {};
   evals.forEach(e => {
-    Object.entries(e.ratings || {}).forEach(([id, r]) => (ontv[id] = ontv[id] || []).push(r));
+    Object.entries(e.ratings || {}).forEach(([id, r]) => (ontv[id] = ontv[id] || []).push(Number(r)));
     if (e.motm) motm[e.motm] = (motm[e.motm] || 0) + 1;
     if (e.weak_link) wl[e.weak_link] = (wl[e.weak_link] || 0) + 1;
   });
   const sorteer = id => ontv[id] && ontv[id].length ? Number(gemiddelde(ontv[id])) : -1;
-  const eigenGem = e => { if (!e || !e.ingediend) return "–"; const v = Object.entries(e.antwoorden || {}).filter(([k]) => /^(eigen_|k_)/.test(k) && !/_opm$/.test(k)).map(([, x]) => parseFloat(x)).filter(n => !isNaN(n)); return v.length ? (v.reduce((a, b) => a + b, 0) / v.length).toFixed(1) : "–"; };
-  const rijen = ids.map(id => P.spelerMap[id]).filter(Boolean)
-    .sort((a, b) => sorteer(b.id) - sorteer(a.id))
-    .map(s => {
-      const e = perSpeler[s.id], a = (e && e.antwoorden) || {};
-      return `<tr>
-        <td><b style="color:${e && e.ingediend ? "var(--goed)" : "var(--fout)"}" title="${e && e.ingediend ? "Ingediend" : e ? "Nog niet ingediend (concept)" : "Nog niet ingevuld"}">${esc(naamVan(s))}</b>${e && !e.ingediend ? ' <span class="klein">concept</span>' : ""}</td>
-        <td><b>${gemiddelde(ontv[s.id])}</b> <span class="klein">(${(ontv[s.id] || []).length})</span></td>
-        <td><b>${eigenGem(e)}</b></td>
-        <td>${motm[s.id] ? "⭐ " + motm[s.id] : ""}</td>
-        ${P.ploeg.weak_link_aan ? `<td>${wl[s.id] || ""}</td>` : ""}
-        <td>${e ? `<button class="knop klein" onclick="A.toonEval('${s.id}')">Bekijk</button>` : ""}</td></tr>`;
-    }).join("");
-  const tel = k => gemiddelde(evals.map(e => e.antwoorden && Number(e.antwoorden[k])).filter(Boolean));
-  const systemen = {}; evals.forEach(e => { const s = e.antwoorden && e.antwoorden.teg_systeem; if (s) systemen[s] = (systemen[s] || 0) + 1; });
-  const tegTekst = evals.map(e => [e.speler_id, e.antwoorden || {}]).filter(([, a]) => a.teg_beste || a.teg_extra);
+  const ingediend = evals.filter(e => e.ingediend).length;
+  const spelers = ids.map(id => P.spelerMap[id]).filter(Boolean).sort((x, y) => sorteer(y.id) - sorteer(x.id) || kortNaam(x).localeCompare(kortNaam(y)));
+  const rijen = spelers.map(s => {
+    const e = perSpeler[s.id], st = e && e.ingediend ? "ok" : e ? "concept" : "nog";
+    return `<div class="ev-rij">
+      <div class="ev-naam"><span class="ev-stip ${st}" title="${st === "ok" ? "Ingediend" : st === "concept" ? "Concept" : "Nog niet ingevuld"}"></span><b>${esc(kortNaam(s))}</b>
+        ${e ? `<button class="ev-bekijk" onclick="A.toonEval('${s.id}')">Bekijk ›</button>` : `<span class="ev-nog">${st === "nog" ? "nog niet ingevuld" : ""}</span>`}</div>
+      <div class="ev-cijfers">
+        <span class="ev-pil" title="Gemiddelde van ploegmaats (${(ontv[s.id] || []).length} scores)">${scorePil(ontv[s.id] && ontv[s.id].length ? Number(gemiddelde(ontv[s.id])) : null)}<i>${(ontv[s.id] || []).length || ""}</i></span>
+        <span class="ev-pil" title="Gemiddelde van de eigen scores">${scorePil(eigenGemiddelde(e))}</span>
+        <span class="ev-badges">${motm[s.id] ? `<span title="Man van de match">⭐${motm[s.id]}</span>` : ""}${P.ploeg.weak_link_aan && wl[s.id] ? `<span title="Weak link">🔴${wl[s.id]}</span>` : ""}</span>
+      </div></div>`;
+  }).join("");
+  const tel = k => { const v = evals.map(e => e.antwoorden && Number(e.antwoorden[k])).filter(Boolean); return v.length ? Number(gemiddelde(v)) : null; };
+  const systemen = {}; evals.forEach(e => { const sy = e.antwoorden && e.antwoorden.teg_systeem; if (sy) (systemen[sy] = systemen[sy] || []).push(e.speler_id); });
+  const beste = evals.map(e => [e.speler_id, e.antwoorden || {}]).filter(([, a]) => a.teg_beste || a.teg_extra);
   const waarom = evals.map(e => [e.speler_id, e.antwoorden && e.antwoorden.team_waarom]).filter(x => x[1]);
-  window._evals = { evals, w };
+  window._evals = { evals, w, ontvangers: ontv };
+  const pct = ids.length ? Math.round(ingediend / ids.length * 100) : 0;
   app().innerHTML = kop + `
   <a class="terug" href="#/p/${P.id}/wedstrijden/${w.id}">← ${esc(w.tegenstander)}</a>
-  <div class="licht">
+  <div class="licht evv">
   <div class="blok" style="margin-top:10px">
-    <div class="rij tussen"><h2 style="margin:0">Evaluaties · ${esc(w.tegenstander)}</h2>
-    <span class="klein">${evals.filter(e => e.ingediend).length} van ${ids.length} ingediend</span></div>
-    <div class="tabelwrap" style="margin-top:10px"><table>
-      <tr><th>Speler</th><th>Score ploegmaats</th><th title="Gemiddelde van de eigen scores">Eigen score</th><th>MOTM</th>${P.ploeg.weak_link_aan ? "<th>Weak link</th>" : ""}<th></th></tr>
-      ${rijen || '<tr><td colspan="7" class="leeg">Nog niemand opgesteld.</td></tr>'}
-    </table></div>
+    <div class="rij tussen" style="align-items:baseline"><h2 style="margin:0">Evaluaties · ${esc(w.tegenstander)}</h2><span class="klein"><b>${ingediend}</b> van ${ids.length} ingediend</span></div>
+    <div class="ev-voortgang"><i style="width:${pct}%"></i></div>
+    <div class="ev-legende"><span><span class="ev-stip ok"></span>ingediend</span><span><span class="ev-stip concept"></span>concept</span><span><span class="ev-stip nog"></span>nog niet</span><span class="ev-schaal"><b class="s-laag">1-5</b><b class="s-mid">6</b><b class="s-goed">7</b><b class="s-top">8-10</b></span></div>
+    ${rijen ? `<div class="ev-kolkop"><span>Speler</span><span><b>Ploeg</b><b>Zelf</b><b></b></span></div>` : ""}
+    <div class="ev-lijst">${rijen || '<p class="leeg">Nog niemand opgesteld.</p>'}</div>
   </div>
-  <div class="raster twee" style="margin-top:14px">
+  <div class="raster twee" style="margin-top:12px">
     <div class="blok"><h2>De ploeg volgens de spelers</h2>
-      <p style="margin:0">Mentaliteit: <b>${tel("team_mentaliteit")}</b> · Samenspel: <b>${tel("team_samenspel")}</b></p>
-      ${waarom.length ? "<hr>" + waarom.map(([id, t]) => `<p style="margin:0 0 8px"><span class="wie">${esc(kortNaam(P.spelerMap[id]))}:</span> ${esc(t)}</p>`).join("") : ""}
+      <div class="ev-duo"><span>Mentaliteit ${scorePil(tel("team_mentaliteit"))}</span><span>Samenspel ${scorePil(tel("team_samenspel"))}</span></div>
+      ${waarom.length ? `<details class="ev-meer"><summary>Wat de spelers zeggen (${waarom.length})</summary>${waarom.map(([id, t]) => `<p class="ev-quote"><b>${esc(kortNaam(P.spelerMap[id]))}</b> ${esc(t)}</p>`).join("")}</details>` : ""}
     </div>
     <div class="blok"><h2>Tegenstander</h2>
-      ${Object.keys(systemen).length ? `<p style="margin:0">Systeem: ${Object.entries(systemen).sort((a, b) => b[1] - a[1]).map(([s, n]) => `<b>${esc(s)}</b> (${n})`).join(", ")}</p>` : '<p class="sub" style="margin:0">Nog geen antwoorden.</p>'}
-      ${tegTekst.length ? "<hr>" + tegTekst.map(([id, a]) => `<p style="margin:0 0 8px"><span class="wie">${esc(kortNaam(P.spelerMap[id]))}:</span> ${a.teg_beste ? "beste speler: " + esc(a.teg_beste) : ""}${a.teg_beste && a.teg_extra ? " · " : ""}${esc(a.teg_extra || "")}</p>`).join("") : ""}
+      ${Object.keys(systemen).length ? `<div class="ev-systemen">${Object.entries(systemen).sort((x, y) => y[1].length - x[1].length).map(([sy, wie]) =>
+        `<div><span class="ev-sys">${esc(sy)}</span><span class="ev-wie">${wie.map(id => esc(kortNaam(P.spelerMap[id]))).join(", ")}</span></div>`).join("")}</div>` : '<p class="sub" style="margin:0">Nog geen antwoorden.</p>'}
+      ${beste.length ? `<details class="ev-meer"><summary>Beste speler en opmerkingen (${beste.length})</summary>${beste.map(([id, a]) => `<p class="ev-quote"><b>${esc(kortNaam(P.spelerMap[id]))}</b> ${a.teg_beste ? "Beste speler: " + esc(a.teg_beste) : ""}${a.teg_beste && a.teg_extra ? " · " : ""}${esc(a.teg_extra || "")}</p>`).join("")}</details>` : ""}
     </div>
   </div>
-  <div id="evaldetail"></div>
-  </div>`;
+  </div>
+  <div id="evaldetail"></div>`;
+}
+function scoreKlasse(v) { return v == null ? "s-leeg" : v >= 8 ? "s-top" : v >= 7 ? "s-goed" : v >= 6 ? "s-mid" : "s-laag"; }
+function scorePil(v) { return `<b class="sc ${scoreKlasse(v)}">${v == null ? "–" : (Number.isInteger(v) ? v : v.toFixed(1))}</b>`; }
+function eigenGemiddelde(e) {
+  if (!e || !e.ingediend) return null;
+  const v = Object.entries(e.antwoorden || {}).filter(([k]) => /^(eigen_|k_)/.test(k) && !/_opm$/.test(k)).map(([, x]) => parseFloat(x)).filter(n => !isNaN(n));
+  return v.length ? Number((v.reduce((x, y) => x + y, 0) / v.length).toFixed(1)) : null;
 }
 
 /* ---------- instellingen ---------- */
@@ -1736,16 +1797,22 @@ const A = window.A = {
   toonEval(sid) {
     const { evals } = window._evals; const e = evals.find(x => x.speler_id === sid); if (!e) return;
     const a = e.antwoorden || {}, s = P.spelerMap[sid];
-    const rijen = Object.entries(EVAL_LABELS).filter(([k]) => a[k] != null || a[k + "_opm"]).map(([k, t]) => `<tr><td>${t}</td><td><b>${esc(a[k] ?? "–")}</b></td><td>${esc(a[k + "_opm"] || "")}</td></tr>`).join("");
-    const gegeven = Object.entries(e.ratings || {}).map(([id, r]) => `${esc(kortNaam(P.spelerMap[id]))}: <b>${esc(r)}</b>`).join(" · ");
-    $("#evaldetail").innerHTML = `<div class="blok" style="margin-top:14px"><div class="rij tussen"><h2 style="margin:0">Evaluatie van ${esc(naamVan(s))}</h2><button class="knop klein" onclick="this.closest('.blok').remove()">Sluiten</button></div>
-      <div class="tabelwrap"><table><tr><th>Vraag</th><th>Score</th><th>Toelichting</th></tr>${rijen || '<tr><td colspan="3">Geen scores.</td></tr>'}</table></div>
-      ${a.team_waarom ? `<p><span class="klein">Over de ploeg:</span> ${esc(a.team_waarom)}</p>` : ""}
-      ${[["wat_goed", "Wat ging goed"], ["wat_minder", "Wat ging minder"], ["hoe_verbeteren", "Hoe verbeteren"], ["analyse", "Analyse"]].filter(([k]) => a[k]).map(([k, t]) => `<p><span class="klein">${t}:</span> ${esc(a[k])}</p>`).join("")}
-      ${a.teg_systeem || a.teg_beste || a.teg_extra ? `<p><span class="klein">Tegenstander:</span> ${esc(a.teg_systeem || "")}${a.teg_beste ? " · beste speler: " + esc(a.teg_beste) : ""}${a.teg_extra ? " · " + esc(a.teg_extra) : ""}</p>` : ""}
-      ${gegeven ? `<p><span class="klein">Scores aan teamgenoten:</span> ${gegeven}</p>` : ""}
-      <p class="klein">⭐ MOTM: ${e.motm ? esc(naamVan(P.spelerMap[e.motm])) : "–"}${P.ploeg.weak_link_aan ? " · 🔴 Weak link: " + (e.weak_link ? esc(naamVan(P.spelerMap[e.weak_link])) : "–") : ""}</p></div>`;
-    $("#evaldetail").scrollIntoView({ behavior: "smooth" });
+    const vragen = Object.entries(EVAL_LABELS).filter(([k]) => /^(eigen_|k_)/.test(k) && (a[k] != null || a[k + "_opm"]))
+      .map(([k, t]) => `<div class="ev-vraag"><div class="rij tussen"><span>${t}</span>${scorePil(a[k] != null ? Number(a[k]) : null)}</div>${a[k + "_opm"] ? `<p>${esc(a[k + "_opm"])}</p>` : ""}</div>`).join("");
+    const chips = lijst => lijst.length ? `<div class="ev-chips">${lijst.map(([naam, r]) => `<span class="ev-chip ${scoreKlasse(r)}">${esc(naam)}<b>${r}</b></span>`).join("")}</div>` : '<p class="klein" style="margin:0">Geen.</p>';
+    const gegeven = Object.entries(e.ratings || {}).map(([id, r]) => [kortNaam(P.spelerMap[id]), Number(r)]).sort((x, y) => y[1] - x[1]);
+    const ontvangen = evals.filter(x => x.speler_id !== sid && x.ratings && x.ratings[sid] != null).map(x => [kortNaam(P.spelerMap[x.speler_id]), Number(x.ratings[sid])]).sort((x, y) => y[1] - x[1]);
+    const tekst = [["wat_goed", "Wat ging goed"], ["wat_minder", "Wat ging minder"], ["hoe_verbeteren", "Hoe verbeteren"], ["analyse", "Analyse"], ["team_waarom", "Over de ploeg"]].filter(([k]) => a[k]);
+    $("#evaldetail").innerHTML = `<div class="ev-modal" onclick="if(event.target===this)this.remove()"><div class="ev-sheet licht">
+      <div class="rij tussen ev-kop"><h2 style="margin:0">${esc(kortNaam(s))}</h2><button class="knop klein" onclick="this.closest('.ev-modal').remove()">Sluiten</button></div>
+      <h3>Eigen prestatie</h3>${vragen || '<p class="klein">Geen eigen scores.</p>'}
+      <h3>De ploeg</h3><div class="ev-duo"><span>Mentaliteit ${scorePil(a.team_mentaliteit != null ? Number(a.team_mentaliteit) : null)}</span><span>Samenspel ${scorePil(a.team_samenspel != null ? Number(a.team_samenspel) : null)}</span></div>
+      ${tekst.map(([k, t]) => `<p class="ev-quote"><b>${t}</b> ${esc(a[k])}</p>`).join("")}
+      <h3>Gaf aan ploegmaats</h3>${chips(gegeven)}
+      <h3>Kreeg van ploegmaats</h3>${chips(ontvangen)}
+      <div class="ev-duo" style="margin-top:12px"><span>⭐ ${e.motm ? esc(kortNaam(P.spelerMap[e.motm])) : "–"}</span>${P.ploeg.weak_link_aan ? `<span>🔴 ${e.weak_link ? esc(kortNaam(P.spelerMap[e.weak_link])) : "–"}</span>` : ""}</div>
+      ${a.teg_systeem || a.teg_beste || a.teg_extra ? `<h3>Tegenstander</h3><p class="ev-quote">${a.teg_systeem ? `<span class="ev-sys">${esc(a.teg_systeem)}</span> ` : ""}${a.teg_beste ? "Beste speler: " + esc(a.teg_beste) : ""}${a.teg_extra ? " · " + esc(a.teg_extra) : ""}</p>` : ""}
+    </div></div>`;
   },
   async logo(input) {
     const f = input.files && input.files[0]; if (!f) return;
