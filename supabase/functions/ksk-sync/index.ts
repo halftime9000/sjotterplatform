@@ -167,9 +167,12 @@ async function kskTabel(tabel) {
   if (!key) throw new Error("Geheim KSK_SERVICE_KEY ontbreekt bij de functie ksk-sync");
   const rijen = [];
   for (let van = 0; ; van += 1000) {
-    const r = await fetch(`${url}/rest/v1/${tabel}?select=*&order=id`, {
+    const haal = (orde) => fetch(`${url}/rest/v1/${tabel}?select=*${orde ? "&order=" + orde : ""}`, {
       headers: { ...sleutelHeaders(key), Range: `${van}-${van + 999}`, "Range-Unit": "items" },
     });
+    // niet elke KSK-tabel heeft een kolom "id" (bv. user_roles): dan zonder sortering
+    let r = await haal("id");
+    if (r.status === 400) r = await haal(null);
     if (!r.ok) throw new Error(r.status === 401 ? `KSK weigert de sleutel (401). Controleer KSK_SERVICE_KEY: het moet de secret- of service_role-key van het KSK-project (gfjq…) zijn.` : `KSK ${tabel}: ${r.status} ${(await r.text()).slice(0, 200)}`);
     const deel = await r.json();
     rijen.push(...deel);
