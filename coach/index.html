@@ -415,6 +415,10 @@ body::before{background:radial-gradient(55% 45% at 6% 0%,rgba(47,138,132,.6) 0%,
 /* Knoppen: schuin zoals de hub */
 .knop{transform:skewX(-10deg);border-radius:6px!important;font-style:italic;font-weight:800!important}
 .tabs a{border-radius:6px!important;transform:skewX(-10deg)}
+.ksk-strook{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--zacht);text-decoration:none;border:1px solid var(--rand);border-radius:999px;padding:6px 12px}
+.ksk-strook .stip{background:var(--live);width:8px;height:8px}
+.ksk-strook.fout .stip{background:var(--fout)}
+.ksk-strook:hover{color:#fff;border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -452,6 +456,38 @@ const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xx
 function vandaag() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
 const MAANDEN = ["januari","februari","maart","april","mei","juni","juli","augustus","september","oktober","november","december"];
 const DAGEN = ["zo","ma","di","wo","do","vr","za"];
+/* ---------- KSK-synchronisatie ---------- */
+const KSK_PLOEG = "8ce2957f-4ea1-5eee-acd7-2570f80743e1";
+function geleden(t) {
+  const s = Math.round((Date.now() - new Date(t).getTime()) / 1000);
+  if (s < 60) return "net nu"; if (s < 3600) return Math.round(s / 60) + " min geleden";
+  if (s < 86400) return Math.round(s / 3600) + " u geleden";
+  return new Date(t).toLocaleString("nl-BE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+function kskSamenvatting(r) {
+  if (!r.ok) return "mislukt: " + (r.fout || "onbekende fout");
+  const t = r.telling || {}, d = [];
+  const n = (k, een, meer) => { if (t[k]) d.push(t[k] + " " + (t[k] === 1 ? een : meer)); };
+  n("evaluaties_nieuw", "nieuwe evaluatie", "nieuwe evaluaties"); n("evaluaties_bij", "evaluatie bijgewerkt", "evaluaties bijgewerkt");
+  n("wedstrijden_nieuw", "nieuwe wedstrijd", "nieuwe wedstrijden"); n("wedstrijden_bij", "wedstrijd bijgewerkt", "wedstrijden bijgewerkt");
+  n("spelers_nieuw", "nieuwe speler", "nieuwe spelers"); n("spelers_bij", "speler bijgewerkt", "spelers bijgewerkt");
+  n("fiches_bij", "fiche bijgewerkt", "fiches bijgewerkt");
+  return d.length ? d.join(", ") : "geen wijzigingen";
+}
+async function kskStatus(doel, kort) {
+  const el = $(doel); if (!el) return;
+  let rijen;
+  try { rijen = await q(sb.from("cs_ksk_sync_log").select("tijd,ok,bron,telling,fout").eq("ploeg_id", P.id).order("id", { ascending: false }).limit(kort ? 1 : 10)); }
+  catch (e) { el.innerHTML = kort ? "" : '<p class="klein">De synchronisatie is nog niet geactiveerd (sql/coach/003_ksk_sync.sql en de functie ksk-sync).</p>'; return; }
+  if (kort) {
+    const r = rijen[0];
+    el.innerHTML = r ? `<a class="ksk-strook ${r.ok ? "" : "fout"}" href="#/p/${P.id}/instellingen"><span class="stip"></span>KSK-sync · ${esc(geleden(r.tijd))} · ${esc(kskSamenvatting(r))}</a>` : "";
+    return;
+  }
+  el.innerHTML = rijen.length ? `<div class="tabelwrap"><table><tr><th>Wanneer</th><th>Hoe</th><th>Resultaat</th></tr>${rijen.map(r =>
+    `<tr><td style="white-space:nowrap">${esc(geleden(r.tijd))}</td><td class="klein">${esc(r.bron || "")}</td><td${r.ok ? "" : ' style="color:var(--fout)"'}>${esc(kskSamenvatting(r))}</td></tr>`).join("")}</table></div>`
+    : '<p class="klein">Nog geen synchronisatie gebeurd.</p>';
+}
 function datumMooi(d, kort) {
   if (!d) return "";
   const x = new Date(d + "T12:00:00");
@@ -984,6 +1020,7 @@ async function cHome(kop) {
       <div><b>${fiches}</b><span class="klein">fiche ingevuld</span></div></div>
     </div>
   </div>
+  <div id="ksk-status"></div>
   <div class="bijzaak">
     <span>Spelers uitnodigen · teamcode <b style="font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.15em;color:var(--accent-d);font-size:15px">${esc(P.ploeg.code)}</b></span>
     <span class="rij" style="gap:8px">
@@ -991,6 +1028,7 @@ async function cHome(kop) {
       <a class="knop klein" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Sluit aan bij " + P.ploeg.naam + " op Sjotter. Teamcode: " + P.ploeg.code + "\n" + deelLink())}">Delen via WhatsApp</a>
     </span>
   </div>`;
+  if (P.id === KSK_PLOEG) kskStatus("#ksk-status", true);
   if (laatste) {
     try {
       const ev = await q(sb.from("cs_evaluaties").select("speler_id").eq("wedstrijd_id", laatste.id).eq("ingediend", true));
@@ -1362,6 +1400,9 @@ function cInstellingen(kop) {
       <label class="knop vol" style="cursor:pointer">${P.ploeg.logo ? "Ander logo kiezen" : "Logo uploaden"}<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="A.logo(this)" hidden></label>
       ${P.ploeg.logo ? '<button class="knop gevaar" onclick="A.logoWeg()">Verwijderen</button>' : ""}
     </div></div>
+  ${P.id === KSK_PLOEG ? `<div class="blok"><div class="rij tussen"><h2 style="margin:0">Synchronisatie met KSK</h2><button class="knop vol klein" id="ksk-knop" onclick="A.kskSync()">Nu synchroniseren</button></div>
+    <p class="sub" style="margin-top:8px">Zolang je spelers het oude KSK-platform gebruiken, komt alles automatisch hierheen: spelers, fiches, wedstrijden, uitslagen en evaluaties. KSK zelf wordt nooit gewijzigd. Wat je hier zelf aanmaakt of instelt, blijft staan.</p>
+    <div id="ksk-log"><div class="laden">Laden…</div></div></div>` : ""}
   <div class="blok"><h2>Teamcode</h2>
     <p class="sub">Is de code te ver rondgegaan? Maak een nieuwe. De oude werkt dan niet meer, wie al lid is blijft lid.</p>
     <div class="rij"><span class="code">${esc(P.ploeg.code)}</span><button class="knop" onclick="A.nieuweCode()">Nieuwe code</button></div></div>
@@ -1372,6 +1413,7 @@ function cInstellingen(kop) {
       <button class="knop klein gevaar" onclick="A.lidWeg('${l.id}')">Verwijder</button>`}</div>`).join("")}</div></div>
   ${eigenaar ? `<div class="blok"><h2>Ploeg verwijderen</h2><p class="sub">Verwijdert de ploeg met alle spelers, wedstrijden en evaluaties. Dit kan niet ongedaan gemaakt worden.</p><button class="knop gevaar" onclick="A.ploegWeg()">Ploeg definitief verwijderen</button></div>`
     : `<div class="blok"><h2>Ploeg verlaten</h2><button class="knop gevaar" onclick="A.verlaten()">Ik verlaat deze ploeg</button></div>`}`;
+  if (P.id === KSK_PLOEG) kskStatus("#ksk-log", false);
   $("#pf").onsubmit = async e => {
     e.preventDefault();
     try { const rij = leesPloegFormulier(e.target); await q(sb.from("cs_ploegen").update(rij).eq("id", P.id)); toast("Opgeslagen"); herlaad(); }
@@ -1724,6 +1766,16 @@ const A = window.A = {
   },
   async logoWeg() {
     try { await q(sb.from("cs_ploegen").update({ logo: null }).eq("id", P.id)); toast("Logo verwijderd"); herlaad(); } catch (e) { logoFout(e); }
+  },
+  async kskSync() {
+    const knop = $("#ksk-knop"); if (knop) { knop.disabled = true; knop.textContent = "Bezig…"; }
+    try {
+      const r = await fetch(CFG.SUPABASE_URL + "/functions/v1/ksk-sync", { method: "POST", headers: { Authorization: "Bearer " + sessie.access_token, apikey: CFG.SUPABASE_ANON_KEY } });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.ok) throw new Error(d.fout || ("Fout " + r.status));
+      toast("Gesynchroniseerd: " + kskSamenvatting({ ok: true, telling: d.telling }));
+      P._verouderd = true; route();
+    } catch (e) { toast("Synchronisatie mislukt: " + e.message, true); if (knop) { knop.disabled = false; knop.textContent = "Nu synchroniseren"; } kskStatus("#ksk-log", false); }
   },
   async nieuweCode() {
     if (!confirm("Nieuwe teamcode maken? De oude werkt dan niet meer.")) return;
